@@ -1,0 +1,19 @@
+{% extends 'judge/base.html' %}
+
+{% block title %}
+	<h1> {{ problem.title }} </h1>
+{% endblock %}
+{% block content %}
+	<p> {{ problem.statement|safe }} </p>
+
+	{% if request.user.is_authenticated %}
+		<a href="{% url 'judge:solution_submit' problem.id %}">Submit a Solution</a>
+	{% else %} <p>
+		<a href="{% url 'judge:login' %}?next=
+				{% url 'judge:solution_submit' problem.id %}">
+			Login
+		</a> 
+		to submit a soltion</p>
+	{% endif %}
+
+{% endblock content %}

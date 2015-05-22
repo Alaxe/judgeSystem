@@ -1,0 +1,3 @@
+Hello {{ username }},
+To activate you account in Judgesystem, please visit the link below
+{{ conf_url }}

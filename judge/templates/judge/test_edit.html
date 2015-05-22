@@ -1,0 +1,19 @@
+{% extends 'judge/base.html' %}
+{% load bootstrap3 %}
+
+{% block title %}
+	<h1> {{title}} </h1>
+{% endblock %}
+
+{% block content %}
+	Problem : {{problem}} <br>
+
+	<form class="form-horizontal" enctype="multipart/form-data" 
+			 method = "POST" action ="{{request.get_full_path}}">
+		{% csrf_token %}
+		{% bootstrap_form form %}
+		{% buttons %}
+			<input class="btn btn-primary" type="submit" value="submit">
+		{% endbuttons %}
+	</form>
+{% endblock content %}

@@ -1,0 +1,47 @@
+{% extends 'judge/base.html' %}
+{% load bootstrap3 %}
+
+{% block title %}
+	<h1> {{title}} </h1>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+
+	<div class="col-md-8">
+		<form method = "POST" action = "{{request.get_full_path}}">
+			{% csrf_token %}
+			{% bootstrap_form form %}
+
+			{% buttons %}
+				<input class="btn btn-primary" type="submit" value="submit"> 
+			{% endbuttons %}
+		</form>
+	</div>
+
+	{% if pk >= 0 %}
+	<div class="col-md-4">
+		<div class="panel panel-info">
+			<div class="panel-heading">Tests</div>
+
+			<div class="panel-body">
+				<ul class="list-group">		
+					<li class="list-group-item">
+							<a class="btn btn-primary form-control"
+								href="{% url 'judge:test_new' pk %}">
+								Add test
+							</a>
+					</li>
+
+					{% for t in tests.all %}
+					<li class="list-group-item">
+						<a href="{% url 'judge:test_edit' t.pk %}">
+							edit test {{forloop.counter}}
+						</a>
+					</li>
+				{% endfor %}
+				</ul>
+			</div>
+		</div>
+	{% endif %}
+{% endblock content %}
