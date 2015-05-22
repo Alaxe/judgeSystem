@@ -27,6 +27,6 @@ How to run:
       (you can mess with the parameters if you want) 
 
 Adittional Notes:
-  * If you use the register functionlity(you probably would) you need to change the SMTP info in judgeSystem/setting.py
+  * You need to create a judgeSystem/sens.py to include the email, password and domain of the system.
   * This project is using a precompiled version of isolate sandbox(https://github.com/cms-dev/isolate). You may need
     to compile it on your own. (The system uses judge/isolate for all it's tesing)
