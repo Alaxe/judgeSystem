@@ -41,7 +41,16 @@
 						</thead>
 						<tbody>
 							{% for sol in solutions %}
-							<tr>
+
+								{% if sol.get_scr == sol.problem.get_max_scr %}
+									<tr class="success">
+								{% elif sol.get_scr > 0 %}
+									<tr class="warning">
+								{% elif sol.grader_message == 'Testing' %}
+									<tr class="info">
+								{% else %}
+									<tr>
+								{% endif %}
 
 								<td>{{forloop.counter }}</td>
 								<td>{{sol.grader_message}}</td>

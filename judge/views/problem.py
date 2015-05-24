@@ -48,13 +48,13 @@ class ProblemDetails(View):
         
         if request.user.is_authenticated():
             solutions = Solution.objects.filter(user = request.user,
-                                                problem = problem)
+                    problem = problem)[:20]
 
         context = {'problem': problem, 'solutions': solutions}
         return render(request, self.template_name, context)
 
 class ProblemNew(View):
-    template_name = 'judge/edit_problem.html'
+    template_name = 'judge/problem_edit.html'
     title = 'Add Problem'
 
     def get_context(self, form):
@@ -78,7 +78,7 @@ class ProblemNew(View):
         return HttpResponseRedirect(url)
 
 class ProblemEdit(View):
-    template_name = 'judge/edit_problem.html'
+    template_name = 'judge/problem_edit.html'
     title = 'Edit Problem'
 
     def get_context(self, problem, form):

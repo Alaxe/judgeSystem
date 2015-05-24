@@ -3,20 +3,29 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives
 from django.core.urlresolvers import reverse
-from django.forms import Form, CharField, PasswordInput, EmailField
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.template import Context
 from django.template.loader import get_template
+from django.utils import timezone
 from django.views.generic import View 
 
-from judge.models import Confirmation
+from judge.models import Confirmation, PassReset
 
-class LoginForm(Form):
-    username = CharField(label = 'User Name',
-            error_messages = {'required': 'Username is required'})
-    password = CharField(label = 'Password', widget = PasswordInput(),
-            error_messages = {'required': 'Password is required'})
+from .user_forms import LoginForm, RegisterForm, ResetForm, PasswordForm
+
+def send_email(template, context, subject, to):
+    sender = settings.EMAIL_HOST_USER
+
+    plaintext = get_template(template + '.txt')
+    html      = get_template(template + '.html')
+    
+    text_content = plaintext.render(context)
+    html_content = html.render(context)
+
+    msg = EmailMultiAlternatives(subject, text_content, sender, to)
+    msg.attach_alternative(html_content, 'text/html')
+    msg.send()
 
 class Login(View):
     def render_form(self, request, form):
@@ -53,50 +62,6 @@ class Login(View):
             redir_url = request.GET.get('next', reverse('judge:problem_list'))
             return HttpResponseRedirect(redir_url)
 
-class RegisterForm(Form):
-    username = CharField(label = 'User Name', min_length = 6, 
-            max_length = 30, error_messages = {
-            'required': 'Username is required',
-            'unique': 'Username is already used',
-            'min_length': 'Username should be at least \
-                    6 characters long',
-            'max_length': 'Username should be less \
-                    than 30 chracters long'})
-
-    email = EmailField(label = 'E-mail', error_messages = {
-                'required': 'E-mail is required'})
-
-    password1 = CharField(label = 'Password',  min_length = 6, 
-            max_length = 20, widget = PasswordInput(), 
-            error_messages = { 
-                'required': 'Password is required',
-                'min_length': 'Password should be at least \
-                               6 characters long',
-                'max_length': 'Password should be at most\
-                               30 characters long'})
-
-    password2 = CharField(label = 'Confirm password', 
-            widget = PasswordInput(), error_messages = 
-            { 'required': 'Confirm password'})
-
-    def is_valid(self):
-        valid = super(RegisterForm, self).is_valid()
-        
-        data = self.cleaned_data
-        if not data.get('password1') == data.get('password2'):
-            self.add_error('password2', 'Passwords don\'t match')
-            valid = False
-
-        if User.objects.filter(username = data.get('username')).exists():
-            self.add_error('username', 'Username already taken')
-            valid = False
-
-        if User.objects.filter(email = data.get('email')).exists():
-            self.add_error('email', 'Email already used')
-            valid = False
-
-        return valid
-
 class Register(View):
     template_name = 'judge/register.html'
 
@@ -119,25 +84,18 @@ class Register(View):
         return user
 
     def send_conf_mail(self):
+        template = 'judge/email/confirm_email'
+
         conf_loc_url = reverse('judge:activate', args=(self.confirm.code,))
         conf_url = settings.SITE_HOST + conf_loc_url
 
-        sender = settings.EMAIL_HOST_USER
-        to = self.user.email
+        to = [self.user.email]
         subject = 'JudgeSystem account confirmation'
 
-        plaintext = get_template('judge/confirm_email.txt')
-        html      = get_template('judge/confirm_email.html')
-        
         context = Context({
             'username': self.user.username, 'conf_url': conf_url})
 
-        text_content = plaintext.render(context)
-        html_content = html.render(context)
-
-        msg = EmailMultiAlternatives(subject, text_content, sender, [to])
-        msg.attach_alternative(html_content, 'text/html')
-        msg.send()
+        send_email(template, context, subject, to)
 
     def post(self, request):
         self.form = RegisterForm(request.POST)
@@ -153,6 +111,89 @@ class Register(View):
 
         redir_url = reverse('judge:problem_list')
         return HttpResponseRedirect(redir_url)
+
+class ResetPassword(View):
+    template_name = 'judge/password_reset.html'
+
+    def get(self, request):
+        context = {'form': ResetForm()}
+        return render(request, self.template_name, context)
+
+    def post(self, request):
+        form = ResetForm(request.POST)
+        
+        if not form.is_valid():
+            context = {'form': form}
+            return render(request, self.template_name, context)
+
+        email = form.cleaned_data.get('email')
+        
+        try:
+            user = User.objects.get(email = email)
+            reset = PassReset(user = user)
+            reset.save()
+
+            reset_loc_url = reverse('judge:set_password', args=(reset.code,))
+            reset_url = settings.SITE_HOST + reset_loc_url
+
+            context = Context({
+                'username': user.username, 'reset_link': reset_url})
+            
+            template = 'judge/email/password_reset'
+            subject = 'Password reset'
+
+            send_email(template, context, subject, [email])
+
+        except User.DoesNotExist:
+            pass
+
+        redir_url = reverse('judge:problem_list')
+        return HttpResponseRedirect(redir_url)
+    
+class SetPassword(View):
+    template_name = 'judge/password_set.html'
+
+    def get(self, request, code):
+        get_object_or_404(PassReset, code = code)
+        context = {'form': PasswordForm()}
+        return render(request, self.template_name, context)
+
+    def post(self, request, code):
+        reset = get_object_or_404(PassReset, code = code)
+        form = PasswordForm(request.POST)
+
+        if not form.is_valid():
+            context = {'form': form}
+            return render(request, self.template_name, context)
+
+        password = form.cleaned_data.get('password1')
+        user = reset.user
+
+        user.set_password(password)
+        user.save() 
+        reset.delete()
+
+        return HttpResponseRedirect(settings.LOGIN_URL)
+
+class UserDetails(View):
+    template_name = 'judge/user_details.html'
+
+    def get(self, request):
+        context = {'passwordForm': PasswordForm()}
+        return render(request, self.template_name, context)
+
+    def post(self, request):
+        user = request.user
+        form = PasswordForm(request.POST)
+
+        if form.is_valid():
+            password = form.cleaned_data.get('password1')
+            user.set_password(password)
+            user.save()
+            form = PasswordForm()
+
+        context = {'passwordForm': form}
+        return render(request, self.template_name, context)
 
 class Logout(View):
     def get(self, request):

@@ -15,59 +15,20 @@
 </head>
 <body>
 	{% block navbar %}
-	<nav class="navbar navbar-default navbar-static-top">
-	<div class="container">
-		<div class="navbar-header">
-			<button type="button" class="navbar-toggle collapsed"
-			data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-			      <span class="sr-only">Toggle navigation</span>
-			      <span class="icon-bar"></span>
-			      <span class="icon-bar"></span>
-			      <span class="icon-bar"></span>
-			</button>
-			<a class="navbar-brand" href="#">Judge system</a>
-		</div>
-		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-			<ul class="nav navbar-nav">
-				<li>{% block nav-home %}
-					<a href="{% url 'judge:problem_list' %}">Problems</a>
-				{% endblock %}</li>
-			</ul>
-			<ul class="nav navbar-nav navbar-right">
-			{% block nav-login %}
-				{% if request.user.is_active %}
-					<li> <a href="#">{{request.user.username}}</a> </li>
-					<li> <a href="{% url 'judge:logout' %}">Logout</a> </li>
-				{% else %}
-					<li> 
-						<a href="{% url 'judge:login' %}?next=
-							{{request.get_full_path}}">
-							Login
-						</a> 
-					<li>
-					<li>
-						<a href="{% url 'judge:register'%}">
-							Register
-						</a>
-					</li>
-				{% endif %}
-			{% endblock %}
-			</ul>
-		</div>
-	</div>
-	</nav>
+		{% include 'judge/navbar.html' %}
 	{% endblock navbar %}
+
 	<div class="container">
+
 		{% block header-div %}
-		<div class="page-header">
-			{% block title %}{% endblock %}
-		</div>
+			<div class="page-header">
+				{% block title %}{% endblock %}
+			</div>
 		{% endblock %}
 
 		{% block content %}{% endblock %}
 	</div>
-	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-	{% bootstrap_javascript %}
+
+	{% bootstrap_javascript jquery=1 %}
 </body>
 </html>

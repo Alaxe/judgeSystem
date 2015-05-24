@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Problem, Test, Solution, TestResult
+from .models import Problem, Test, Solution, TestResult, PassReset, Confirmation
 
 class TestInLine(admin.TabularInline):
 	model = Test
@@ -18,5 +18,5 @@ admin.site.register(Problem, ProblemAdmin)
 admin.site.register(Solution)
 admin.site.register(Test)
 admin.site.register(TestResult)
-
-# Register your models here.
+admin.site.register(PassReset)
+admin.site.register(Confirmation)

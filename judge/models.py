@@ -3,6 +3,8 @@ import string, random
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import timezone
+
 class Problem(models.Model):
     title = models.CharField('Title', max_length = 64)
     statement = models.TextField('Problem statement')
@@ -63,10 +65,17 @@ class TestResult(models.Model):
     class Meta:
         ordering = ['test']
 
-def gen_conf_code():
+def gen_randcode():
     chars = string.ascii_uppercase + string.digits
     return ''.join(random.choice(chars) for _ in range(32))
 
 class Confirmation(models.Model):
-    code = models.CharField(max_length = 32, default = gen_conf_code())
+    code = models.CharField(max_length = 32, default = gen_randcode())
     user = models.OneToOneField(settings.AUTH_USER_MODEL)
+    created = models.DateTimeField(default = timezone.now())
+
+class PassReset(models.Model):
+    code = models.CharField(max_length = 32, default = gen_randcode())
+    user = models.OneToOneField(settings.AUTH_USER_MODEL)
+    created = models.DateTimeField(default = timezone.now())
+
