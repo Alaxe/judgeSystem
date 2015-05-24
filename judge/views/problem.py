@@ -1,12 +1,12 @@
-from django.shortcuts import render, get_object_or_404
-from django.http import Http404, HttpResponseRedirect
-from django.views.generic import TemplateView, DetailView, View
-
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.forms import ModelForm
+from django.http import Http404, HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404
+from django.views.generic import TemplateView, DetailView, View
 
-from judge.models import Problem, Test
+from judge.models import Problem, Test, Solution
 
 class ProblemForm(ModelForm):
     class Meta:
@@ -37,10 +37,21 @@ class ProblemList(TemplateView):
 
         return context
 
-class ProblemDetails(DetailView):
+class ProblemDetails(View):
     model = Problem
     context_object_name = 'problem'
     template_name = 'judge/problem_details.html'
+
+    def get(self, request, pk):
+        problem = get_object_or_404(Problem, pk = pk)
+        solutions = []
+        
+        if request.user.is_authenticated():
+            solutions = Solution.objects.filter(user = request.user,
+                                                problem = problem)
+
+        context = {'problem': problem, 'solutions': solutions}
+        return render(request, self.template_name, context)
 
 class ProblemNew(View):
     template_name = 'judge/edit_problem.html'

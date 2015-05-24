@@ -6,6 +6,34 @@
 {% endblock %}
 {% block content %}
 <div class="row">
+	<div class="col-md-8">
+	<div class="panel panel-primary">
+		<div class="panel-heading"> Result </div>
+
+		<div class="panel-body">
+		<table class="table">
+			<thead>
+			<tr>
+				<th> # </th>
+				<th> points </th>
+				<th> message </th>
+			</tr>
+			</thead>
+
+			<tbody>
+			{% for result in solution.testresult_set.all %}
+			<tr>
+				<th>{{ forloop.counter }}</th>
+				<td>{{ result.score }}</td>
+				<td>{{ result.message }}</td>
+			</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+		</div>
+	</div>
+	</div>
+
 	<div class="col-md-4">
 	<div class="panel panel-info">
 		<div class="panel-heading">Information</div>
@@ -36,33 +64,7 @@
 		</div>
 	</div>
 	</div>
-	<div class="col-md-8">
-	<div class="panel panel-primary">
-		<div class="panel-heading"> Result </div>
-
-		<div class="panel-body">
-		<table class="table">
-			<thead>
-			<tr>
-				<th> # </th>
-				<th> points </th>
-				<th> message </th>
-			</tr>
-			</thead>
-
-			<tbody>
-			{% for result in solution.testresult_set.all %}
-			<tr>
-				<th>{{ forloop.counter }}</th>
-				<td>{{ result.score }}</td>
-				<td>{{ result.message }}</td>
-			</tr>
-			{% endfor %}
-			</tbody>
-		</table>
-		</div>
-	</div>
-	</div>
+	
 </div>
 
 Source:

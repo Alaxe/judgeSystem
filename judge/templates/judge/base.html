@@ -1,4 +1,5 @@
 {% load bootstrap3 %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,11 +10,12 @@
 	other head content must come *after* these tags -->
 	<title>Judge</title>
 	<!-- Bootstrap -->
-	{% bootstrap_css %}
+	<link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.4/cosmo/bootstrap.min.css"
+	   rel="stylesheet">
 </head>
 <body>
 	{% block navbar %}
-	<nav class="navbar navbar-inverse navbar-static-top">
+	<nav class="navbar navbar-default navbar-static-top">
 	<div class="container">
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle collapsed"
@@ -28,7 +30,7 @@
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
 				<li>{% block nav-home %}
-					<a href="{% url 'judge:problem_list' %}">Home</a>
+					<a href="{% url 'judge:problem_list' %}">Problems</a>
 				{% endblock %}</li>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">

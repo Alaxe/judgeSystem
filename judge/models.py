@@ -25,6 +25,9 @@ class Solution(models.Model):
     problem = models.ForeignKey(Problem)
     user = models.ForeignKey(User)
 
+    class Meta:
+        ordering = ['-submit_date']
+
     #To do
     def __str__(self):
         return self.problem.title + ' --- Solution'
