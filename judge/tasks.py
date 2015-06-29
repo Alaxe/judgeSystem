@@ -116,5 +116,6 @@ def run_test(solution, test):
     if test_finished(solution):
         os.remove(get_sol_loc(solution))
         solution.grader_message = 'Tested'
+        solution.update_score()
         solution.save()
 

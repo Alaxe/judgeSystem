@@ -16,11 +16,11 @@
 
 			{% buttons %}
 				<input type="submit" class="btn btn-primary" value="Log in">
-				<a href="{% url 'judge:register' %}" class="btn btn-info">
+				<a href="{% url 'users:register' %}" class="btn btn-info">
 					Register
 				</a>
 			{% endbuttons %}
-			<a href="{% url 'judge:password_reset' %}">Reset password</a>
+			<a href="{% url 'users:password_reset' %}">Reset password</a>
 			{% csrf_token %}
 		</form>
 	</div>

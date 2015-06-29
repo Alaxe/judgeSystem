@@ -2,6 +2,7 @@ judgeSystem/sens.py
 db.sqlite3
 *.swp
 *.swo
+run-celery.sh
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

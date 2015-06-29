@@ -1,20 +1,33 @@
 {% extends 'judge/base.html' %}
+{% load bootstrap_pagination %}
 
 {% block navbar %}
 	{% include 'judge/navbar.html' with page='problem_list' %}
 {% endblock %}
 
+{% block title %}
+	<h1>Problem list</h1>
+{% endblock %}
+
 {% block content %}
-	<div  class="page-header">
-		<h1>Problem list</h1>
-	</div>
 	<ul class="list-group">
-	{% for problem in problem_list %}
+	{% for problem in page.object_list %}
 		<li class="list-group-item">
 			<a href = "{% url 'judge:problem_details' problem.id %}">
 				{{ problem.title }}
 			</a>
+			
+			{% if problem.status == 'solved' %}
+				<span class="label label-success" style="float: right;">
+					solved
+				</span>
+			{% elif problem.status == 'attempted' %}
+				<span class="label label-warning" style="float: right;">
+					attempted
+				</span>
+			{% endif %}
 		</li>
 	{% endfor %}
 	</ul>
+	{% bootstrap_paginate page url_view_name='judge:problem_page' range=5%}
 {% endblock content %}

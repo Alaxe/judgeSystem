@@ -11,13 +11,13 @@
 
 {% block content %}
 	<div class="well well-lg">
-		<form method="POST" action="{% url 'judge:register' %}">
+		<form method="POST" action="{{ request.get_full_path}}">
 			{% csrf_token %}
 			{% bootstrap_form form %}
 
 			{% buttons %}
 				<input type="submit" class="btn btn-primary" value="Register">
-				<a href="{% url 'judge:login' %}" class="btn btn-info">
+				<a href="{% url 'users:login' %}" class="btn btn-info">
 					Log in
 				</a>
 			{% endbuttons %}

@@ -39,8 +39,10 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'djcelery',
-    'judge',
     'bootstrap3',
+    'bootstrap_pagination',
+    'judge',
+    'users',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -109,4 +111,4 @@ EMAIL_HOST_USER = sens.EMAIL
 EMAIL_HOST_PASSWORD = sens.EMAIL_PASSWORD
 SITE_HOST = sens.SITE_HOST
 
-LOGIN_URL = '/judge/login'
+LOGIN_URL = '/account/login'

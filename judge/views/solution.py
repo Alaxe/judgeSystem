@@ -2,6 +2,7 @@ import datetime
 
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.forms import Form, CharField, Textarea
 from django.shortcuts import render, get_object_or_404
@@ -9,7 +10,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.views.generic import DetailView, View
 from django.utils import timezone
 
-from judge.models import Problem, Solution
+from judge.models import Problem, Solution, UserProblemData
 from judge.tasks import test_solution
 
 class SolutionDetails(DetailView):
@@ -50,6 +51,28 @@ class SolutionSubmit(View):
         if not self.form.is_valid():
             return self.render(request)
 
+        try:
+            data = UserProblemData.objects.get(user = user,
+                                                problem = self.problem)
+
+            nextSubmit = data.last_submit + datetime.timedelta(seconds = 27)
+
+            if nextSubmit > timezone.now():
+                messageText = 'You can submit a solution once every 30 \
+                        seconds. Try again in a little bit.'
+                messages.add_message(request, messages.WARNING, messageText)
+                return self.render(request)
+
+            else:
+                data.last_submit = timezone.now()
+                data.save()
+
+        except UserProblemData.DoesNotExist:
+            data = UserProblemData(user = user,
+                                    problem = self.problem,
+                                    last_submit = timezone.now())
+            data.save()
+
         source = self.form.cleaned_data['source']
         solution = Solution(
             source = source,
@@ -64,5 +87,3 @@ class SolutionSubmit(View):
 
         url = reverse('judge:solution_details', args = (solution.pk,))
         return HttpResponseRedirect(url)
-
-

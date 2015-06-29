@@ -1,40 +1,54 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.core.urlresolvers import reverse
 from django.forms import ModelForm
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import TemplateView, DetailView, View
 
-from judge.models import Problem, Test, Solution
+from judge.models import Problem, Test, Solution, UserProblemData
 
 class ProblemForm(ModelForm):
     class Meta:
         model = Problem
-        fields = '__all__'
+        exclude = ['maxScore']
 
 class ProblemList(TemplateView):
     template_name = 'judge/problem_list.html'
 
-    def get_context_data(self, page_id = 1):
-        problems_per_page = 3
-
+    def get_context_data(self, page = 1):
+        paginator = Paginator(Problem.objects.all(), 5)
         context = super(ProblemList, self).get_context_data()
-        page_id = int(page_id)
 
-        if page_id < 1 :
-            raise Http404('Page index start from 1')
+        if int(page) < 1:
+            page = 1
 
-        start_ind = (page_id - 1) * problems_per_page
-        end_ind = start_ind + problems_per_page
-
-        problems = Problem.objects.all()[start_ind:end_ind]
-
-        if not problems:
-            raise Http404('Page not found')
+        try:
+            page = paginator.page(page)
+        except PageNotAnInteger:
+            page = paginator.page(1)
+        except EmptyPage:
+            page = paginator.page(paginator.num_pages)
         
-        context['problem_list'] = problems
+        user = self.request.user
+        if user.is_authenticated():
+            for prob in page.object_list :
+                
+                try :
+                    solData = UserProblemData.objects.get(problem = prob, 
+                                                        user = user)
+                
+                    if solData.maxScore == prob.maxScore:
+                        prob.status = 'solved'
+                    else:
+                        prob.status = 'attempted'
 
+                except UserProblemData.DoesNotExist :
+                    prob.status = 'not_attempted'
+
+        context['page'] = page
+    
         return context
 
 class ProblemDetails(View):
@@ -109,5 +123,3 @@ class ProblemEdit(View):
         form.save()
         url = reverse('judge:problem_details', args = (pk,))
         return HttpResponseRedirect(url)
-
-

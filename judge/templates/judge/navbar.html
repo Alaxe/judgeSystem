@@ -19,24 +19,24 @@
 			<ul class="nav navbar-nav navbar-right">
 				{% if request.user.is_active %}
 					<li class="{%if page == 'user_details'%}active{%endif%}"> 
-						<a href="{% url 'judge:user_details'%}">
+						<a href="{% url 'users:user_details'%}">
 							{{request.user.username}}
 						</a> 
 					</li>
 					<li> 
-						<a href="{% url 'judge:logout' %}">
+						<a href="{% url 'users:logout' %}">
 							Logout
 						</a>
 					</li>
 				{% else %}
 					<li class="{% if page == 'login' %}active{% endif %}"> 
-						<a href="{% url 'judge:login' %}?next=
+						<a href="{% url 'users:login' %}?next=
 								{{request.get_full_path}}">
 							Login
 						</a> 
 					</li>
 					<li class="{% if page == 'register' %}active{% endif %}">
-						<a href="{% url 'judge:register'%}">
+						<a href="{% url 'users:register'%}">
 							Register
 						</a>
 					</li>
