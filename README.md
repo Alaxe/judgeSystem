@@ -15,7 +15,7 @@ What it is aiming to do:
 
 Required software:
   * Python 3.*
-  * Python moules: django, celery, django-celery, django-bootsrap3
+  * Python moules: django, celery, django-celery, django-bootsrap3, django-bootstrap-pagination
   * g++ compiler
   * rabbitmq for Celery
 
