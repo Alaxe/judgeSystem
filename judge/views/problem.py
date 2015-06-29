@@ -126,13 +126,18 @@ class ProblemEdit(View):
         return HttpResponseRedirect(url)
 
 class ProblemDelete(View):
-    template_name = 'judge/problem_delete.html'
+    template_name = 'judge/model_delete.html'
 
     def get(self, request, pk):
         problem = get_object_or_404(Problem, pk = pk)
 
-        context = {'problem': problem}
+        context = {
+            'modelName': problem.title,
+            'modelType': 'problem',
+            'cancelUrl': reverse('judge:problem_edit', args = (pk,))
+        }
         return render(request, self.template_name, context)
+
     def post(self, request, pk):
         curProblem = Problem.objects.get(pk = pk)
         curProblem.delete()

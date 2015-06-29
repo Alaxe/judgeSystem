@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -33,15 +34,16 @@ class TestForm(ModelForm):
         return valid
 
 class TestNew(View):
-    perm = 'judge.add_test'
     template_name = 'judge/test_edit.html'
     title = 'Add Test'
 
     def get_context(self, form, problem):
         return {
             'form' : form,
-            'problem': problem.title,
-            'title' : self.title}
+            'problem': problem,
+            'title' : self.title,
+            'action': 'create'
+        }
     
     def get(self, request, problem_id):
         problem = get_object_or_404(Problem, pk = problem_id)
@@ -67,20 +69,18 @@ class TestNew(View):
         return HttpResponseRedirect(url)
 
 class TestEdit(View):
-    perm = 'judge.change_test'
     template_name = 'judge/test_edit.html'
     title = 'Edit Test'
 
     def get_context(self, form, test):
         return {
             'form' : form,
-            'problem': test.problem.title,
-            'title': self.title}
+            'problem': test.problem,
+            'title': self.title,
+            'pk': test.pk
+        }
 
     def get(self, request, pk):
-        if not request.user.has_perm(self.perm):
-            return HttpResponseForbidden()
-
         test = get_object_or_404(Test, pk = pk)
         form = TestForm(instance = test)
 
@@ -88,9 +88,6 @@ class TestEdit(View):
         return render(request, self.template_name, context)
 
     def post(self, request, pk):
-        if not request.user.has_perm(self.perm):
-            return HttpResponseForbidden()
-
         test = get_object_or_404(Test, pk = pk)
         form = TestForm(request.POST, request.FILES, instance = test)
         problem = test.problem
@@ -111,3 +108,28 @@ class TestEdit(View):
 
         url = reverse('judge:problem_edit', args = (problem.pk,))
         return HttpResponseRedirect(url)
+
+class TestDelete(View):
+    template_name = 'judge/model_delete.html'
+
+    def get(self, request, pk):
+        test = get_object_or_404(Test, pk = pk)
+
+        context = {
+            'modelName': 'a test for ' + test.problem.title,
+            'modelType': 'test',
+            'cancelUrl': reverse('judge:test_edit', args=(test.pk,))
+        }
+
+        return render(request, self.template_name, context)
+
+    def post(self, request, pk):
+        test = get_object_or_404(Test, pk = pk)
+        test.delete()
+
+        messageText = 'You\'ve successfuly deleted this test'
+        messages.add_message(request, messages.SUCCESS, messageText)
+
+        url = reverse('judge:problem_edit', args=(test.problem.pk,))
+        return HttpResponseRedirect(url)
+
