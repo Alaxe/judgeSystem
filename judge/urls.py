@@ -15,6 +15,9 @@ urlpatterns = patterns('',
    url(r'^problems/(?P<pk>\d+)/edit/$', permission_required(
        'judge.change_problem')(views.ProblemEdit.as_view()), 
        name = 'problem_edit'),
+   url(r'^problems/(?P<pk>\d+)/delete/$', permission_required(
+       'judge.delete_problem')(views.ProblemDelete.as_view()),
+       name = 'problem_delete'),
 
    url(r'^problems/(?P<pk>\d+)/$', views.ProblemDetails.as_view(), 
        name = 'problem_details'),

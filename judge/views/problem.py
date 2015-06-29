@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
@@ -123,3 +124,23 @@ class ProblemEdit(View):
         form.save()
         url = reverse('judge:problem_details', args = (pk,))
         return HttpResponseRedirect(url)
+
+class ProblemDelete(View):
+    template_name = 'judge/problem_delete.html'
+
+    def get(self, request, pk):
+        problem = get_object_or_404(Problem, pk = pk)
+
+        context = {'problem': problem}
+        return render(request, self.template_name, context)
+    def post(self, request, pk):
+        curProblem = Problem.objects.get(pk = pk)
+        curProblem.delete()
+
+        messageText = 'You\'ve Successfuly deleted this problem'
+        messages.add_message(request, messages.SUCCESS, messageText)
+        
+        url = reverse('judge:problem_list')
+        return HttpResponseRedirect(url)
+
+

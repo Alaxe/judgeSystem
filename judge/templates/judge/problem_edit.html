@@ -21,13 +21,26 @@
 
 	{% if pk >= 0 %}
 	<div class="col-md-4">
-		<div class="panel panel-info">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				Global Settings
+			</div>
+			<div class="panel-body">
+				<a class="btn btn-default btn-block">
+					Change global limits
+				</a>
+				<a href="{% url 'judge:problem_delete' pk %}"
+				   class="btn btn-warning btn-block">
+					Delete Problem
+				</a>
+			</div>
+		</div>
+		<div class="panel panel-primary">
 			<div class="panel-heading">Tests</div>
-
 			<div class="panel-body">
 				<ul class="list-group">		
 					<li class="list-group-item">
-							<a class="btn btn-primary form-control"
+							<a class="btn btn-default form-control"
 								href="{% url 'judge:test_new' pk %}">
 								Add test
 							</a>
