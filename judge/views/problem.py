@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.core.urlresolvers import reverse
-from django.forms import ModelForm
+from django.forms import ModelForm, Form, IntegerField, DecimalField
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import TemplateView, DetailView, View
@@ -148,4 +148,50 @@ class ProblemDelete(View):
         url = reverse('judge:problem_list')
         return HttpResponseRedirect(url)
 
+class ProblemGlobalForm(Form):
+    timeLimit = DecimalField(required = False, decimal_places = 4)
+    memoryLimit = IntegerField(required = False)
+    pointsPerTest = IntegerField(required = False)
 
+class ProblemGlobal(View):
+    template_name = 'judge/problem_global.html'
+
+    def get_context(self, form, pk):
+        return {
+            'form': form,
+            'pk': pk
+        }
+
+    def get(self, request, pk):
+        form = ProblemGlobalForm()
+        context = self.get_context(form, pk)
+        return render(request, self.template_name, context)
+        
+    def post(self, request, pk):
+        form = ProblemGlobalForm(request.POST)
+
+        if not form.is_valid():
+            context = self.get_context(form, pk)
+            return render(request, self.template_name, context)
+
+        problem = get_object_or_404(Problem, pk = pk)
+
+        timeLimit = form.cleaned_data['timeLimit']
+        memoryLimit = form.cleaned_data['memoryLimit']
+        pointsPerTest = form.cleaned_data['pointsPerTest']
+
+        for test in problem.test_set.all():
+            if not timeLimit == None:
+                test.time_limit = timeLimit
+            if not memoryLimit == None:
+                test.mem_limit = memoryLimit
+            if not pointsPerTest == None:
+                test.points = pointsPerTest
+
+            test.save()
+        
+        messageText = 'Test updated successfully'
+        messages.add_message(request, messages.SUCCESS, messageText)
+
+        url = reverse('judge:problem_edit', args=(pk,))
+        return HttpResponseRedirect(url)

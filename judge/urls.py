@@ -18,6 +18,10 @@ urlpatterns = patterns('',
    url(r'^problems/(?P<pk>\d+)/delete/$', permission_required(
        'judge.delete_problem')(views.ProblemDelete.as_view()),
        name = 'problem_delete'),
+   url(r'^problems/(?P<pk>\d+)/global/$', permission_required(
+       'judge.change_test')(views.ProblemGlobal.as_view()),
+       name = 'problem_global'), 
+
 
    url(r'^problems/(?P<pk>\d+)/$', views.ProblemDetails.as_view(), 
        name = 'problem_details'),
