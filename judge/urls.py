@@ -9,8 +9,8 @@ urlpatterns = patterns('',
    url(r'^problems/page/(?P<page>\d+)/$', views.ProblemList.as_view(), 
        name = 'problem_page'),
 
-   url(r'^problems/new/', 
-       permission_required('judge.add_problem')(views.ProblemNew.as_view()), 
+   url(r'^problems/new/', permission_required(
+       'judge.add_problem')(views.ProblemNew.as_view()), 
        name = 'problem_new'),
    url(r'^problems/(?P<pk>\d+)/edit/$', permission_required(
        'judge.change_problem')(views.ProblemEdit.as_view()), 
@@ -27,17 +27,20 @@ urlpatterns = patterns('',
        name = 'problem_details'),
 
    url(r'^problems/(?P<problem_id>\d+)/newtest/$', 
-       permission_required('judge.add_test')(views.TestNew.as_view()), 
+    permission_required('judge.add_test')(views.TestNew.as_view()), 
        name = 'test_new'),
-   url(r'^test/(?P<pk>\d+)/edit/$', 
-       permission_required('judge.change_test')(views.TestEdit.as_view()),
+   url(r'^problems/(?P<pk>\d+)/tests/$', permission_required(
+       'judge.change_problem')(views.TestList.as_view()),
+       name = 'test_list'),
+   url(r'^test/(?P<pk>\d+)/edit/$', permission_required(
+       'judge.change_test')(views.TestEdit.as_view()),
        name = 'test_edit'),
-   url(r'^test/(?P<pk>\d+)/delete/$',
-       permission_required('judge.delete_test')(views.TestDelete.as_view()),
-       name = 'delete_test'),
+   url(r'^test/(?P<pk>\d+)/delete/$', permission_required(
+           'judge.delete_test')(views.TestDelete.as_view()),
+       name = 'test_delete'),
 
-   url(r'^problems/(?P<pk>\d+)/submit/$', 
-       login_required(views.SolutionSubmit.as_view()), 
+   url(r'^problems/(?P<pk>\d+)/submit/$', login_required(
+       views.SolutionSubmit.as_view()), 
        name = 'solution_submit'),
    url(r'^solutions/(?P<pk>\d+)/$', views.SolutionDetails.as_view(),
        name = 'solution_details'),

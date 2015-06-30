@@ -77,7 +77,8 @@ class TestEdit(View):
             'form' : form,
             'problem': test.problem,
             'title': self.title,
-            'pk': test.pk
+            'pk': test.pk,
+            'problem_pk': test.problem.pk
         }
 
     def get(self, request, pk):
@@ -106,19 +107,17 @@ class TestEdit(View):
         test.problem = problem
         test.save()
 
-        url = reverse('judge:problem_edit', args = (problem.pk,))
+        url = reverse('judge:test_list', args = (problem.pk,))
         return HttpResponseRedirect(url)
 
 class TestDelete(View):
-    template_name = 'judge/model_delete.html'
+    template_name = 'judge/test_delete.html'
 
     def get(self, request, pk):
         test = get_object_or_404(Test, pk = pk)
 
         context = {
-            'modelName': 'a test for ' + test.problem.title,
-            'modelType': 'test',
-            'cancelUrl': reverse('judge:test_edit', args=(test.pk,))
+            'problem_pk': test.problem.pk
         }
 
         return render(request, self.template_name, context)
@@ -133,3 +132,16 @@ class TestDelete(View):
         url = reverse('judge:problem_edit', args=(test.problem.pk,))
         return HttpResponseRedirect(url)
 
+class TestList(View):
+    template_name = 'judge/test_list.html'
+    
+    def get(self, request, pk):
+        problem = get_object_or_404(Problem, pk = pk)
+
+        context = {
+            'problem' : problem,
+            'tests' : problem.test_set.all(),
+            'problem_pk': pk
+        }
+
+        return render(request, self.template_name, context)

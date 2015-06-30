@@ -1,26 +1,19 @@
-{% extends 'judge/base.html' %}
+{% extends 'judge/problem_edit_base.html' %}
 {% load bootstrap3 %}
 
 {% block title %}
 	<h1>Global test settings</h1>
 {% endblock %}
 
-{% block content %}
+{% block edit_content %}
 	<form method="POST" action="{{ request.get_full_path }}">
 		{% csrf_token %}
 		{% bootstrap_form form %}
-		<div class="row">
-			<div class="col-sm-6">
-				<input type="submit" value="Set settings" 
-					class="btn btn-primary btn-block">
-			</div>
-			<div class="col-sm-6">
-				<a href="{% url 'judge:problem_edit' pk%}" 
-					class="btn btn-default btn-block">
-					Back to problem edit
-				</a>
-			</div>
-		</div>
+		<input type="submit" value="Set settings" 
+				class="btn btn-default btn-block">
 	</form>
 {% endblock %}
 
+{% block edit_nav %}
+	{% include 'judge/problem_edit_nav.html' with page='global_settings'%}
+{% endblock %}

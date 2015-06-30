@@ -1,0 +1,58 @@
+{% extends 'judge/problem_edit_base.html' %}
+{% block title %}
+	<h1> 
+		Tests for
+		<a href="{% url 'judge:problem_edit' problem.pk%}" >
+			{{ problem.title }}
+		</a>
+	</h1>
+{% endblock %}
+
+{% block edit_content %}
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>Edit</th>
+				<th>Time limit</th>
+				<th>Memory limit</th>
+				<th>Points</th>
+				<th class="text-warning">Delete</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for test in tests %}
+			<tr>
+				<td>
+					{{ test.pk }}
+				</td>
+				<td>
+					<a href="{% url 'judge:test_edit' test.pk %}">
+						Edit test #{{ forloop.counter }}
+					</a>
+				</td>
+				<td>
+					{{ test.time_limit}} sec
+				</td>
+				<td>
+					{{ test.mem_limit }} MB
+				</td>
+				<td>
+					{{ test.points }}
+				</td>
+				<td>
+					<a href="{% url 'judge:test_delete' test.pk %}" 
+						class="btn btn-warning btn-xs btn-block">
+						Delete
+					</a>
+				</td>
+
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% endblock %}
+
+{% block edit_nav %}
+	{% include 'judge/problem_edit_nav.html' with page='tests' %}
+{% endblock %}

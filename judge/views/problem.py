@@ -102,7 +102,8 @@ class ProblemEdit(View):
             'form' : form,
             'title': self.title,
             'tests': problem.test_set,
-            'pk'   : pk}
+            'problem_pk'   : pk
+        }
 
     def get(self, request, pk = 0):
         problem = get_object_or_404(Problem, pk = pk)
@@ -126,7 +127,7 @@ class ProblemEdit(View):
         return HttpResponseRedirect(url)
 
 class ProblemDelete(View):
-    template_name = 'judge/model_delete.html'
+    template_name = 'judge/problem_delete.html'
 
     def get(self, request, pk):
         problem = get_object_or_404(Problem, pk = pk)
@@ -134,7 +135,8 @@ class ProblemDelete(View):
         context = {
             'modelName': problem.title,
             'modelType': 'problem',
-            'cancelUrl': reverse('judge:problem_edit', args = (pk,))
+            'cancelUrl': reverse('judge:problem_edit', args = (pk,)),
+            'problem_pk': pk
         }
         return render(request, self.template_name, context)
 
@@ -159,7 +161,7 @@ class ProblemGlobal(View):
     def get_context(self, form, pk):
         return {
             'form': form,
-            'pk': pk
+            'problem_pk': pk
         }
 
     def get(self, request, pk):

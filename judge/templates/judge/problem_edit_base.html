@@ -1,0 +1,20 @@
+{% extends 'judge/base.html' %}
+{% load bootstrap3 %}
+
+{% block title %}
+	<h1> {{title}} </h1>
+{% endblock %}
+
+{% block content %}
+	<div class="row">
+		{% if problem_pk %}
+			<div class="col-md-4">
+				{% block edit_nav %}{% endblock %}
+			</div>
+		{% endif %}
+
+		<div class="col-md-8">
+			{% block edit_content %}{% endblock %}
+		</div>
+	</div>
+{% endblock content %}

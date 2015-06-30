@@ -1,60 +1,18 @@
-{% extends 'judge/base.html' %}
+{% extends 'judge/problem_edit_base.html' %}
 {% load bootstrap3 %}
 
-{% block title %}
-	<h1> {{title}} </h1>
+{% block edit_content %}
+	<form method = "POST" action = "{{request.get_full_path}}">
+		{% csrf_token %}
+		{% bootstrap_form form %}
+
+		{% buttons %}
+			<input type="submit" value="Submit"
+				 class="btn btn-default btn-block"> 
+		{% endbuttons %}
+	</form>
 {% endblock %}
 
-{% block content %}
-<div class="row">
-
-	<div class="col-md-8">
-		<form method = "POST" action = "{{request.get_full_path}}">
-			{% csrf_token %}
-			{% bootstrap_form form %}
-
-			{% buttons %}
-				<input class="btn btn-primary" type="submit" value="submit"> 
-			{% endbuttons %}
-		</form>
-	</div>
-
-	{% if pk >= 0 %}
-	<div class="col-md-4">
-		<div class="panel panel-primary">
-			<div class="panel-heading">
-				Global Settings
-			</div>
-			<div class="panel-body">
-				<a href="{% url 'judge:problem_global' pk %}"class="btn btn-default btn-block">
-					Change global test settings
-				</a>
-				<a href="{% url 'judge:problem_delete' pk %}"
-				   class="btn btn-warning btn-block">
-					Delete Problem
-				</a>
-			</div>
-		</div>
-		<div class="panel panel-primary">
-			<div class="panel-heading">Tests</div>
-			<div class="panel-body">
-				<ul class="list-group">		
-					<li class="list-group-item">
-							<a class="btn btn-default form-control"
-								href="{% url 'judge:test_new' pk %}">
-								Add test
-							</a>
-					</li>
-
-					{% for t in tests.all %}
-					<li class="list-group-item">
-						<a href="{% url 'judge:test_edit' t.pk %}">
-							edit test {{forloop.counter}}
-						</a>
-					</li>
-				{% endfor %}
-				</ul>
-			</div>
-		</div>
-	{% endif %}
-{% endblock content %}
+{% block edit_nav %}
+	{% include 'judge/problem_edit_nav.html' with page='statement' %}
+{% endblock %}

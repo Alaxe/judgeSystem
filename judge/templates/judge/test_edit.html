@@ -1,31 +1,19 @@
-{% extends 'judge/base.html' %}
+{% extends 'judge/problem_edit_base.html' %}
 {% load bootstrap3 %}
 
 {% block title %}
 	<h1> {{title}} </h1>
 {% endblock %}
 
-{% block content %}
-	<a href="{% url 'judge:problem_edit' problem.pk %}">
-		Problem : {{problem.title}}
-	</a>
-
+{% block edit_content %}
 	<form class="form-horizontal" enctype="multipart/form-data" 
 			 method = "POST" action ="{{request.get_full_path}}">
 		{% csrf_token %}
 		{% bootstrap_form form %}
-		<div class="row">
-			<div class="col-sm-6">
-				<input class="btn btn-primary btn-block" type="submit" value="submit">
-			</div>
-			<div class="col-sm-6">
-				{% if pk > 0 %}
-					<a href="{% url 'judge:delete_test' pk %}" 
-						class="btn btn-warning btn-block">
-						Delete Test
-					</a>
-				{% endif %}
-			</div>
-		</div>
+		<input class="btn btn-default btn-block" type="submit" value="submit">
 	</form>
-{% endblock content %}
+{% endblock %}
+
+{% block edit_nav %}
+	{% include 'judge/problem_edit_nav.html' %}
+{% endblock %}
