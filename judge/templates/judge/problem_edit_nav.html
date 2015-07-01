@@ -1,39 +1,29 @@
 <ul class="nav nav-pills nav-stacked">
-	{% if page == 'statement' %}
-	<li class="active">
-	{% else %}
-	<li>
-	{% endif %}
+	<li {% if page == 'statement' %} class="active" {%endif%}>
 		<a href="{% url 'judge:problem_edit' problem_pk%}">
 			Edit statement
 		</a>
 	</li>
-	
-	{% if page == 'tests' %}
-	<li class="active">
-	{% else %}
-	<li>
-	{% endif %}
+
+	<li {% if page == 'tests' %} class="active" {% endif %}>
 		<a href="{% url 'judge:test_list' problem_pk %}">
 			Edit tests
 		</a>
 	</li>
 
-	{% if page == 'global_settings' %}
-	<li class="active">
-	{% else %}
-	<li>
-	{% endif %}
+	<li {% if page == 'global_settings' %} class="active" {% endif %}>
 		<a href="{% url 'judge:problem_global' problem_pk %}">
 			Change global test settings
 		</a>
 	</li>
 
-	{% if page == 'delete' %}
-	<li class="active">
-	{% else %}
-	<li>
-	{% endif %}
+	<li {% if page == 'retest' %} class="active" {% endif %}>
+		<a href="{% url 'judge:problem_retest' problem_pk %}">
+			Retest problem
+		</a>
+	</li>
+
+	<li {% if page == 'delete' %} class="active" {% endif %}>
 		<a href="{% url 'judge:problem_delete' problem_pk %}">
 			Delete Problem
 		</a>

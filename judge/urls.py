@@ -21,6 +21,9 @@ urlpatterns = patterns('',
    url(r'^problems/(?P<pk>\d+)/global/$', permission_required(
        'judge.change_test')(views.ProblemGlobal.as_view()),
        name = 'problem_global'), 
+   url(r'^problems/(?P<pk>\d+)/retest/$', permission_required(
+       'judge.retest_problem')(views.ProblemRetest.as_view()),
+       name = 'problem_retest'),
 
 
    url(r'^problems/(?P<pk>\d+)/$', views.ProblemDetails.as_view(), 

@@ -1,0 +1,23 @@
+{% extends 'judge/problem_edit_base.html' %}
+
+{% block title %}
+	<h1>Retest problem</h1>
+{% endblock %}
+
+{% block edit_content %}
+	<p class="lead">
+		This is intended to be used only when the test have been modified.
+		Pressing the button bellow will test all the solutions on all tests 
+		again. Note that there are {{ solutionCount  }} solutions and the 
+		retest may take a long time.
+	</p>
+	<form method="POST" action="{{ request.get_full_path }}">
+		{% csrf_token %}
+		<input type="Submit" value="Start retest" 
+					   class="btn btn-default btn-block">
+	</form>
+{% endblock %}
+
+{% block edit_nav %}
+	{% include 'judge/problem_edit_nav.html' with page='retest' %}
+{% endblock %}

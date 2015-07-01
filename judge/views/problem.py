@@ -3,12 +3,14 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.core.urlresolvers import reverse
+from django.db.transaction import set_autocommit, commit
 from django.forms import ModelForm, Form, IntegerField, DecimalField
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import TemplateView, DetailView, View
 
 from judge.models import Problem, Test, Solution, UserProblemData
+from judge.tasks import test_solution
 
 class ProblemForm(ModelForm):
     class Meta:
@@ -193,6 +195,42 @@ class ProblemGlobal(View):
             test.save()
         
         messageText = 'Test updated successfully'
+        messages.add_message(request, messages.SUCCESS, messageText)
+
+        url = reverse('judge:problem_edit', args=(pk,))
+        return HttpResponseRedirect(url)
+
+class ProblemRetest(View):
+    template_name = 'judge/problem_retest.html'
+
+    def get(self, request, pk):
+        problem = get_object_or_404(Problem, pk = pk)
+        solCnt = Solution.objects.filter(problem = problem).count()
+
+        context = {
+            'problem_pk': pk,
+            'solutionCount': solCnt
+        }
+
+        return render(request, self.template_name, context)
+
+    def post(self, request, pk):
+        problem = get_object_or_404(Problem, pk = pk)
+        solutions = problem.solution_set.all()
+
+       # set_autocommit(False)
+        for sol in solutions:
+            sol.testresult_set.all().delete()
+            sol.score = 0
+            sol.grader_message = 'retesting'
+            sol.save()
+
+            test_solution.delay(sol)
+
+        #commit()
+        #set_autocommit(True)
+
+        messageText = "Solutions added to the queue."
         messages.add_message(request, messages.SUCCESS, messageText)
 
         url = reverse('judge:problem_edit', args=(pk,))
