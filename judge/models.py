@@ -12,6 +12,9 @@ class Problem(models.Model):
 
     class Meta:
         ordering = ['-id']
+        permissions = (
+            ('retest_problem', 'Can start a retest'),
+        )
 
     def __str__(self):  
         return self.title
@@ -68,6 +71,11 @@ class Test(models.Model):
     points = models.IntegerField()
     
     problem = models.ForeignKey(Problem)
+
+    class Meta:
+        permissions = (
+            ('view_test', 'Can see input/output files'),
+        )
 
     def __str__(self):
         return self.problem.title + ' --- Test'

@@ -236,3 +236,6 @@ class ProblemRetest(View):
 
         url = reverse('judge:problem_edit', args=(pk,))
         return HttpResponseRedirect(url)
+
+        problem = get_object_or_404(Problem, pk = pk)
+        return HttpResponse(problem.stdin, content_type="text/plain")

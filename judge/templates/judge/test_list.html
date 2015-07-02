@@ -17,6 +17,8 @@
 				<th>Time limit</th>
 				<th>Memory limit</th>
 				<th>Points</th>
+				<th>Input</th>
+				<th>Output</th>
 				<th class="text-warning">Delete</th>
 			</tr>
 		</thead>
@@ -28,17 +30,21 @@
 				</td>
 				<td>
 					<a href="{% url 'judge:test_edit' test.pk %}">
-						Edit test #{{ forloop.counter }}
+						Edit test
+					</a>
+				</td>
+				<td> {{ test.time_limit}} sec </td>
+				<td> {{ test.mem_limit }} MB </td>
+				<td> {{ test.points }} </td>
+				<td>
+					<a href="{% url 'judge:test_input' test.pk %}">
+						View input
 					</a>
 				</td>
 				<td>
-					{{ test.time_limit}} sec
-				</td>
-				<td>
-					{{ test.mem_limit }} MB
-				</td>
-				<td>
-					{{ test.points }}
+					<a href="{% url 'judge:test_output' test.pk %}">
+						View output
+					</a>
 				</td>
 				<td>
 					<a href="{% url 'judge:test_delete' test.pk %}" 

@@ -3,7 +3,8 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.forms import ModelForm, FileField
-from django.http import Http404, HttpResponseRedirect, HttpResponseForbidden
+from django.http import Http404, HttpResponse, HttpResponseRedirect,\
+            HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import View
 
@@ -145,3 +146,13 @@ class TestList(View):
         }
 
         return render(request, self.template_name, context)
+
+class TestInput(View):
+    def get(self, request, pk):
+        test = get_object_or_404(Test, pk = pk)
+        return HttpResponse(test.stdin, content_type = 'text/plain')
+
+class TestOutput(View):
+    def get(self, request, pk):
+        test = get_object_or_404(Test, pk = pk)
+        return HttpResponse(test.stdout, content_type = 'text/plain')
