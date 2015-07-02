@@ -30,7 +30,8 @@ class Problem(models.Model):
 class Solution(models.Model):
     source = models.TextField()
     submit_date = models.DateTimeField('Date of submition')
-    grader_message = models.CharField(max_length = 128)
+
+    grader_message = models.CharField(max_length = 32)
 
     problem = models.ForeignKey(Problem)
     user = models.ForeignKey(User)
@@ -90,6 +91,7 @@ class Test(models.Model):
 class TestResult(models.Model):
     message = models.CharField(max_length = 64)
     score = models.IntegerField()
+    exec_time = models.CharField(max_length = 16)
 
     solution = models.ForeignKey(Solution)
     test = models.ForeignKey(Test)

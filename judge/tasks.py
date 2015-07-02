@@ -49,8 +49,10 @@ def setup_box(solution, test):
 def run_solution(test):
     sandbox = get_sandbox()
     boxId = get_box_id()
-    args = [sandbox, '-i', 'std.in', '-o', 'std.out',
-            '-b', str(boxId), '-t', str(test.time_limit), '-m', 
+    time_limit = str(test.time_limit)
+
+    args = [sandbox, '-i', 'std.in', '-o', 'std.out', '-b', str(boxId), 
+            '-t', time_limit, '-x', time_limit, '-m', 
             str(test.mem_limit * 1024), '--run', 'solution']
 
     proc = subprocess.Popen(args, stdout = subprocess.PIPE, 
@@ -71,15 +73,6 @@ def check_output(test):
     corOut = test.stdout
 
     return curOut == corOut 
-
-def test_finished(solution):
-    if solution.grader_message == 'Tested':
-        return False
-    testCnt = solution.problem.test_set.count()
-    resultCnt = solution.testresult_set.count()
-
-
-    return resultCnt == testCnt
 
 @shared_task
 def test_solution(solution):
@@ -110,18 +103,22 @@ def run_test(solution, test):
     print('testing')
     sandbox_msg = run_solution(test)
     print('grading')
+
     score = 0
+    time = 'N\\A'
+
     if sandbox_msg[:2] == 'OK' :
         msg = 'wrong awnser'
+        time = sandbox_msg[4:9]
         
         if check_output(test):
             msg = 'correct'
             score = test.points
 
-        sandbox_msg = msg + sandbox_msg[2:]
+        sandbox_msg = msg
     
     result = TestResult(message = sandbox_msg, score = score,
-                        solution = solution, test = test)
+                        solution = solution, test = test, exec_time = time)
     print('test passed')
     return result
 

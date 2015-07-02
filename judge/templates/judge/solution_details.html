@@ -15,8 +15,9 @@
 					<thead>
 						<tr>
 							<th> # </th>
-							<th> points </th>
-							<th> message </th>
+							<th> Points </th>
+							<th> Message </th>
+							<th> Execution time</th>
 						</tr>
 					</thead>
 
@@ -26,6 +27,7 @@
 								<th>{{ forloop.counter }}</th>
 								<td>{{ result.score }}</td>
 								<td>{{ result.message }}</td>
+								<td>{{ result.exec_time }}</td>
 							</tr>
 						{% endfor %}
 					</tbody>
