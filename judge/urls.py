@@ -52,6 +52,10 @@ urlpatterns = patterns('',
     url(r'^problems/(?P<pk>\d+)/submit/$', login_required(
         views.SolutionSubmit.as_view()), 
         name = 'solution_submit'),
-    url(r'^solutions/(?P<pk>\d+)/$', views.SolutionDetails.as_view(),
+    url(r'^solutions/(?P<pk>\d+)/$', login_required(
+        views.SolutionDetails.as_view()),
         name = 'solution_details'),
+    url(r'^solutions/(?P<pk>\d+)/source/$', login_required(
+        views.SolutionSource.as_view()),
+        name = 'solution_source'),
 )

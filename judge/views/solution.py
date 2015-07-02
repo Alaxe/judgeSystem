@@ -6,17 +6,34 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.forms import Form, CharField, Textarea
 from django.shortcuts import render, get_object_or_404
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect,\
+        HttpResponseForbidden
 from django.views.generic import DetailView, View
 from django.utils import timezone
 
 from judge.models import Problem, Solution, UserProblemData
 from judge.tasks import test_solution
 
-class SolutionDetails(DetailView):
+def may_view_solution(user, solution):
+    if user.has_perm('judge.view_foreign_solution'):
+        return True
+    else:
+        return solution.user == user
+
+class SolutionDetails(View):
     template_name = 'judge/solution_details.html'
-    model = Solution
-    context_object_name = 'solution'
+
+    def get(self, request, pk):
+        sol = get_object_or_404(Solution, pk = pk)
+        
+        if may_view_solution(request.user, sol):
+            context = { 
+                'solution': sol,
+                'pk': sol.pk
+            }
+            return render(request, self.template_name, context)
+        else:
+            return HttpResponseForbidden()
 
 class SolutionSubmitForm(Form):
     source = CharField(label = 'Source Code',
@@ -87,3 +104,12 @@ class SolutionSubmit(View):
 
         url = reverse('judge:solution_details', args = (solution.pk,))
         return HttpResponseRedirect(url)
+
+class SolutionSource(View):
+    def get(self, request, pk):
+        sol = get_object_or_404(Solution, pk = pk)
+
+        if may_view_solution(request.user, sol):
+            return HttpResponse(sol.source, content_type = 'text/plain')
+        else:
+            return HttpResponseForbidden()

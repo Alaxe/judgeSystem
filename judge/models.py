@@ -38,6 +38,9 @@ class Solution(models.Model):
 
     class Meta:
         ordering = ['-submit_date']
+        permissions = (
+            ('view_foreign_solution', 'Can see somebody else\'s solution'),
+        )
 
     #To do
     def __str__(self):
