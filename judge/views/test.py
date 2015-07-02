@@ -35,14 +35,14 @@ class TestForm(ModelForm):
 
 class TestNew(View):
     template_name = 'judge/test_edit.html'
-    title = 'Add Test'
+    title = 'Add a test'
 
     def get_context(self, form, problem):
         return {
             'form' : form,
             'problem': problem,
-            'title' : self.title,
-            'action': 'create'
+            'problem_pk': problem.pk,
+            'title' : self.title
         }
     
     def get(self, request, problem_id):
@@ -70,7 +70,7 @@ class TestNew(View):
 
 class TestEdit(View):
     template_name = 'judge/test_edit.html'
-    title = 'Edit Test'
+    title = 'Edit test'
 
     def get_context(self, form, test):
         return {

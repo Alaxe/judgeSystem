@@ -72,12 +72,13 @@ class ProblemDetails(View):
 
 class ProblemNew(View):
     template_name = 'judge/problem_edit.html'
-    title = 'Add Problem'
+    title = 'Add a problem'
 
     def get_context(self, form):
         return {
             'form' : form,
-            'title' : self.title}
+            'title' : self.title
+        }
 
     def get(self, request):
         context = self.get_context(ProblemForm())
@@ -96,7 +97,7 @@ class ProblemNew(View):
 
 class ProblemEdit(View):
     template_name = 'judge/problem_edit.html'
-    title = 'Edit Problem'
+    title = 'Edit statement'
 
     def get_context(self, problem, form):
         pk = problem.pk
