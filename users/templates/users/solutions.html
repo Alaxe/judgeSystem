@@ -1,0 +1,56 @@
+{% extends details_base %}
+{% load bootstrap_pagination %}
+{% load users %}
+
+{% block title %}
+	<h1>Your solutions</h1>
+{% endblock %}
+
+{% block user_content %}
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<th>View</th>
+				<th>Problem</th>
+				<th>Message</th>
+				<th>Score</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for sol in page.object_list %}
+
+				{% if sol.score == sol.problem.maxScore %}
+				<tr class="success">
+				{% elif sol.score > 0 %}
+				<tr class="warning">
+				{% else %}
+				<tr>
+				{% endif %}
+
+					<td>
+						<a href="{% url 'judge:solution_details' sol.pk %}">
+							view solution
+						</a>
+					</td>
+					<td>
+						<a href="
+							{% url 'judge:problem_details' sol.problem.pk%}">
+							{{ sol.problem.title }}
+						</a>
+					</td>
+					<td>
+						{{ sol.grader_message }}
+					</td>
+					<td>
+						{{ sol.score }} / {{ sol.problem.maxScore }}	
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	{% bootstrap_paginate page url_view_name='users:solutions_page' range=5 %}
+{% endblock %}
+
+{% block user_nav %}
+	{% user_nav page='solutions' %}
+{% endblock %}

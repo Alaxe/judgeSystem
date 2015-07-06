@@ -1,8 +1,8 @@
-{% extends 'judge/base.html' %}
+{% extends base_template %}
 {% load bootstrap3 %}
 
 {% block navbar %}
-	{% include 'judge/navbar.html' with page='register' %}
+	{% include base_navbar with page='register' %}
 {% endblock %}
 
 {% block title %}
@@ -10,18 +10,15 @@
 {% endblock %}
 
 {% block content %}
-	<div class="well well-lg">
-		<form method="POST" action="{{ request.get_full_path}}">
-			{% csrf_token %}
-			{% bootstrap_form form %}
+	<form method="POST" action="{{ request.get_full_path}}">
+		{% csrf_token %}
+		{% bootstrap_form form %}
 
-			{% buttons %}
-				<input type="submit" class="btn btn-primary" value="Register">
-				<a href="{% url 'users:login' %}" class="btn btn-info">
-					Log in
-				</a>
-			{% endbuttons %}
-
-		</form>
-	</div>
+		{% buttons %}
+			<input type="submit" class="btn btn-primary" value="Register">
+			<a href="{% url 'users:login' %}" class="btn btn-info">
+				Log in
+			</a>
+		{% endbuttons %}
+	</form>
 {% endblock %}

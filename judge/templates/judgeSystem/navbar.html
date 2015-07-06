@@ -19,7 +19,7 @@
 			<ul class="nav navbar-nav navbar-right">
 				{% if request.user.is_active %}
 					<li class="{%if page == 'user_details'%}active{%endif%}"> 
-						<a href="{% url 'users:user_details'%}">
+						<a href="{% url 'users:details'%}">
 							{{request.user.username}}
 						</a> 
 					</li>

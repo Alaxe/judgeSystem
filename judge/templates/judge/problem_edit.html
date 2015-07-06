@@ -1,5 +1,6 @@
 {% extends 'judge/problem_edit_base.html' %}
 {% load bootstrap3 %}
+{% load problem_edit %}
 
 {% block title %}
 	<h1> {{ title }} </h1>
@@ -18,5 +19,5 @@
 {% endblock %}
 
 {% block edit_nav %}
-	{% include 'judge/problem_edit_nav.html' with page='statement' %}
+	{% problem_edit_nav page='statement' %}
 {% endblock %}

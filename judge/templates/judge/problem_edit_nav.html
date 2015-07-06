@@ -1,32 +1,10 @@
 <ul class="nav nav-pills nav-stacked">
-	<li {% if page == 'statement' %} class="active" {%endif%}>
-		<a href="{% url 'judge:problem_edit' problem_pk%}">
-			Edit statement
-		</a>
-	</li>
-
-	<li {% if page == 'tests' %} class="active" {% endif %}>
-		<a href="{% url 'judge:test_list' problem_pk %}">
-			Edit tests
-		</a>
-	</li>
-
-	<li {% if page == 'global_settings' %} class="active" {% endif %}>
-		<a href="{% url 'judge:problem_global' problem_pk %}">
-			Change global test settings
-		</a>
-	</li>
-
-	<li {% if page == 'retest' %} class="active" {% endif %}>
-		<a href="{% url 'judge:problem_retest' problem_pk %}">
-			Retest problem
-		</a>
-	</li>
-
-	<li {% if page == 'delete' %} class="active" {% endif %}>
-		<a href="{% url 'judge:problem_delete' problem_pk %}">
-			Delete Problem
-		</a>
-	</li>
+	{% for page in pages %}
+		<li {% if page.name == curPage %} class="active" {%endif%}>
+			<a href="{{ page.url }}">
+				{{ page.text }}
+			</a>
+		</li>
+	{% endfor %}
 </ul>
 

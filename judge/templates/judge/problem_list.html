@@ -1,8 +1,8 @@
-{% extends 'judge/base.html' %}
+{% extends base_template %}
 {% load bootstrap_pagination %}
 
 {% block navbar %}
-	{% include 'judge/navbar.html' with page='problem_list' %}
+	{% include base_navbar with page='problem_list' %}
 {% endblock %}
 
 {% block title %}

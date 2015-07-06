@@ -1,11 +1,14 @@
-{% extends 'judge/base.html' %}
+{% extends base_template %}
 {% load bootstrap3 %}
+{% load problem_edit %}
 
 {% block content %}
 	<div class="row">
 		{% if problem_pk %}
 			<div class="col-md-4">
-				{% block edit_nav %}{% endblock %}
+				{% block edit_nav %}
+					{% problem_edit_nav %}
+				{% endblock %}
 			</div>
 		{% endif %}
 

@@ -1,9 +1,8 @@
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
+from django.dispatch import Signal
 from django.utils import timezone
-
-from users.models import UserStatts
 
 class Problem(models.Model):
     title = models.CharField('Title', max_length = 64)
@@ -53,7 +52,6 @@ class Solution(models.Model):
             self.score += res.score
         self.save()
 
-        userStatts = UserStatts.objects.get(user = self.user)
         data = UserProblemData.objects.get(user = self.user,
                                             problem = self.problem)
 
@@ -62,8 +60,9 @@ class Solution(models.Model):
             data.save()
 
             if data.maxScore == self.problem.maxScore :
-                userStatts.solvedProblems += 1
-                userStatts.save()
+                statts = UserStatts.objects.get(user = dada.user)
+                statts.solvedProblems += 1
+                statts.save()
 
 class Test(models.Model):
     stdin = models.TextField()
@@ -106,3 +105,9 @@ class UserProblemData(models.Model):
 
     maxScore = models.IntegerField(default = 0)
     last_submit = models.DateTimeField()
+
+class UserStatts(models.Model):
+    user = models.OneToOneField(User)
+
+    solvedProblems = models.IntegerField(default = 0)
+    triedProblems = models.IntegerField(default = 0)

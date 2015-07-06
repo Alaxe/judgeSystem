@@ -1,57 +1,25 @@
-{% extends 'judge/base.html' %}
+{% extends details_base  %}
 {% load bootstrap3 %}
-
-{% block navbar %}
-	{% include 'judge/navbar.html' with page='user_details' %}
-{% endblock %}
+{% load users %}
 
 {% block title %}
 	<h1>Account details</h1>
 {% endblock %}
 
-{% block content %}
-	<div class="row">
-		<div class="col-md-8">
-			<div class="well well-lg">
-				<h3>Password change</h3>
-				<form method="POST" action="{{request.get_full_path}}">
-					{% bootstrap_form passwordForm %}
-					{% buttons %}
-						<input type="submit" class="btn btn-primary" 
-						   value="Change password">
-					{% endbuttons %}
-					{% csrf_token %}
-				</form>
-			</div>
-		</div>
-		<div class="col-md-4">
-			<div class="panel panel-primary">
-				<div class="panel-heading">
-					<h1 class="panel-title">
-						Details
-					</h1>
-				</div>
-				<div class="panel-body">
-					<table class="table">
-						<tr>
-							<th>Username</th>
-							<td>{{request.user.username}}</td>
-						</tr>
-						<tr>
-							<th>E-mail</th>
-							<td>{{request.user.email}}</td>
-						</tr>
-						<tr>
-							<th>Attempted Problems</th>
-							<td>{{statts.triedProblems}}</td>
-						</tr>
-						<tr>
-							<th>Solved Problems</th>
-							<td>{{statts.solvedProblems}}</td>
-						</tr>
-					</table>
-				</div>
-			</div>
-		</div>
-	</div>
+{% block user_nav %}
+	{% user_nav page='details' %}
 {% endblock %}
+
+{% block user_content %}
+	<table class="table">
+		<tbody>
+			{% for row in details %}
+				<tr>
+					<th>{{ row.0 }}</th>
+					<td>{{ row.1 }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% endblock %}
+

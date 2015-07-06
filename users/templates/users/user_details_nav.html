@@ -1,0 +1,17 @@
+<ul class="nav nav-pills nav-stacked">
+	<li {% if page == 'details' %} class="active" {% endif %}>
+		<a href="{% url 'users:user_details' %}">
+			Details
+		</a>	
+	</li>
+	<li {% if page == 'password_change' %} class="active" {% endif %}>
+		<a href="{% url 'users:password_change' %}">
+			Change password
+		</a>
+	</li>
+	<li {% if page == 'last_subimssions' %} class="active" {% endif %}>
+		<a href="">
+			Last submissions
+		</a>
+	</li>
+</ul>

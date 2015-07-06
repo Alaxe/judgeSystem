@@ -1,4 +1,5 @@
 {% extends 'judge/problem_edit_base.html' %}
+{% load problem_edit %}
 
 {% block title %}
 	<h1>Retest problem</h1>
@@ -19,5 +20,5 @@
 {% endblock %}
 
 {% block edit_nav %}
-	{% include 'judge/problem_edit_nav.html' with page='retest' %}
+	{% problem_edit_nav page='retest' %}
 {% endblock %}

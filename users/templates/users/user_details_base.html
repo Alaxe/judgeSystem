@@ -1,0 +1,19 @@
+{% extends base_template  %}
+{% load users %}
+
+{% block navbar %}
+	{% include base_navbar with page='user_details' %}
+{% endblock %}
+
+{% block content %}
+	<div class="row">
+		<div class="col-md-4">
+			{% block user_nav %}
+				{% user_nav %}
+			{% endblock %}
+		</div>
+		<div class="col-md-8">
+			{% block user_content %}{% endblock %}
+		</div>
+	</div>
+{% endblock %}

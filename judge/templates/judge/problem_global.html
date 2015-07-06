@@ -1,4 +1,5 @@
 {% extends 'judge/problem_edit_base.html' %}
+{% load problem_edit %}
 {% load bootstrap3 %}
 
 {% block title %}
@@ -15,5 +16,5 @@
 {% endblock %}
 
 {% block edit_nav %}
-	{% include 'judge/problem_edit_nav.html' with page='global_settings'%}
+	{% problem_edit_nav page='global'%}
 {% endblock %}

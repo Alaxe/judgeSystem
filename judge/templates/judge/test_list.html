@@ -1,4 +1,5 @@
 {% extends 'judge/problem_edit_base.html' %}
+{% load problem_edit %}
 
 {% block title %}
 	<h1> Tests overview </h1>
@@ -24,41 +25,41 @@
 		</thead>
 		<tbody>
 			{% for test in tests %}
-			<tr>
-				<td>
-					{{ test.pk }}
-				</td>
-				<td>
-					<a href="{% url 'judge:test_edit' test.pk %}">
-						Edit test
-					</a>
-				</td>
-				<td> {{ test.time_limit}} sec </td>
-				<td> {{ test.mem_limit }} MB </td>
-				<td> {{ test.points }} </td>
-				<td>
-					<a href="{% url 'judge:test_input' test.pk %}">
-						View input
-					</a>
-				</td>
-				<td>
-					<a href="{% url 'judge:test_output' test.pk %}">
-						View output
-					</a>
-				</td>
-				<td>
-					<a href="{% url 'judge:test_delete' test.pk %}" 
-						class="btn btn-warning btn-xs btn-block">
-						Delete
-					</a>
-				</td>
+				<tr>
+					<td>
+						{{ test.pk }}
+					</td>
+					<td>
+						<a href="{% url 'judge:test_edit' test.pk %}">
+							Edit test
+						</a>
+					</td>
+					<td> {{ test.time_limit}} sec </td>
+					<td> {{ test.mem_limit }} MB </td>
+					<td> {{ test.points }} </td>
+					<td>
+						<a href="{% url 'judge:test_input' test.pk %}">
+							View input
+						</a>
+					</td>
+					<td>
+						<a href="{% url 'judge:test_output' test.pk %}">
+							View output
+						</a>
+					</td>
+					<td>
+						<a href="{% url 'judge:test_delete' test.pk %}" 
+							class="btn btn-warning btn-xs btn-block">
+							Delete
+						</a>
+					</td>
 
-			</tr>
+				</tr>
 			{% endfor %}
 		</tbody>
 	</table>
 {% endblock %}
 
 {% block edit_nav %}
-	{% include 'judge/problem_edit_nav.html' with page='tests' %}
+	{% problem_edit_nav page='tests' %}
 {% endblock %}

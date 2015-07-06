@@ -1,4 +1,4 @@
-{% extends 'judge/base.html' %}
+{% extends base_template  %}
 {% load bootstrap3 %}
 
 {% block title %}
@@ -23,7 +23,15 @@
 
 					<tbody>
 						{% for result in solution.testresult_set.all %}
+
+							{% if result.score == result.test.points %}
+							<tr class="success">
+							{% elif result.score > 0 %}
+							<tr class="warning">
+							{% else %}
 							<tr>
+							{% endif %}
+
 								<th>{{ forloop.counter }}</th>
 								<td>{{ result.score }}</td>
 								<td>{{ result.message }}</td>

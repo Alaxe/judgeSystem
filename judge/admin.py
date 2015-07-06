@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from judge.models import Problem, Test, Solution, TestResult, UserProblemData
+from judge.models import *
 
 class TestInLine(admin.TabularInline):
 	model = Test
@@ -19,3 +19,4 @@ admin.site.register(Solution)
 admin.site.register(Test)
 admin.site.register(TestResult)
 admin.site.register(UserProblemData)
+admin.site.register(UserStatts)

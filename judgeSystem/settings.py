@@ -67,12 +67,16 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.tz',
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.request',
+    'judgeSystem.context_processors.base_url',
+    'users.context_processors.base_url',
 )
 
 ROOT_URLCONF = 'judgeSystem.urls'
 
 WSGI_APPLICATION = 'judgeSystem.wsgi.application'
 
+BASE_TEMPLATE = 'judgeSystem/base.html'
+BASE_NAVBAR = 'judgeSystem/navbar.html'
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases

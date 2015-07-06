@@ -3,16 +3,16 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.template import Context
 from django.template.loader import get_template
 from django.utils import timezone
-from django.views.generic import View 
+from django.views.generic import View, TemplateView
 
-from users.models import Confirmation, PassReset, UserStatts
-
+from users.models import Confirmation, PassReset
 from users.forms import LoginForm, RegisterForm, ResetForm, PasswordForm
 
 def send_email(template, context, subject, to):
@@ -144,7 +144,7 @@ class ResetPassword(View):
                 reset.created = timezone.now()
             reset.save()
 
-            reset_loc_url = reverse('users:set_password', args=(reset.code,))
+            reset_loc_url = reverse('users:password_set', args=(reset.code,))
             reset_url = settings.SITE_HOST + reset_loc_url
 
             context = Context({
@@ -195,30 +195,6 @@ class SetPassword(View):
 
         return HttpResponseRedirect(settings.LOGIN_URL)
 
-class UserDetails(View):
-    template_name = 'users/user_details.html'
-
-    def get(self, request):
-        userStatts = UserStatts.objects.get(user = request.user)
-        context = {
-                'passwordForm': PasswordForm(),
-                'statts': userStatts 
-        }
-        return render(request, self.template_name, context)
-
-    def post(self, request):
-        user = request.user
-        form = PasswordForm(request.POST)
-
-        if form.is_valid():
-            password = form.cleaned_data.get('password1')
-            user.set_password(password)
-            user.save()
-            form = PasswordForm()
-
-        context = {'passwordForm': form}
-        return render(request, self.template_name, context)
-
 class Logout(View):
     def get(self, request):
         logout(request)
@@ -245,3 +221,79 @@ class Confirm(View):
         except Confirmation.DoesNotExist:
             error_url = reverse('judge:problem_list')
             return HttpResponseRedirect(error_url)
+
+
+class PasswordChange(View):
+    template_name = 'users/change_password.html'
+
+    def get(self, request):
+        context = {
+                'passwordForm': PasswordForm(),
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request):
+        user = request.user
+        form = PasswordForm(request.POST)
+
+        if form.is_valid():
+            password = form.cleaned_data.get('password1')
+            user.set_password(password)
+            user.save()
+            form = PasswordForm()
+
+        context = {'passwordForm': form}
+        return render(request, self.template_name, context)
+
+class UserDetails(TemplateView):
+    template_name = 'users/user_details.html'
+
+    def get_context_data(self, **kwargs):
+        details = [
+            ('Username', self.request.user.username),
+            ('E-mail', self.request.user.email)
+        ]
+        
+        try:
+            from judge.models import UserStatts
+            userStatts = UserStatts.objects.get(user = self.request.user)
+            details.extend([
+                ('Attempted problems', userStatts.triedProblems),
+                ('Solved problems', userStatts.solvedProblems)
+            ])
+        except ImportError:
+            pass
+
+        context = { 
+            'details': details
+        }
+
+        return context
+
+# if judge app is also installed
+try:
+    from judge.models import Solution
+
+    class Solutions(TemplateView):
+        template_name = 'users/solutions.html'
+
+        def get_context_data(self, **kwargs):
+            sol = Solution.objects.filter(user = self.request.user)
+            paginator = Paginator(sol, 20)
+
+            pageId = int(kwargs.get('page', 1))
+
+            if pageId < 0:
+                pageId = 1
+
+            try:
+                page = paginator.page(pageId)
+            except PageNotAnInteger:
+                page = paginator.page(1)
+            except EmptyPage:
+                page = paginator.page(paginator.num_pages)
+            
+            return { 'page': page }
+
+except ImportError:
+    pass

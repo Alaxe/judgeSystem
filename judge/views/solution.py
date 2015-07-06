@@ -11,7 +11,8 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect,\
 from django.views.generic import DetailView, View
 from django.utils import timezone
 
-from judge.models import Problem, Solution, UserProblemData
+from judge.models import *
+from judge.signals import problem_tried
 from judge.tasks import test_solution
 
 def may_view_solution(user, solution):
@@ -88,7 +89,9 @@ class SolutionSubmit(View):
             data = UserProblemData(user = user,
                                     problem = self.problem,
                                     last_submit = timezone.now())
+
             data.save()
+            problem_tried.send(sender = self.__class__, data = data)
 
         source = self.form.cleaned_data['source']
         solution = Solution(
