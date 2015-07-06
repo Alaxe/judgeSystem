@@ -29,6 +29,10 @@ def problem_edit_nav(context, *args, **kwargs):
             'url': reverse('judge:problem_retest', args = (problem_pk,)),
             'text': 'Retest problem'
         }, {
+            'name': 'visibility',
+            'url': reverse('judge:problem_visibility', args= (problem_pk,)),
+            'text': 'Change visibility'
+        }, {
             'name': 'delete',
             'url': reverse('judge:problem_delete', args = (problem_pk,)),
             'text': 'Delete problem'

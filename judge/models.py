@@ -8,11 +8,13 @@ class Problem(models.Model):
     title = models.CharField('Title', max_length = 64)
     statement = models.TextField('Problem statement')
     maxScore = models.IntegerField(default = 0)
+    visible = models.BooleanField(default = False)
 
     class Meta:
         ordering = ['-id']
         permissions = (
             ('retest_problem', 'Can start a retest'),
+            ('prbolem_visibility', 'Can change problem visibility'),
         )
 
     def __str__(self):  

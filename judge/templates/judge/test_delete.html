@@ -1,7 +1,12 @@
 {% extends 'judge/problem_edit_base.html' %}
+{% load problem_edit %}
 
 {% block title %}
 	<h1> Delete test </h1>
+{% endblock %}
+
+{% block edit_nav %}
+	{% problem_edit_nav page='tests' %}
 {% endblock %}
 
 {% block edit_content %}

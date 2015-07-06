@@ -1,0 +1,37 @@
+{% extends 'judge/problem_edit_base.html' %}
+{% load problem_edit %}
+
+{% block title %}
+	<h1>
+		{% if visible %}
+			Make problem hidden
+		{% else %}
+			Make problem visible
+		{% endif %}
+	</h1>
+{% endblock %}
+
+{% block edit_nav %}
+	{% problem_edit_nav page='visibility' %}
+{% endblock %}
+
+{% block edit_content %}
+	<p>
+		{% if visible %}
+			This problem is visible. Making it hidden will not display it 
+			in the problem list and users won't be able to read it or submit
+			solutions (unless they have special permissions). Old solutions 
+			will remain unchaged. 
+		{% else %}
+			This problem is hidden. Making it visibile will dispaly it in
+			the problem list and users will be able to read it and submit
+			solutions.
+		{% endif %}
+	</p>
+	<form method="POST" action="{{ request.get_full_path }}">
+		{% csrf_token %}
+		<input type="submit" class="btn btn-default btn-block" 
+		   value="Change visibility">
+	</form>
+{% endblock %}
+

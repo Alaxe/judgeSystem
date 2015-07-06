@@ -15,13 +15,13 @@ from judge.tasks import test_solution
 class ProblemForm(ModelForm):
     class Meta:
         model = Problem
-        exclude = ['maxScore']
+        exclude = ['maxScore', 'visible']
 
 class ProblemList(TemplateView):
     template_name = 'judge/problem_list.html'
 
     def get_context_data(self, page = 1):
-        paginator = Paginator(Problem.objects.all(), 5)
+        paginator = Paginator(Problem.objects.filter(visible = True), 5)
         context = super(ProblemList, self).get_context_data()
 
         if int(page) < 1:
@@ -60,7 +60,10 @@ class ProblemDetails(View):
     template_name = 'judge/problem_details.html'
 
     def get(self, request, pk):
-        problem = get_object_or_404(Problem, pk = pk)
+        if not request.user.has_perm('judge.change_problem'):
+            problem = get_object_or_404(Problem, pk = pk, visible = True)
+        else:
+            problem = get_object_or_404(Problem, pk = pk)
         solutions = []
         
         if request.user.is_authenticated():
@@ -239,3 +242,27 @@ class ProblemRetest(View):
 
         problem = get_object_or_404(Problem, pk = pk)
         return HttpResponse(problem.stdin, content_type="text/plain")
+
+class ProblemVisibility(View):
+    template_name = 'judge/problem_visibility.html'
+
+    def get(self, request, pk):
+        prob = get_object_or_404(Problem, pk = pk)
+
+        context = { 
+            'visible': prob.visible,
+            'problem_pk': prob.pk
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request, pk):
+        prob = get_object_or_404(Problem, pk = pk)
+        prob.visible = not prob.visible
+        prob.save()
+
+        visText = 'visible' if prob.visible else 'hidden'
+        messageText = 'Visibility is successfully changed to ' + visText
+        messages.add_message(request, messages.SUCCESS, messageText)
+
+        url = reverse('judge:problem_edit', args=(prob.pk,))
+        return HttpResponseRedirect(url)

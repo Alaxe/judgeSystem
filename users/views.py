@@ -108,7 +108,11 @@ class Register(View):
         self.confirm = Confirmation(user = self.user)
         self.confirm.save()
 
-        UserStatts(user = self.user).save()
+        try:
+            from judge.models import UserStatts
+            UserStatts(user = self.user).save()
+        except ImportError:
+            pass
 
         self.send_conf_mail()
 
