@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.core.paginator import InvalidPage, Paginator
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
@@ -244,7 +244,14 @@ class PasswordChange(View):
             password = form.cleaned_data.get('password1')
             user.set_password(password)
             user.save()
+
+            user = authenticate(username = user.username, password = password)
+            login(request, user)
+
             form = PasswordForm()
+
+            messageText = 'Your password has been changed successfully'
+            messages.add_message(request, messages.SUCCESS, messageText)
 
         context = {'passwordForm': form}
         return render(request, self.template_name, context)
@@ -292,11 +299,9 @@ try:
 
             try:
                 page = paginator.page(pageId)
-            except PageNotAnInteger:
-                page = paginator.page(1)
-            except EmptyPage:
-                page = paginator.page(paginator.num_pages)
-            
+            except InvalidPage:
+                raise Http404
+
             return { 'page': page }
 
 except ImportError:

@@ -12,9 +12,9 @@ def gen_randcode():
 class Confirmation(models.Model):
     code = models.CharField(max_length = 32, default = gen_randcode())
     user = models.OneToOneField(User)
-    created = models.DateTimeField(default = timezone.now())
+    created = models.DateTimeField(default = timezone.now)
 
 class PassReset(models.Model):
     code = models.CharField(max_length = 32, default = gen_randcode())
     user = models.OneToOneField(User)
-    created = models.DateTimeField(default = timezone.now())
+    created = models.DateTimeField(default = timezone.now)

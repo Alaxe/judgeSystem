@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.core.paginator import InvalidPage, Paginator
 from django.core.urlresolvers import reverse
 from django.db.transaction import set_autocommit, commit
 from django.forms import ModelForm, Form, IntegerField, DecimalField
@@ -24,15 +24,10 @@ class ProblemList(TemplateView):
         paginator = Paginator(Problem.objects.filter(visible = True), 5)
         context = super(ProblemList, self).get_context_data()
 
-        if int(page) < 1:
-            page = 1
-
         try:
             page = paginator.page(page)
-        except PageNotAnInteger:
-            page = paginator.page(1)
-        except EmptyPage:
-            page = paginator.page(paginator.num_pages)
+        except InvalidPage:
+            raise Http404
         
         user = self.request.user
         if user.is_authenticated():

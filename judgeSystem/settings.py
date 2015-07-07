@@ -46,6 +46,7 @@ INSTALLED_APPS = (
     'bootstrap_pagination',
     'judge',
     'users',
+    'blog',
 )
 
 MIDDLEWARE_CLASSES = (

@@ -14,13 +14,24 @@
 		{% csrf_token %}
 		{% bootstrap_form form %}
 
-		{% buttons %}
-			<input type="submit" class="btn btn-primary" value="Log in">
-			<a href="{% url 'users:register' %}" class="btn btn-info">
-				Register
-			</a>
-		{% endbuttons %}
+		<div class="row">
+			<div class="col-md-4">
+				<input type="submit" value="Log in"
+					  class="btn btn-default btn-block">
+			</div>
+			<div class="col-md-4">
+				<a href="{% url 'users:register' %}" 
+					class="btn btn-primary btn-block">
+					Register
+				</a>
+			</div>
+			<div class="col-md-4">
+				<a href="{% url 'users:password_reset' %}" 
+					   class="btn btn-info btn-block">
+					Reset password
+				</a>
+			</div>
+		</div>
 
-		<a href="{% url 'users:password_reset' %}">Reset password</a>
 	</form>
 {% endblock %}

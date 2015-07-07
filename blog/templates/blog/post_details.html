@@ -1,0 +1,13 @@
+{% extends base_template %}
+{% load blog %}
+
+{% block title %}
+	<h1> {{ post.title }}</h1>
+	<p class="lead">
+		{{ post|post_subheading }}
+	</p>
+{% endblock %}
+
+{% block content %}
+	{{ post.content|safe}}
+{% endblock %}

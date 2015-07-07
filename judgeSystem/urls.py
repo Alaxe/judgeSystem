@@ -9,4 +9,5 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^judge/', include('judge.urls', namespace = 'judge')),
     url(r'^account/', include('users.urls', namespace = 'users')),
+    url(r'^blog/', include('blog.urls', namespace = 'blog')),
 )

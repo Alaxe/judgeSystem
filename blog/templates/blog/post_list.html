@@ -1,0 +1,22 @@
+{% extends base_template %}
+{% load blog %}
+{% load bootstrap_pagination %}
+
+{% block title %}
+	<h1>Blog</h1>
+{% endblock %}
+
+{% block content %}
+	{% for post in page.object_list %}
+		<h2> {{ post.title }} </h2>
+		<p class="lead">
+			{{ post|post_subheading }}
+		</p>
+		{{ post.content|safe|truncatewords_html:100 }}
+		<a href="{% url 'blog:post_details' post.pk %}">
+			Read the full blog post
+		</a>
+	{% endfor %}
+	<br>
+	{% bootstrap_paginate page url_view_name='blog:post_page' range=20%}
+{% endblock %}
