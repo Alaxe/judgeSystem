@@ -4,11 +4,12 @@ import subprocess, time, os
 
 from billiard import current_process
 from celery import shared_task
-from celery.task import chord
+from celery.task import chord, group
 from django.core.cache import cache
 from django.db import transaction
 
-from judge.models import Test, TestResult, Solution
+from judge.models import Test, TestResult, Solution, UserProblemData,\
+                        UserStatts
 
 def get_sol_loc(solution):
     solutionRoot = 'judge/solutions/'
@@ -84,14 +85,17 @@ def test_solution(solution):
     solution.grader_message = 'Testing'
     solution.save()
 
-    curTasks = list()
-    for t in solution.problem.test_set.all():
-        curSubTask = run_test.subtask(args=(solution, t,))
-        curTasks.append(curSubTask)
+    taskList = list()
+    tests = solution.problem.test_set.all()
+    for t in tests:
+        curSubTask = run_test.si(solution, t)
+        taskList.append(curSubTask)
 
-    job = chord(curTasks, save_result.s(solution))
     print(get_box_id())
-    result = job.apply_async()
+
+    res = chord(group(taskList), save_result.s(solution))
+    res.apply_async()
+
     print('sheduled for testing')
 
 @shared_task
@@ -113,7 +117,7 @@ def run_test(solution, test):
         
         if check_output(test):
             msg = 'correct'
-            score = test.points
+            score = test.score
 
         sandbox_msg = msg
     
@@ -130,13 +134,38 @@ def save_result(result, solution):
         for taskRes in result:
             taskRes.save()
 
-        try:
-            os.remove(get_sol_loc(solution))
-        except FileNotFoundError:
-            pass
-
         solution.grader_message = 'Tested'
         solution.update_score()
         solution.save()
 
+    try:
+        os.remove(get_sol_loc(solution))
+    except FileNotFoundError:
+        pass
+
     print('results saved')
+
+@shared_task
+def retest_problem(problem):
+    solutions = problem.solution_set.all()
+
+    # set_autocommit(False)
+    with transaction.atomic():
+        UPdata = UserProblemData.objects.filter(problem = problem)
+
+        for data in UPdata:
+            if data.maxScore == problem.maxScore:
+                statts = UserStatts.objects.get(user = data.user)
+                statts.solvedProblems -= 1
+                statts.save()
+
+            data.maxScore = 0
+            data.save()
+
+        for sol in solutions:
+            sol.testresult_set.all().delete()
+            sol.score = 0
+            sol.grader_message = 'retesting'
+            sol.save()
+
+            test_solution.delay(sol)

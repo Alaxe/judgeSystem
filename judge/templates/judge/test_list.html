@@ -1,5 +1,5 @@
 {% extends 'judge/problem_edit_base.html' %}
-{% load problem_edit %}
+{% load judge %}
 
 {% block title %}
 	<h1> Tests overview </h1>
@@ -36,7 +36,7 @@
 					</td>
 					<td> {{ test.time_limit}} sec </td>
 					<td> {{ test.mem_limit }} MB </td>
-					<td> {{ test.points }} </td>
+					<td> {{ test.score }} </td>
 					<td>
 						<a href="{% url 'judge:test_input' test.pk %}">
 							View input

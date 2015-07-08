@@ -1,4 +1,5 @@
 {% extends 'judge/base.html' %}
+{% load judge %}
 
 {% block title %}
 	<h1> {{ problem.title }} </h1>
@@ -41,17 +42,8 @@
 							</tr>
 						</thead>
 						<tbody>
-							{% for sol in solutions %}
-
-								{% if sol.score == sol.problem.maxScore %}
-									<tr class="success">
-								{% elif sol.score > 0 %}
-									<tr class="warning">
-								{% elif sol.grader_message == 'Testing' %}
-									<tr class="info">
-								{% else %}
-									<tr>
-								{% endif %}
+						{% for sol in solutions %}
+							<tr class="{{ sol|status_class }}">
 
 								<td>{{forloop.counter }}</td>
 								<td>{{sol.grader_message}}</td>
@@ -64,7 +56,7 @@
 									</a>
 								</td>
 							</tr>
-							{% endfor %}
+						{% endfor %}
 						</tbody>
 				{% endif %}
 			{% endif %}

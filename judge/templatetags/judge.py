@@ -1,6 +1,8 @@
 from django import template
 from django.core.urlresolvers import reverse
 
+from judge.models import Solution, TestResult
+
 register = template.Library()
 
 @register.inclusion_tag('judge/problem_edit_nav.html', takes_context = True)
@@ -37,3 +39,25 @@ def problem_edit_nav(context, *args, **kwargs):
         }
      ]
     }
+
+
+
+@register.filter
+def status_class(obj, *args, **kwargs):
+    maxScore = 1000
+    if type(obj) is Solution:
+        if obj.grader_message == 'testing':
+            return 'info'
+        else:
+            maxScore = obj.problem.maxScore
+
+    elif type(obj) is TestResult:
+        maxScore = obj.test.score
+    
+    if obj.score == maxScore:
+        return 'success'
+    elif obj.score == 0:
+        return 'danger'
+    else:
+        return 'warning'
+

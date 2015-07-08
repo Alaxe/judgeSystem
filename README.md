@@ -6,18 +6,20 @@ What it does now:
   * Task/test editing
   * Grading solutions(only exact output)
   * Submiting solutions
+  * A simple blog
 
 What it is aiming to do:
   * More solution graders(and support for custom checkers)
-  * A blog
   * Competitions
   * Comunity submited problems
 
 Required software:
-  * Python 3.
+  * Python 3.\*
   * Python moules: django, celery, django-celery, django-bootsrap3, django-bootstrap-pagination
   * g++ compiler
   * postgreSQL database
+  * rabbitmq message broker for celery NOTE: This is optional. If you want you can use django's
+    database as backend. You need to uncoment the BROKER_URL line(17) in judgeSystem/celery.py
 
 How to run:
   0. Create database: python manage.py migrate

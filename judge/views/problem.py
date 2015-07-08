@@ -10,7 +10,7 @@ from django.shortcuts import render, get_object_or_404
 from django.views.generic import TemplateView, DetailView, View
 
 from judge.models import Problem, Test, Solution, UserProblemData
-from judge.tasks import test_solution
+from judge.tasks import test_solution, retest_problem
 
 class ProblemForm(ModelForm):
     class Meta:
@@ -154,7 +154,7 @@ class ProblemDelete(View):
 class ProblemGlobalForm(Form):
     timeLimit = DecimalField(required = False, decimal_places = 4)
     memoryLimit = IntegerField(required = False)
-    pointsPerTest = IntegerField(required = False)
+    testScore = IntegerField(required = False)
 
 class ProblemGlobal(View):
     template_name = 'judge/problem_global.html'
@@ -181,18 +181,23 @@ class ProblemGlobal(View):
 
         timeLimit = form.cleaned_data['timeLimit']
         memoryLimit = form.cleaned_data['memoryLimit']
-        pointsPerTest = form.cleaned_data['pointsPerTest']
+        testScore = form.cleaned_data['testScore']
 
         for test in problem.test_set.all():
-            if not timeLimit == None:
+            if timeLimit != None:
                 test.time_limit = timeLimit
-            if not memoryLimit == None:
+            if memoryLimit != None:
                 test.mem_limit = memoryLimit
-            if not pointsPerTest == None:
-                test.points = pointsPerTest
+            if testScore != None:
+                test.score = testScore
 
             test.save()
         
+        if testScore != None:
+            problem.maxScore = problem.test_set.count() * testScore
+            problem.save()
+
+
         messageText = 'Test updated successfully'
         messages.add_message(request, messages.SUCCESS, messageText)
 
@@ -215,19 +220,8 @@ class ProblemRetest(View):
 
     def post(self, request, pk):
         problem = get_object_or_404(Problem, pk = pk)
-        solutions = problem.solution_set.all()
 
-       # set_autocommit(False)
-        for sol in solutions:
-            sol.testresult_set.all().delete()
-            sol.score = 0
-            sol.grader_message = 'retesting'
-            sol.save()
-
-            test_solution.delay(sol)
-
-        #commit()
-        #set_autocommit(True)
+        retest_problem.delay(problem)
 
         messageText = "Solutions added to the queue."
         messages.add_message(request, messages.SUCCESS, messageText)

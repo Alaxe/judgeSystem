@@ -3,6 +3,7 @@ db.sqlite3
 *.swp
 *.swo
 run-celery.sh
+run-server.sh
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

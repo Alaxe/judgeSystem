@@ -2,6 +2,7 @@
 
 {% load bootstrap3 %}
 {% load base %}
+{% load judge %}
 
 {% block title %}
 <h1> Solution Details </h1>
@@ -30,15 +31,7 @@
 
 					<tbody>
 						{% for result in solution.testresult_set.all %}
-
-							{% if result.score == result.test.points %}
-							<tr class="success">
-							{% elif result.score > 0 %}
-							<tr class="warning">
-							{% else %}
-							<tr>
-							{% endif %}
-
+							<tr class="{{ result|status_class }}">
 								<th>{{ forloop.counter }}</th>
 								<td>{{ result.score }}</td>
 								<td>{{ result.message }}</td>

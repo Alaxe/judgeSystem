@@ -23,7 +23,7 @@ class Problem(models.Model):
     def update_max_score(self):
         awns = 0
         for test in self.test_set.all():
-            awns += test.points
+            awns += test.score
 
         self.maxScore = awns
         self.save()
@@ -62,7 +62,7 @@ class Solution(models.Model):
             data.save()
 
             if data.maxScore == self.problem.maxScore :
-                statts = UserStatts.objects.get(user = dada.user)
+                statts = UserStatts.objects.get(user = data.user)
                 statts.solvedProblems += 1
                 statts.save()
 
@@ -73,7 +73,7 @@ class Test(models.Model):
     #time limit in sec and memory limit in kB
     time_limit = models.DecimalField(max_digits = 6, decimal_places = 4)
     mem_limit  = models.IntegerField()
-    points = models.IntegerField()
+    score = models.IntegerField()
     
     problem = models.ForeignKey(Problem)
 

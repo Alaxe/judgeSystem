@@ -1,6 +1,8 @@
 {% extends details_base %}
+
 {% load bootstrap_pagination %}
 {% load users %}
+{% load judge %}
 
 {% block title %}
 	<h1>Your solutions</h1>
@@ -19,14 +21,7 @@
 		<tbody>
 			{% for sol in page.object_list %}
 
-				{% if sol.score == sol.problem.maxScore %}
-				<tr class="success">
-				{% elif sol.score > 0 %}
-				<tr class="warning">
-				{% else %}
-				<tr>
-				{% endif %}
-
+				<tr class="{{ sol|status_class }}">
 					<td>
 						<a href="{% url 'judge:solution_details' sol.pk %}">
 							view solution
