@@ -1,5 +1,6 @@
 {% load bootstrap3 %}
-{% load static %}
+{% load base %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,14 +9,14 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<!-- The above 3 meta tags *must* come first in the head; any
 	other head content must come *after* these tags -->
-	<title>Judge</title>
+	<title>Judge system</title>
 	<!-- Bootstrap -->
 	<link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.4/cosmo/bootstrap.min.css"
 	   rel="stylesheet">
 </head>
 <body style="padding-top: 75px;">
 	{% block navbar %}
-		{% include base_navbar %}
+		{% base_nav %}
 	{% endblock navbar %}
 
 	<div class="container">

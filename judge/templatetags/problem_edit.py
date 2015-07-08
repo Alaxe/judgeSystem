@@ -3,14 +3,12 @@ from django.core.urlresolvers import reverse
 
 register = template.Library()
 
-@register.simple_tag(takes_context = True)
+@register.inclusion_tag('judge/problem_edit_nav.html', takes_context = True)
 def problem_edit_nav(context, *args, **kwargs):
-    
     page = kwargs.get('page', '')
-
     problem_pk = context['problem_pk']
 
-    context = template.Context({
+    return {
         'curPage': page,
         'pages': [ {
             'name': 'statement',
@@ -38,8 +36,4 @@ def problem_edit_nav(context, *args, **kwargs):
             'text': 'Delete problem'
         }
      ]
-    })
-
-
-    curTemplate = template.loader.get_template('judge/problem_edit_nav.html')
-    return curTemplate.render(context)
+    }

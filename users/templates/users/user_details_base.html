@@ -1,8 +1,9 @@
 {% extends base_template  %}
 {% load users %}
+{% load base %}
 
 {% block navbar %}
-	{% include base_navbar with page='user_details' %}
+	{% base_nav page='user_details' %}
 {% endblock %}
 
 {% block content %}

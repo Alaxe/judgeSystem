@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 
 register = template.Library()
 
-@register.simple_tag(takes_context = True)
+@register.inclusion_tag('judge/problem_edit_nav.html', takes_context = True)
 def user_nav(context, *args, **kwargs):
     curPage = kwargs.get('page', '')
     
@@ -27,11 +27,9 @@ def user_nav(context, *args, **kwargs):
     except ImportError:
         pass
 
-    context = template.Context({
+    return {
         'curPage': curPage,
         'pages': pages
-    })
+    }
 
-    curTemplate = template.loader.get_template('judge/problem_edit_nav.html')
-    return curTemplate.render(context)
 

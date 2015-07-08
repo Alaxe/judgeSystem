@@ -1,9 +1,16 @@
 {% extends base_template  %}
+
 {% load bootstrap3 %}
+{% load base %}
 
 {% block title %}
 <h1> Solution Details </h1>
 {% endblock %}
+
+{% block navbar %}
+	{% base_nav page='judge' %}
+{% endblock %}
+
 {% block content %}
 <div class="row">
 	<div class="col-md-8">

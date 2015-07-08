@@ -1,5 +1,7 @@
-{% extends base_template  %}
+{% extends 'judge/base.html'  %}
+
 {% load bootstrap3 %}
+{% load base %}
 
 {% block title %}
 	<h1> Submit {{ problem.title }} </h1>
@@ -10,9 +12,8 @@
 	{% csrf_token %}
 	{% bootstrap_form form %}
 
-	{% buttons %}
-		<input type="submit" value="Sumit Solution" class="btn btn-primary">
-	{% endbuttons %}
+	<input type="submit" value="Sumit solution" 
+		class="btn btn-default btn-block">
 </form>
 
 {% endblock content %}

@@ -12,35 +12,22 @@
 		</div>
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
-				<li class="{% if page == 'problem_list' %}active{% endif %}"> 
-					<a href="{% url 'judge:problem_list' %}">Problems</a>
-				</li>
+				{% for page in navLeft %}
+					<li class="{% if page.name == curPage %}active{% endif %}">
+						<a href="{{ page.url }}">
+							{{ page.text }}
+						</a>
+					</li>
+				{% endfor %}
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
-				{% if request.user.is_active %}
-					<li class="{%if page == 'user_details'%}active{%endif%}"> 
-						<a href="{% url 'users:details'%}">
-							{{request.user.username}}
+				{% for page in navRight %}
+					<li class="{% if page.name == curPage %}active{% endif %}"> 
+						<a href="{{ page.url }}">
+							{{ page.text }}
 						</a> 
 					</li>
-					<li> 
-						<a href="{% url 'users:logout' %}">
-							Logout
-						</a>
-					</li>
-				{% else %}
-					<li class="{% if page == 'login' %}active{% endif %}"> 
-						<a href="{% url 'users:login' %}?next=
-								{{request.get_full_path}}">
-							Login
-						</a> 
-					</li>
-					<li class="{% if page == 'register' %}active{% endif %}">
-						<a href="{% url 'users:register'%}">
-							Register
-						</a>
-					</li>
-				{% endif %}
+				{% endfor %}
 			</ul>
 		</div>
 	</div>
