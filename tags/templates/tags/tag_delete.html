@@ -1,0 +1,28 @@
+{% extends base_template %}
+
+{% block title %}
+	<h1>Delete tag</h1>
+{% endblock %}
+
+{% block content %}
+	<p class="lead">
+		Are you sure you want to delete this tag. All connected tag instances
+		will be deleted <span class="text-danger">FOREVER</span>
+	</p>
+	<div class="row">
+		<div class="col-md-6">
+			<form method="POST" action="{{ request.get_full_path }}">
+				{% csrf_token %}
+
+				<input type="submit" value="Delete" 
+					 class="btn btn-default btn-block">
+			</form>
+		</div>
+		<div class="col-md-6">
+			<a href="{% url 'tags:tag_list' %}"
+				class="btn btn-primary btn-block">
+				I've changed my mind
+			</a>
+		</div>
+	</div>
+{% endblock %}

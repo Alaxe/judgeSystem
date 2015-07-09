@@ -47,6 +47,7 @@ INSTALLED_APPS = (
     'judge',
     'users',
     'blog',
+    'tags',
 )
 
 MIDDLEWARE_CLASSES = (

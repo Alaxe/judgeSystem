@@ -46,7 +46,7 @@ def problem_edit_nav(context, *args, **kwargs):
 def status_class(obj, *args, **kwargs):
     maxScore = 1000
     if type(obj) is Solution:
-        if obj.grader_message == 'testing':
+        if obj.grader_message == 'Testing':
             return 'info'
         else:
             maxScore = obj.problem.maxScore

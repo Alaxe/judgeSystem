@@ -13,9 +13,9 @@ class PostForm(ModelForm):
         model = BlogPost
         exclude = ['author', 'post_time']
 
-class PostNew(View):
+class PostEdit(View):
     template_name = 'blog/post_edit.html'
-    title = 'New blogpost'
+    title = 'Edit blog post'
 
     def get_response(self, request, form = PostForm(), pk = None):
         context = {
@@ -25,8 +25,18 @@ class PostNew(View):
         }
         return render(request, self.template_name, context)
 
-    def get(self, request):
-        return self.get_response(request)
+    def get(self, request, pk = None):
+        if pk:
+            kwargs = {'pk': pk}
+            if not request.user.has_perm('blog.edit_foreign_post'):
+                kwargs['author'] = request.user
+
+            post = get_object_or_404(BlogPost, **kwargs)
+
+            form = PostForm(instance = post)
+            return self.get_response(request, form = form, pk = pk)
+        else:
+            return self.get_response(request)
 
     def post(self, request, pk = None):
         if pk:
@@ -45,18 +55,8 @@ class PostNew(View):
         url = reverse('blog:post_details', args = (post.pk,))
         return HttpResponseRedirect(url)       
 
-class PostEdit(PostNew):
-    title = 'Edit blogpost'
-
-    def get(self, request, pk):
-        kwargs = {'pk': pk}
-        if not request.user.has_perm('blog.edit_foreign_post'):
-            kwargs['author'] = request.user
-
-        post = get_object_or_404(BlogPost, **kwargs)
-
-        form = PostForm(instance = post)
-        return self.get_response(request, form = form, pk = pk)
+class PostNew(PostEdit):
+    title = 'New blog post'
 
 class PostDetails(DetailView):
     model = BlogPost

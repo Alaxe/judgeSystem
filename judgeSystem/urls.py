@@ -10,4 +10,5 @@ urlpatterns = patterns('',
     url(r'^judge/', include('judge.urls', namespace = 'judge')),
     url(r'^account/', include('users.urls', namespace = 'users')),
     url(r'^blog/', include('blog.urls', namespace = 'blog')),
+    url(r'^tags/', include('tags.urls', namespace = 'tags')),
 )

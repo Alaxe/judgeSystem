@@ -30,7 +30,7 @@ class SolutionDetails(View):
         if may_view_solution(request.user, sol):
             context = { 
                 'solution': sol,
-                'pk': sol.pk
+                'pk': sol.pk,
             }
             return render(request, self.template_name, context)
         else:

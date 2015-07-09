@@ -86,8 +86,8 @@ class Test(models.Model):
         return self.problem.title + ' --- Test'
 
     def save(self, *args, **kwargs):
-        self.problem.update_max_score()
         super(Test, self).save(*args, **kwargs)
+        self.problem.update_max_score()
 
 class TestResult(models.Model):
     message = models.CharField(max_length = 64)

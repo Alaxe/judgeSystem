@@ -21,7 +21,7 @@ class ProblemList(TemplateView):
     template_name = 'judge/problem_list.html'
 
     def get_context_data(self, page = 1):
-        paginator = Paginator(Problem.objects.filter(visible = True), 5)
+        paginator = Paginator(Problem.objects.filter(visible = True), 20)
         context = super(ProblemList, self).get_context_data()
 
         try:
