@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404, render
 from django.views.generic import View, TemplateView
 
 from tags.models import Tag
+from tags.utils import tags_by_category
 
 class TagForm(ModelForm):
     class Meta:
@@ -16,7 +17,7 @@ class TagEdit(View):
     template_name = 'tags/tag_new.html'
     title = 'Edit tag'
 
-    def get_response(self, request, form = TagForm(), pk = None):
+    def get_response(self, request, form = None, pk = None):
         context = {
             'form': form,
             'title': self.title,
@@ -74,22 +75,6 @@ class TagDelete(View):
 
         url = reverse('tags:tag_list')
         return HttpResponseRedirect(url)
-
-def tags_by_category():
-    tags = {}
-    for tag in Tag.objects.all():
-        if tag.category in tags:
-            tags[tag.category].append(tag)
-        else:
-            tags[tag.category] = [tag]
-
-
-    awns = []
-    for key in tags:
-        awns.append((key, tags[key],))
-        
-    return awns
-
 class TagList(TemplateView):
     template_name = 'tags/tag_list.html'
     

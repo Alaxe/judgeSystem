@@ -3,7 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 class Tag(models.Model):
-    label = models.CharField('Tag', max_length = 32)
+    label = models.CharField('Tag', max_length = 32, unique = True)
     category = models.CharField('Category', max_length = 32)
 
     class Meta:

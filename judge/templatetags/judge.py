@@ -33,14 +33,16 @@ def problem_edit_nav(context, *args, **kwargs):
             'url': reverse('judge:problem_visibility', args= (problem_pk,)),
             'text': 'Change visibility'
         }, {
+            'name': 'tags',
+            'url': reverse('judge:problem_tags', args = (problem_pk,)),
+            'text': 'Edit tags'
+        },{
             'name': 'delete',
             'url': reverse('judge:problem_delete', args = (problem_pk,)),
             'text': 'Delete problem'
         }
      ]
     }
-
-
 
 @register.filter
 def status_class(obj, *args, **kwargs):

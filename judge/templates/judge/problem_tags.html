@@ -1,0 +1,47 @@
+{% extends 'judge/problem_edit_base.html' %}
+{% load judge %}
+
+{% block title %}
+	<h1>Edit tags </h1>
+{% endblock %}
+
+{% block edit_content %}
+	<form method="POST" action="{{ request.get_full_path }}">
+		<div class="row">
+			{% for cat in tags %}
+				{% if forloop.counter0|divisibleby:2  and forloop.counter > 1 %}
+					</div>
+					<div class="row">
+				{% endif %}
+
+				<div class="col-md-6">
+					<div class="panel panel-primary">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								{{ cat.0 }}
+							</h3>
+						</div>
+						<ul class="list-group">
+							{% for tag in cat.1 %}
+								<div class="list-group-item">
+									<input type="checkbox" name="tags" 
+									  {% if tag.label in curTags %}checked
+									  {% endif %} value="{{ tag.label }}">
+									{{ tag.label }}
+								</div>
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+		{% csrf_token %}
+		<input type="submit" value="Save"
+				class="btn btn-default btn-block">
+	</form>
+	{{ curTags }}
+{% endblock %}
+
+{% block edit_nav %}
+	{% problem_edit_nav page='tags' %}
+{% endblock %}

@@ -13,6 +13,12 @@
 	<!-- Bootstrap -->
 	<link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.4/cosmo/bootstrap.min.css"
 	   rel="stylesheet">
+	<style>
+		.tag-label {
+			margin: 5px;
+			float: right;
+		}
+	</style>
 </head>
 <body style="padding-top: 75px;">
 	{% block navbar %}
@@ -32,5 +38,8 @@
 	</div>
 
 	{% bootstrap_javascript jquery=1 %}
+	{% block javascript %}
+
+	{% endblock %}
 </body>
 </html>

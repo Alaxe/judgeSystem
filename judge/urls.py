@@ -27,6 +27,9 @@ urlpatterns = patterns('',
     url(r'^problems/(?P<pk>\d+)/visibility/$', permission_required(
         'judge.problem_visibility')(views.ProblemVisibility.as_view()),
         name = 'problem_visibility'),
+    url(r'^problems/(?P<pk>\d+)/tags/$', permission_required(
+        'judge.problem_tags')(views.ProblemTags.as_view()),
+        name = 'problem_tags'),
 
     url(r'^problems/(?P<pk>\d+)/$', views.ProblemDetails.as_view(), 
        name = 'problem_details'),

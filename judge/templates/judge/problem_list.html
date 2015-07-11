@@ -6,24 +6,112 @@
 {% endblock %}
 
 {% block content %}
-	<ul class="list-group">
-	{% for problem in page.object_list %}
-		<li class="list-group-item">
-			<a href = "{% url 'judge:problem_details' problem.id %}">
-				{{ problem.title }}
-			</a>
-			
-			{% if problem.status == 'solved' %}
-				<span class="label btn-success" style="margin-right: 10px; float: right;">
-					Solved
-				</span>
-			{% elif problem.status == 'attempted' %}
-				<span class="label label-warning" style="margin-right: 10px; float: right;">
-					attempted
-				</span>
-			{% endif %}
-		</li>
-	{% endfor %}
-	</ul>
-	{% bootstrap_paginate page url_view_name='judge:problem_page' range=20%}
+	<div class="row">
+		<div class="col-md-9">
+			<ul class="list-group">
+			{% for problem in page.object_list %}
+				<li class="list-group-item">
+					<div class="row">
+						<div class="col-sm-4">
+							<a href="
+								{% url 'judge:problem_details' problem.id %}">
+								{{ problem.title }}
+							</a>
+						</div>
+						<div class="col-sm-8">
+							{% if problem.status == 'solved' %}
+							<span class="label label-success tag-label">
+									Solved
+								</span>
+							{% elif problem.status == 'attempted' %}
+								<span class="label label-warning tag-label">
+									attempted
+								</span>
+							{% endif %}
+
+							{{ problem.taginstance_set }}
+							{% for inst in problem.tagInst %}
+								<span class="label label-primary tag-label"
+										value="{{ inst.tag.label }}">
+									{{ inst.tag.label }}
+								</span>
+							{% endfor %}
+						</div>
+					</div>
+				</li>
+			{% endfor %}
+			</ul>
+		{% bootstrap_paginate page url_view_name='judge:problem_page' range=20%}
+		</div>
+		<div class="col-md-3">
+			{% for cat in tags %}
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">
+							{{ cat.0 }}
+						</h3>
+					</div>
+					<div class="panel-body">
+						<div class="list-group">
+							{% for tag in cat.1 %}
+								<a>
+								<div class="list-group-item tag-selector
+										{% if tag.active %}active{% endif %}"
+										value="{{ tag.label }}">
+									{{ tag.label }}
+								</div>
+								</a>
+							{% endfor %}
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+	
 {% endblock content %}
+
+{% block javascript %}
+	<script type="text/javascript">
+
+		$(document).ready(function() {
+			curTags = {{ curTags|safe }};
+
+			//scroll page to previous position
+			pagePos = parseInt(window.location.hash.substr(1));
+			if(pagePos != NaN) {
+				$(window).scrollTop(pagePos);
+			}
+
+
+			$('.tag-selector, .tag-label').click(function(event) {
+				var selectedTag = $(event.target).attr('value');
+				//alert(selectedTag);
+				var url = '{% url 'judge:problem_list' %}';
+
+				var removed = false;
+				for (var i = 0;i < curTags.length;i++) {
+					if(curTags[i] == selectedTag) {
+						removed = true;
+					} else {
+						if(i == removed) {
+							url += '?tags=';
+						} else {
+							url += '&tags=';
+						}
+						url += curTags[i];
+					}
+				}
+				if(!removed) {
+					if(curTags.length > 0) {
+						url += '&tags=' + selectedTag;
+					} else {
+						url += '?tags=' + selectedTag;
+					}
+				}
+				//alert(url);
+				window.location.href = url + '#' + $(window).scrollTop();
+			});
+		});
+	</script>
+{% endblock %}

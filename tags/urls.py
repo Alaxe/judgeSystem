@@ -13,6 +13,7 @@ urlpatterns = patterns('',
     url(r'^(?P<pk>\d+)/delete/$', permission_required(
         'tags.delete_tag')(views.TagDelete.as_view()),
         name = 'tag_delete'),
-    url(r'^$', views.TagList.as_view(),
+    url(r'^$', permission_required(
+        'tags.change_tag')(views.TagList.as_view()),
         name = 'tag_list'),
 )

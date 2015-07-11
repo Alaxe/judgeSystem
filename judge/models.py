@@ -11,7 +11,7 @@ class Problem(models.Model):
     visible = models.BooleanField(default = False)
 
     class Meta:
-        ordering = ['-id']
+        #ordering = ['-id']
         permissions = (
             ('retest_problem', 'Can start a retest'),
             ('prbolem_visibility', 'Can change problem visibility'),

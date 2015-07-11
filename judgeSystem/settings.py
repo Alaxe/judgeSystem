@@ -44,10 +44,10 @@ INSTALLED_APPS = (
     'djcelery',
     'bootstrap3',
     'bootstrap_pagination',
+    'tags',
     'judge',
     'users',
     'blog',
-    'tags',
 )
 
 MIDDLEWARE_CLASSES = (
