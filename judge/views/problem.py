@@ -10,9 +10,6 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import TemplateView, DetailView, View
 
-from tags.utils import tags_by_category, filter_by_tags
-from tags.models import TagInstance, Tag
-
 from judge.models import Problem, Test, Solution, UserProblemData
 from judge.tasks import test_solution, retest_problem
 
@@ -30,18 +27,24 @@ class ProblemForm(ModelForm):
 class ProblemList(TemplateView):
     template_name = 'judge/problem_list.html'
 
-    def get_context_data(self, page = 1):
-        curTagsLabels = self.request.GET.getlist('tags')
-        curTags = Tag.objects.filter(label__in = curTagsLabels)
+    def get_context_data(self, page = 1, tags = ''):
+        context = super(ProblemList, self).get_context_data()
 
         problems = Problem.objects.filter(visible = True)
-        problems = filter_by_tags(problems, curTags)
 
-        problems.sort(key=lambda x: x.id, reverse = True)
-        
+        if tags != '':
+            tagsList = tags.split(',')
+            for tag in tagsList:
+                problems = problems.filter(tags__name__in = (tag,))
 
-        paginator = Paginator(problems, 20)
-        context = super(ProblemList, self).get_context_data()
+            context['paginate_name'] = 'judge:problem_list_tags_page'
+            context['paginate_extra_kwargs'] = {'tags': tags }
+
+        else:
+            context['paginate_name'] = 'judge:problem_page'
+            context['paginate_extra_kwargs'] = {}
+
+        paginator = Paginator(problems, 3)
 
         try:
             page = paginator.page(page)
@@ -49,6 +52,7 @@ class ProblemList(TemplateView):
             raise Http404
         
         user = self.request.user
+
         if user.is_authenticated():
             for prob in page.object_list :
                 
@@ -63,21 +67,8 @@ class ProblemList(TemplateView):
 
                 except UserProblemData.DoesNotExist :
                     prob.status = 'not_attempted'
-                
-                prob.tagInst = list_tag_inst(prob.pk)
         
         context['page'] = page
-        
-        allTags = tags_by_category()
-        curTagsSet = set(curTagsLabels)
-
-        for cat in allTags:
-            for tag in cat[1]:
-                if tag.label in curTagsSet:
-                    tag.active = True;
-                
-        context['tags'] = allTags;
-        context['curTags'] = curTagsLabels;
     
         return context
 
@@ -287,41 +278,3 @@ class ProblemVisibility(View):
 
         url = reverse('judge:problem_edit', args=(prob.pk,))
         return HttpResponseRedirect(url)
-
-class ProblemTags(View):
-    template_name = 'judge/problem_tags.html'
-    
-    def get_response(self, request, pk,  curInst = []):
-        allTags = tags_by_category()
-        curLabels = { inst.tag.label for inst in curInst }
-        context = {
-            'problem_pk': pk,
-            'tags': allTags,
-            'curTags': curLabels
-        }
-        return render(request, self.template_name, context)
-
-    def get(self, request, pk):
-        problem = get_object_or_404(Problem, pk = pk)
-        curInst = list_tag_inst(pk)
-        return self.get_response(request, pk, curInst = curInst)
-
-    def post(self, request, pk):
-        newTagLabels = request.POST.getlist('tags')
-        newTags = Tag.objects.filter(label__in = newTagLabels)
-
-        list_tag_inst(pk).delete()
-        
-        newTagInst = []
-        for tag in newTags:
-            content_type = ContentType.objects.get_for_model(Problem)
-            tagInst = TagInstance(tag = tag, object_id = pk, 
-                                    content_type = content_type)
-            newTagInst.append(tagInst)
-        
-        TagInstance.objects.bulk_create(newTagInst)
-        
-        return self.get_response(request, pk, curInst = newTagInst)
-
-
-

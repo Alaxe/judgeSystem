@@ -7,12 +7,12 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('tags', '0001_initial'),
+        ('judge', '0020_problem_tags'),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='tag',
-            options={'ordering': ('category', 'label')},
+            name='problem',
+            options={'ordering': ['-id'], 'permissions': (('problem_retest', 'Can start a retest'), ('problem_visibility', "Can change problem's visibility"))},
         ),
     ]

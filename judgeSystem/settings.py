@@ -44,7 +44,7 @@ INSTALLED_APPS = (
     'djcelery',
     'bootstrap3',
     'bootstrap_pagination',
-    'tags',
+    'taggit',
     'judge',
     'users',
     'blog',
@@ -124,3 +124,5 @@ EMAIL_HOST_PASSWORD = sens.EMAIL_PASSWORD
 SITE_HOST = sens.SITE_HOST
 
 LOGIN_URL = '/account/login'
+
+TAGGIT_CASE_INSENSITIVE = True

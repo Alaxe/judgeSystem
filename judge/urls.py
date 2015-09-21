@@ -8,6 +8,10 @@ urlpatterns = patterns('',
         name = 'problem_list'),
     url(r'^problems/page/(?P<page>\d+)/$', views.ProblemList.as_view(), 
         name = 'problem_page'),
+    url(r'^problems/tags/(?P<tags>\w+(,\w+)*)/$', views.ProblemList.as_view(),
+        name = 'problem_list_tags'),
+    url(r'^problems/tags/(?P<tags>\w+(,\w+)*)/page/(?P<page>\d+)/$', 
+        views.ProblemList.as_view(), name = 'problem_list_tags_page'),
 
     url(r'^problems/new/', permission_required(
         'judge.add_problem')(views.ProblemNew.as_view()), 
@@ -22,14 +26,11 @@ urlpatterns = patterns('',
        'judge.change_test')(views.ProblemGlobal.as_view()),
        name = 'problem_global'), 
     url(r'^problems/(?P<pk>\d+)/retest/$', permission_required(
-       'judge.retest_problem')(views.ProblemRetest.as_view()),
+       'judge.problem_retest')(views.ProblemRetest.as_view()),
        name = 'problem_retest'),
     url(r'^problems/(?P<pk>\d+)/visibility/$', permission_required(
         'judge.problem_visibility')(views.ProblemVisibility.as_view()),
         name = 'problem_visibility'),
-    url(r'^problems/(?P<pk>\d+)/tags/$', permission_required(
-        'judge.problem_tags')(views.ProblemTags.as_view()),
-        name = 'problem_tags'),
 
     url(r'^problems/(?P<pk>\d+)/$', views.ProblemDetails.as_view(), 
        name = 'problem_details'),

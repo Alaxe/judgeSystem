@@ -32,10 +32,6 @@ def problem_edit_nav(context, *args, **kwargs):
             'name': 'visibility',
             'url': reverse('judge:problem_visibility', args= (problem_pk,)),
             'text': 'Change visibility'
-        }, {
-            'name': 'tags',
-            'url': reverse('judge:problem_tags', args = (problem_pk,)),
-            'text': 'Edit tags'
         },{
             'name': 'delete',
             'url': reverse('judge:problem_delete', args = (problem_pk,)),

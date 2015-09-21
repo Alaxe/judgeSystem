@@ -4,17 +4,21 @@ from django.db import models
 from django.dispatch import Signal
 from django.utils import timezone
 
+from taggit.managers import TaggableManager
+
 class Problem(models.Model):
     title = models.CharField('Title', max_length = 64)
     statement = models.TextField('Problem statement')
     maxScore = models.IntegerField(default = 0)
     visible = models.BooleanField(default = False)
 
+    tags = TaggableManager()
+
     class Meta:
-        #ordering = ['-id']
+        ordering = ['-id']
         permissions = (
-            ('retest_problem', 'Can start a retest'),
-            ('prbolem_visibility', 'Can change problem visibility'),
+            ('problem_retest', 'Can start a retest'),
+            ('problem_visibility', 'Can change problem\'s visibility'),
         )
 
     def __str__(self):  
