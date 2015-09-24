@@ -59,3 +59,30 @@ def status_class(obj, *args, **kwargs):
     else:
         return 'warning'
 
+@register.filter
+def tags_url(tags, curTag = ''):
+    remTag = False
+    tagsStr = ''
+    curTag = str(curTag)
+
+    for tag in tags:
+        if tag == curTag:
+            remTag = True
+            continue
+
+        if not tagsStr:
+            tagsStr = tag
+        else:
+            tagsStr += ',' + tag
+
+
+    if (not remTag) and curTag:
+        if not tagsStr:
+            tagsStr = curTag
+        else:
+            tagsStr += ',' + curTag
+
+    if tagsStr:
+        return reverse('judge:problem_list_tags', args=(tagsStr,))
+    else:
+        return reverse('judge:problem_list')

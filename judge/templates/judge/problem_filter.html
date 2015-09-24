@@ -1,0 +1,25 @@
+{% extends 'judge/base.html' %}
+
+{% load taggit_extras %}
+
+{% block title %}
+	<h1>Filter problems</h1>
+{% endblock %}
+
+{% block content %}
+	<h2>Tags</h2>
+	<form method="POST" action="{{ request.get_full_path }}">
+		<ul class="list-group">
+			{% get_taglist as tags for 'judge.problem' %}
+			{% for tag in tags %}
+				<li class="list-group-item">
+					<input type="checkbox" name="tag_select" value="{{ tag.name }}"/>
+					{{ tag.name }}
+					<span class="badge">{{ tag.num_times }}</span>
+				</li>
+			{% endfor %}
+		</ul>
+		{% csrf_token %}
+		<input type="submit" class="btn btn-block btn-primary"  value="Search">
+	</form>
+{% endblock %}

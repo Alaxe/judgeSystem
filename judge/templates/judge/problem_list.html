@@ -1,5 +1,8 @@
 {% extends 'judge/base.html' %}
+
 {% load bootstrap_pagination %}
+{% load taggit_extras %}
+{% load judge %}
 
 {% block title %}
 	<h1>Problem list</h1>
@@ -30,9 +33,13 @@
 							{% endif %}
 
 							{% for tag in problem.tags.names %}
-								<span class="label label-primary tag-label">
+							<a href="{{ curTags|tags_url:tag }}">
+								<span class="label tag-label
+										{% if tag in curTags %}label-info
+										{% else %}label-primary{% endif %}">
 									{{tag}}
 								</span>
+							</a>
 							{% endfor %}
 						</div>
 					</div>
@@ -42,28 +49,33 @@
 		{% bootstrap_paginate page url_extra_kwargs=paginate_extra_kwargs url_view_name=paginate_name range=20 %}
 		</div>
 		<div class="col-md-3">
-			{% for cat in tags %}
-				<div class="panel panel-primary">
-					<div class="panel-heading">
-						<h3 class="panel-title">
-							{{ cat.0 }}
-						</h3>
-					</div>
-					<div class="panel-body">
-						<div class="list-group">
-							{% for tag in cat.1 %}
-								<a>
-								<div class="list-group-item tag-selector
-										{% if tag.active %}active{% endif %}"
-										value="{{ tag.label }}">
-									{{ tag.label }}
-								</div>
-								</a>
-							{% endfor %}
-						</div>
-					</div>
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						Tags
+					</h3>
 				</div>
-			{% endfor %}
+				<div class="panel-body">
+					<div class="list-group">
+						{% get_taglist as tags for 'judge.problem' %}
+						{% for tag in tags|slice:":10" %}
+							<a href="{{ curTags|tags_url:tag.name }}">
+							<div class="list-group-item tag-selector
+										{% if tag.name in curTags %}active{% endif %}">
+
+								{{ tag.name }}
+								<span class="badge"> {{ tag.num_times }} </span>
+
+							</div>
+							</a>
+						{% endfor %}
+					</div>
+
+					<a class="btn btn-block btn-info" href="{% url 'judge:problem_filter' %}">
+						Advanced options
+					</a>
+			</div>
+			</div>
 		</div>
 	</div>
 	

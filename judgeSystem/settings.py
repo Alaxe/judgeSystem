@@ -45,6 +45,7 @@ INSTALLED_APPS = (
     'bootstrap3',
     'bootstrap_pagination',
     'taggit',
+    'taggit_templatetags',
     'judge',
     'users',
     'blog',

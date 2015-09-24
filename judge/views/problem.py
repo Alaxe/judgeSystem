@@ -13,12 +13,6 @@ from django.views.generic import TemplateView, DetailView, View
 from judge.models import Problem, Test, Solution, UserProblemData
 from judge.tasks import test_solution, retest_problem
 
-def list_tag_inst(pk):
-        content_type = ContentType.objects.get_for_model(Problem)
-        curInst = TagInstance.objects.filter(object_id = pk,
-                                            content_type = content_type)
-        return curInst
-
 class ProblemForm(ModelForm):
     class Meta:
         model = Problem
@@ -32,9 +26,11 @@ class ProblemList(TemplateView):
 
         problems = Problem.objects.filter(visible = True)
 
+        context['curTags'] = []
         if tags != '':
-            tagsList = tags.split(',')
-            for tag in tagsList:
+            context['curTags'] = tags.split(',')
+
+            for tag in context['curTags']:
                 problems = problems.filter(tags__name__in = (tag,))
 
             context['paginate_name'] = 'judge:problem_list_tags_page'
@@ -72,9 +68,32 @@ class ProblemList(TemplateView):
     
         return context
 
+class ProblemFilter(View):
+    template_name = 'judge/problem_filter.html'
+
+    def get(self, request):
+        return render(request, self.template_name)
+
+    def post(self, request):
+        selectedTags = request.POST.getlist('tag_select')
+
+        tagsStr = ''
+        for tag in selectedTags:
+            if not tagsStr:
+                tagsStr = tag
+            else:
+                tagsStr += ',' + tag
+
+
+
+        if not tagsStr:
+            url = reverse('judge:problem_list')
+        else:
+            url = reverse('judge:problem_list_tags', args=(tagsStr,))
+        return HttpResponseRedirect(url)
+
+
 class ProblemDetails(View):
-    model = Problem
-    context_object_name = 'problem'
     template_name = 'judge/problem_details.html'
 
     def get(self, request, pk):

@@ -4,14 +4,16 @@ from django.contrib.auth.decorators import login_required, permission_required
 from judge import views
 
 urlpatterns = patterns('',
-    url(r'^problems/$', views.ProblemList.as_view(), 
+    url(r'^$', views.ProblemList.as_view(), 
         name = 'problem_list'),
     url(r'^problems/page/(?P<page>\d+)/$', views.ProblemList.as_view(), 
         name = 'problem_page'),
-    url(r'^problems/tags/(?P<tags>\w+(,\w+)*)/$', views.ProblemList.as_view(),
-        name = 'problem_list_tags'),
-    url(r'^problems/tags/(?P<tags>\w+(,\w+)*)/page/(?P<page>\d+)/$', 
+    url(r'^problems/tags/(?P<tags>[\w ]+(,[\w ]+)*)/$', 
+        views.ProblemList.as_view(), name = 'problem_list_tags'),
+    url(r'^problems/tags/(?P<tags>[\w ]+(,[\w ]+)*)/page/(?P<page>\d+)/$', 
         views.ProblemList.as_view(), name = 'problem_list_tags_page'),
+    url(r'^problems/filter/$', views.ProblemFilter.as_view(),
+        name = 'problem_filter'),
 
     url(r'^problems/new/', permission_required(
         'judge.add_problem')(views.ProblemNew.as_view()), 

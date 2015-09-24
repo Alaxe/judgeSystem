@@ -2,8 +2,9 @@ judgeSystem/sens.py
 db.sqlite3
 *.swp
 *.swo
-run-celery.sh
-run-server.sh
+run-celery
+run-server
+erl_crash.dump
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
