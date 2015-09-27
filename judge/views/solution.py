@@ -34,7 +34,8 @@ class SolutionDetails(View):
             }
             return render(request, self.template_name, context)
         else:
-            return HttpResponseForbidden()
+            url = reverse('judge:problem_list')
+            return HttpResponseRedirect(url)
 
 class SolutionSubmitForm(Form):
     source = CharField(label = 'Source Code',

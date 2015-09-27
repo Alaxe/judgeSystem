@@ -26,7 +26,7 @@ def base_nav(context, *args, **kwargs):
             'url': reverse('users:details')
         }, {
             'name': 'logout',
-            'text': 'Logout',
+            'text': 'Log out',
             'url': reverse('users:logout')
         }]
     else:

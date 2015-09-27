@@ -31,7 +31,7 @@ urlpatterns = patterns('',
         'judge.problem_visibility')(views.ProblemVisibility.as_view()),
         name = 'problem_visibility'),
     url(r'^problems/(?P<pk>\d+)/checker/$', permission_required(
-        'judge.problem_edit')(views.ProblemChecker.as_view()),
+        'judge.change_problem')(views.ProblemChecker.as_view()),
         name = 'problem_checker'),
 
     url(r'^problems/(?P<pk>\d+)/$', views.ProblemDetails.as_view(), 
@@ -46,7 +46,7 @@ urlpatterns = patterns('',
     url(r'^test/(?P<pk>\d+)/edit/$', permission_required(
        'judge.change_test')(views.TestEdit.as_view()),
        name = 'test_edit'),
-    url(r'^test/(?P<pk>\d+)/delete/$', permission_required(
+    url(r'^test/(?P<ids>\d+(,\d+)*)/delete/$', permission_required(
         'judge.delete_test')(views.TestDelete.as_view()),
         name = 'test_delete'),
     url(r'^test/(?P<pk>\d+)/input/$', permission_required(
