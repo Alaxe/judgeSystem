@@ -4,14 +4,14 @@
 {% block content %}
 	<div class="row">
 		{% if problem_pk %}
-			<div class="col-md-4">
+			<div class="col-md-3">
 				{% block edit_nav %}
 					{% problem_edit_nav %}
 				{% endblock %}
 			</div>
 		{% endif %}
 
-		<div class="col-md-8">
+		<div class="col-md-9">
 			{% block edit_content %}{% endblock %}
 		</div>
 	</div>

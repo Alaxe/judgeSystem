@@ -21,18 +21,22 @@ def problem_edit_nav(context, *args, **kwargs):
             'url': reverse('judge:test_list', args = (problem_pk,)),
             'text': 'Edit tests'
         }, {
-            'name': 'global',
-            'url': reverse('judge:problem_global', args = (problem_pk,)),
-            'text': 'Change global settings'
+            'name': 'test_new',
+            'url': reverse('judge:test_new', args = (problem_pk,)),
+            'text': 'Add a test'
+        }, {
+            'name': 'checker',
+            'url': reverse('judge:problem_checker', args = (problem_pk,)),
+            'text': 'Configure a custom checker'
+        }, {
+            'name': 'visibility',
+            'url': reverse('judge:problem_visibility', args= (problem_pk,)),
+            'text': 'Change visibility'
         }, {
             'name': 'retest',
             'url': reverse('judge:problem_retest', args = (problem_pk,)),
             'text': 'Retest problem'
         }, {
-            'name': 'visibility',
-            'url': reverse('judge:problem_visibility', args= (problem_pk,)),
-            'text': 'Change visibility'
-        },{
             'name': 'delete',
             'url': reverse('judge:problem_delete', args = (problem_pk,)),
             'text': 'Delete problem'

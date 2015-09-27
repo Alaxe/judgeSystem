@@ -11,6 +11,7 @@ class Problem(models.Model):
     statement = models.TextField('Problem statement')
     maxScore = models.IntegerField(default = 0)
     visible = models.BooleanField(default = False)
+    customChecker = models.BooleanField(default = False)
 
     tags = TaggableManager()
 
@@ -85,6 +86,7 @@ class Test(models.Model):
         permissions = (
             ('view_test', 'Can see input/output files'),
         )
+        ordering = ['pk']
 
     def __str__(self):
         return self.problem.title + ' --- Test'

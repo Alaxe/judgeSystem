@@ -20,6 +20,8 @@ def get_box_loc():
     return '/tmp/box/' + str(get_box_id()) + '/box/'
 def get_sandbox():
     return 'judge/isolate'
+def get_grader_loc(problem):
+    return 'judge/graders/' + str(problem.pk)
 
 def compile_solution(solution):
     sourceName = str(solution.pk) + 'source.cpp'
@@ -65,6 +67,12 @@ def run_solution(test):
     return err.decode('utf-8')
 
 def check_output(test):
+    if test.problem.customChecker:
+        return custom_grader(test)
+    else:
+        return default_grader(test)
+
+def default_grader(test):
     outFilePath = get_box_loc() + 'std.out'
     outFile = open(outFilePath, 'r')
     curOut = outFile.read()
@@ -74,6 +82,28 @@ def check_output(test):
     corOut = test.stdout
 
     return curOut == corOut 
+
+def custom_grader(test):
+    problem = test.problem
+
+    inFilePath = get_box_loc() + 'std.in'
+    outFilePath = get_box_loc() + 'std.out'
+    correctFilePath = get_box_loc() + 'cor.out'
+    graderFilePath = get_box_loc() + 'grader'
+
+    correctFile = open(correctFilePath, 'w')
+    correctFile.write(test.stdout)
+    correctFile.close()
+
+    subprocess.call(['cp', get_grader_loc(problem), graderFilePath])
+    subprocess.call(['chmod', '700', graderFilePath])
+    scoreMessage = subprocess.check_output([graderFilePath, inFilePath, 
+            outFilePath, correctFilePath])
+
+    score = float(scoreMessage.split()[0])
+
+    return score
+
 
 @shared_task
 def test_solution(solution):

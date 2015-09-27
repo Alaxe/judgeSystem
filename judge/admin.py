@@ -8,8 +8,9 @@ class TestInLine(admin.TabularInline):
 
 class ProblemAdmin(admin.ModelAdmin):
 	fieldsets = [
-		('Titel', {'fields': ['title',]}),
-		(None, {'fields': ['statement',], 'classes': ['wide',]}),]
+		('Title', {'fields': ['title',]}),
+		(None, {'fields': ['statement', 'customChecker'], 
+                    'classes': ['wide',]}),]
 
 	inlines = [TestInLine]
 	search_fields = ['title']

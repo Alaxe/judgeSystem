@@ -5,18 +5,13 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.paginator import InvalidPage, Paginator
 from django.core.urlresolvers import reverse
 from django.db.transaction import set_autocommit, commit
-from django.forms import ModelForm, Form, IntegerField, DecimalField
+from django import forms
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import TemplateView, DetailView, View
 
 from judge.models import Problem, Test, Solution, UserProblemData
 from judge.tasks import test_solution, retest_problem
-
-class ProblemForm(ModelForm):
-    class Meta:
-        model = Problem
-        exclude = ['maxScore', 'visible']
 
 class ProblemList(TemplateView):
     template_name = 'judge/problem_list.html'
@@ -92,7 +87,6 @@ class ProblemFilter(View):
             url = reverse('judge:problem_list_tags', args=(tagsStr,))
         return HttpResponseRedirect(url)
 
-
 class ProblemDetails(View):
     template_name = 'judge/problem_details.html'
 
@@ -109,6 +103,12 @@ class ProblemDetails(View):
 
         context = {'problem': problem, 'solutions': solutions}
         return render(request, self.template_name, context)
+
+
+class ProblemForm(forms.ModelForm):
+    class Meta:
+        model = Problem
+        exclude = ['maxScore', 'visible', 'customChecker']
 
 class ProblemNew(View):
     template_name = 'judge/problem_edit.html'
@@ -193,54 +193,57 @@ class ProblemDelete(View):
         url = reverse('judge:problem_list')
         return HttpResponseRedirect(url)
 
-class ProblemGlobalForm(Form):
-    timeLimit = DecimalField(required = False, decimal_places = 4)
-    memoryLimit = IntegerField(required = False)
-    testScore = IntegerField(required = False)
+class ProblemCheckerForm(forms.Form):
+    useCustomChecker = forms.BooleanField(label = 'Use custom checker', 
+                    required = False)
+    customChecker = forms.FileField(required = False, 
+                    label = 'Upload checker (if used)')
 
-class ProblemGlobal(View):
-    template_name = 'judge/problem_global.html'
+    def is_valid(self):
+        valid = super(ProblemCheckerForm, self).is_valid()
 
-    def get_context(self, form, pk):
+        data = self.cleaned_data
+        if data.get('useCustomChecker') and (not data.get('customChecker')) :
+                self.add_error('customChecker', 'You need to provide a checker')
+                valid = False
+
+        return valid
+
+class ProblemChecker(View):
+    template_name = 'judge/problem_checker.html'
+
+    def get_context(self, pk, form = None):
+        if not form:
+            problem = get_object_or_404(Problem, pk = pk)
+            form = ProblemCheckerForm()
+            form.fields['useCustomChecker'].initial = problem.customChecker
+
         return {
             'form': form,
             'problem_pk': pk
         }
 
     def get(self, request, pk):
-        form = ProblemGlobalForm()
-        context = self.get_context(form, pk)
+        context = self.get_context(pk)
         return render(request, self.template_name, context)
-        
+
     def post(self, request, pk):
-        form = ProblemGlobalForm(request.POST)
-
-        if not form.is_valid():
-            context = self.get_context(form, pk)
-            return render(request, self.template_name, context)
-
+        form = ProblemCheckerForm(request.POST, request.FILES)
         problem = get_object_or_404(Problem, pk = pk)
 
-        timeLimit = form.cleaned_data['timeLimit']
-        memoryLimit = form.cleaned_data['memoryLimit']
-        testScore = form.cleaned_data['testScore']
+        if not form.is_valid():
+            context = self.get_context(pk, form = form)
+            return render(request, self.template_name, context)
 
-        for test in problem.test_set.all():
-            if timeLimit != None:
-                test.time_limit = timeLimit
-            if memoryLimit != None:
-                test.mem_limit = memoryLimit
-            if testScore != None:
-                test.score = testScore
+        problem.customChecker = form.cleaned_data.get('useCustomChecker')
+        problem.save()
 
-            test.save()
-        
-        if testScore != None:
-            problem.maxScore = problem.test_set.count() * testScore
-            problem.save()
+        if problem.customChecker:
+            dest = open('judge/graders/' + str(problem.pk), 'wb')
+            dest.write(request.FILES['customChecker'].read())
+            dest.close()
 
-
-        messageText = 'Test updated successfully'
+        messageText = 'Checker successfully updated'
         messages.add_message(request, messages.SUCCESS, messageText)
 
         url = reverse('judge:problem_edit', args=(pk,))
