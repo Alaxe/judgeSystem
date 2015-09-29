@@ -23,7 +23,7 @@ def problem_edit_nav(context, *args, **kwargs):
         }, {
             'name': 'test_new',
             'url': reverse('judge:test_new', args = (problem_pk,)),
-            'text': 'Add a test'
+            'text': 'Add tests'
         }, {
             'name': 'checker',
             'url': reverse('judge:problem_checker', args = (problem_pk,)),

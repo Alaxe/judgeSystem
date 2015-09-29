@@ -12,8 +12,12 @@
 		{% csrf_token %}
 		{% bootstrap_form form %}
 
+		<input type="submit" name="update" value="Set settings" 
+				class="btn btn-default btn-block">
+		<input type="submit" name="delete" value="Delete tests"
+				class="btn btn-warning btn-block">
+
 		<h3>Select Tests</h3>
-		{{ testIds }}
 		<table class="table table-hover">
 			<thead>
 				<tr>
@@ -68,11 +72,6 @@
 				{% endfor %}
 			</tbody>
 		</table>
-		<input type="submit" name="update" value="Set settings" 
-				class="btn btn-default btn-block">
-		<input type="submit" name="delete" value="Delete tests"
-				class="btn btn-warning btn-block">
-
 	</form>
 {% endblock %}
 

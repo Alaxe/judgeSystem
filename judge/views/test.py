@@ -10,7 +10,10 @@ from django.views.generic import View
 
 from judge.models import Problem, Test
 
-class TestForm(forms.ModelForm):
+from zipfile import ZipFile, BadZipFile
+import os
+
+class TestEditForm(forms.ModelForm):
     stdinFile = forms.FileField(required=False)
     stdoutFile = forms.FileField(required=False)
 
@@ -19,7 +22,7 @@ class TestForm(forms.ModelForm):
         exclude = ['stdin', 'stdout', 'problem']
 
     def is_valid(self, update=False):
-        valid = super(TestForm, self).is_valid()
+        valid = super(TestEditForm, self).is_valid()
         
         if update:
             return valid
@@ -34,11 +37,28 @@ class TestForm(forms.ModelForm):
 
         return valid
 
+class TestNewForm(TestEditForm):
+    zipFile = forms.FileField(required = False)
+
+    def is_valid(self):
+        super(TestEditForm, self).is_valid()
+
+        update = False
+
+        if self.cleaned_data['zipFile'] != None:
+            update = True
+    
+        valid = super(TestNewForm, self).is_valid(update = update)
+        if not valid:
+            self.add_error('zipFile', 'No zipfile uploaded')
+
+        return valid
+
 class TestNew(View):
     template_name = 'judge/test_edit.html'
     title = 'Add a test'
 
-    def get_context(self, form, problem):
+    def get_context(self, problem, form  = TestNewForm()):
         return {
             'form' : form,
             'problem': problem,
@@ -49,25 +69,89 @@ class TestNew(View):
     def get(self, request, problem_id):
         problem = get_object_or_404(Problem, pk = problem_id)
 
-        context = self.get_context(TestForm(), problem)
+        context = self.get_context(problem)
         return render(request, self.template_name, context)
 
-    def post(self, request, problem_id):
-        problem = get_object_or_404(Problem, pk = problem_id)
-        form = TestForm(request.POST, request.FILES)
-
-        if not form.is_valid():
-            context = self.get_context(form, problem)
-            return render(request, self.template_name, context)
-
+    def add_single_test(self, form, problem, request):
         test = form.save(commit = False)
         test.stdin = request.FILES['stdinFile'].read()
         test.stdout = request.FILES['stdoutFile'].read()
         test.problem = problem
         test.save()
 
-        url = reverse('judge:test_list', args = (problem.pk,))
-        return HttpResponseRedirect(url)
+        return True
+
+    def add_zip_tests(self, form, problem, request):
+        zipName = 'tests.zip'
+
+        with open(zipName, 'wb+') as zipFile:
+            for chunk in request.FILES['zipFile'].chunks():
+                zipFile.write(chunk)
+
+        try:
+            with ZipFile(zipName) as testsZip:
+                fileNames = testsZip.namelist()
+                fileNamesSet = set(fileNames)
+
+                testCount = 0
+                for inFileName in fileNames:
+                    if not inFileName.endswith('.in'):
+                        continue
+
+                    testName = inFileName[:-3]
+                    if testName + '.sol' in fileNamesSet:
+                        outFileName = testName + '.sol'
+                    elif testName + '.out' in fileNamesSet:
+                        outFileName = testName + '.out'
+                    else:
+                        continue
+
+                    testCount += 1
+
+                    test = Test(problem = problem)
+                    test.time_limit = form.cleaned_data['time_limit']
+                    test.mem_limit  = form.cleaned_data['mem_limit']
+                    test.score      = form.cleaned_data['score']
+
+                    with testsZip.open(inFileName, 'r') as inFile:
+                        test.stdin = inFile.read()
+                    with testsZip.open(outFileName, 'r') as outFile:
+                        test.stdout = outFile.read()
+
+                    test.save()
+
+            os.remove(zipName)
+
+            if testCount:
+                messageText = '{0} tests were added'.format(testCount)
+                messages.add_message(request, messages.SUCCESS, messageText)
+            else:
+                messageText = 'No test were added'
+                messages.add_message(request, messages.WARNING, messageText)
+
+        except BadZipFile:
+            form.add_error('zipFile', 'Invalid zip file')
+            return False
+
+        return True
+
+    def post(self, request, problem_id):
+        problem = get_object_or_404(Problem, pk = problem_id)
+        form = TestNewForm(request.POST, request.FILES)
+
+        success = False
+        if form.is_valid():
+            if form.cleaned_data['zipFile']:
+                success = self.add_zip_tests(form, problem, request)
+            else:
+                success = self.add_single_test(form, problem, request)
+
+        if success:
+            url = reverse('judge:test_list', args = (problem.pk,))
+            return HttpResponseRedirect(url)
+        else:
+            context = self.get_context(problem, form)
+            return render(request, self.template_name, context)
 
 class TestEdit(View):
     template_name = 'judge/test_edit.html'
@@ -84,14 +168,14 @@ class TestEdit(View):
 
     def get(self, request, pk):
         test = get_object_or_404(Test, pk = pk)
-        form = TestForm(instance = test)
+        form = TestEditForm(instance = test)
 
         context = self.get_context(form, test)
         return render(request, self.template_name, context)
 
     def post(self, request, pk):
         test = get_object_or_404(Test, pk = pk)
-        form = TestForm(request.POST, request.FILES, instance = test)
+        form = TestEditForm(request.POST, request.FILES, instance = test)
         problem = test.problem
 
         if not form.is_valid(update = True):
@@ -196,8 +280,17 @@ class TestList(View):
 
             test.save()
         
-        print('hi')
         problem.save()
+
+        if not testIds:
+            messageText = 'No tests selected for update'
+            messages.add_message(request, messages.WARNING, messageText)
+        elif (not timeLimit) and (not memoryLimit) and (not testScore):
+            messageText = 'No fields selected for update'
+            messages.add_message(request, messages.WARNING, messageText)
+        else:
+            messageText = '{0} tests updated successfully'.format(len(testIds))
+            messages.add_message(request, messages.SUCCESS, messageText)
 
         return render(request, self.template_name, context)
 
@@ -206,6 +299,9 @@ class TestList(View):
         testStr = ','.join(testIds)
 
         if not testStr:
+            messageText = 'No tests selected for deletion'
+            messages.add_message(request, messages.WARNING, messageText)
+
             url = reverse('judge:test_list', args=(pk,))
         else:
             url = reverse('judge:test_delete', args=(testStr,))

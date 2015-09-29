@@ -55,8 +55,8 @@ def run_solution(test):
     time_limit = str(test.time_limit)
 
     args = [sandbox, '-i', 'std.in', '-o', 'std.out', '-b', str(boxId), 
-            '-t', time_limit, '-x', time_limit, '-m', 
-            str(test.mem_limit * 1024), '--run', 'solution']
+            '-t', time_limit, '-m', str(test.mem_limit * 1024), 
+            '--run', 'solution']
 
     proc = subprocess.Popen(args, stdout = subprocess.PIPE, 
                             stderr = subprocess.PIPE)
