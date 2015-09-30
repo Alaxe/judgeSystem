@@ -52,7 +52,10 @@ class SolutionSubmit(View):
 
     def get(self, request, pk):
         self.form = SolutionSubmitForm()
-        self.problem = get_object_or_404(Problem, pk = pk)
+        if request.user.has_perm('judge.problem_hidden'):
+            self.problem = get_object_or_404(Problem, pk = pk)
+        else:
+            self.problem = get_object_or_404(Problem, pk = pk, visible = True)
 
         if not request.user.is_active:
             return HttpResponseRedirect(reverse('judge:login'))

@@ -7,14 +7,21 @@ from django.utils import timezone
 
 def gen_randcode():
     chars = string.ascii_uppercase + string.digits
-    return ''.join(random.choice(chars) for _ in range(32))
+    return ''.join(random.SystemRandom().choice(chars) for i in range(32))
 
-class Confirmation(models.Model):
-    code = models.CharField(max_length = 32, default = gen_randcode())
+class UserLink(models.Model):
+    code = models.CharField(max_length = 32, default = '')
     user = models.OneToOneField(User)
     created = models.DateTimeField(default = timezone.now)
 
-class PassReset(models.Model):
-    code = models.CharField(max_length = 32, default = gen_randcode())
-    user = models.OneToOneField(User)
-    created = models.DateTimeField(default = timezone.now)
+    class Meta:
+        abstract = True
+
+    def __init__(self, *args, **kwargs):
+        super(UserLink, self).__init__(*args, **kwargs)
+        self.code = gen_randcode()
+
+class Confirmation(UserLink):
+    pass
+class PassReset(UserLink):
+    pass

@@ -20,6 +20,7 @@ class Problem(models.Model):
         permissions = (
             ('problem_retest', 'Can start a retest'),
             ('problem_visibility', 'Can change problem\'s visibility'),
+            ('problem_hidden', 'Can see hidden problems')
         )
 
     def __str__(self):  

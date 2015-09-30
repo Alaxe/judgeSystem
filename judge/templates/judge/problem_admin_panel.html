@@ -1,0 +1,23 @@
+{% if has_permission %}
+<div class="panel panel-info">
+	<div class="panel-heading">
+		<h3 class="panel-title">
+			Admin options
+		</h3>
+	</div>
+	<div class="panel-body">
+		{% if problem %}
+			<a href="{% url 'judge:problem_edit' problem.pk %}"
+				 class="btn btn-default btn-block">
+				Edit statement
+			</a>
+		{% else %}
+			<a href="{% url 'judge:problem_new' %}"
+				class="btn btn-default btn-block">
+				New problem
+			</a>
+		{% endif %}
+	</div>
+
+</div>
+{% endif %}

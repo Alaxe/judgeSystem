@@ -13,6 +13,10 @@ def problem_edit_nav(context, *args, **kwargs):
     return {
         'curPage': page,
         'pages': [ {
+            'name': 'preview',
+             'url': reverse('judge:problem_details', args = (problem_pk,)),
+             'text': 'Preview'
+        },{
             'name': 'statement',
             'url': reverse('judge:problem_edit', args = (problem_pk,)),
             'text': 'Edit statement'
@@ -43,6 +47,19 @@ def problem_edit_nav(context, *args, **kwargs):
         }
      ]
     }
+
+@register.inclusion_tag('judge/problem_admin_panel.html', takes_context = True)
+def problem_admin_panel(context, *args, **kwargs):
+    user = context.request.user
+
+    pageContext = {}
+    if 'problem' in kwargs:
+        pageContext['problem'] = kwargs['problem']
+        pageContext['has_permission'] = user.has_perm('judge.change_problem')
+    else:
+        pageContext['has_permission'] = user.has_perm('judge.add_problem')
+
+    return pageContext
 
 @register.filter
 def status_class(obj, *args, **kwargs):

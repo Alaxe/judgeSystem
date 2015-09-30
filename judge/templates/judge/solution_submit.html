@@ -4,7 +4,12 @@
 {% load base %}
 
 {% block title %}
-	<h1> Submit {{ problem.title }} </h1>
+	<h1> 
+		Submit {{ problem.title }} 
+		{% if not problem.visible %}
+			<small>Hidden</small>
+		{% endif %}
+	</h1>
 {% endblock %}
 
 {% block content %}

@@ -2,7 +2,12 @@
 {% load judge %}
 
 {% block title %}
-	<h1> {{ problem.title }} </h1>
+	<h1> 
+		{{ problem.title }} 
+		{% if not problem.visible %}
+			<small>Hidden</small>
+		{% endif %}
+	</h1>
 {% endblock %}
 
 {% block content %}
@@ -12,10 +17,13 @@
 	</div>
 
 	<div class="col-md-4">
+	{% problem_admin_panel problem=problem %}
+
 	<div class="panel panel-primary">
 		<div class="panel-heading">
 			<h3 class="panel-title">Your solutions</h3>
 		</div>
+
 		<div class="panel-body">
 			{% if not request.user.is_authenticated %}
 				<a href="{% url 'users:login' %}?next=

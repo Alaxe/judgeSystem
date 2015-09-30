@@ -19,7 +19,9 @@ class ProblemList(TemplateView):
     def get_context_data(self, page = 1, tags = ''):
         context = super(ProblemList, self).get_context_data()
 
-        problems = Problem.objects.filter(visible = True)
+        problems = Problem.objects.all()
+        if not self.request.user.has_perm('judge.problem_hidden'):
+            problems = problems.filter(visible = True)
 
         context['curTags'] = []
         if tags != '':
@@ -87,22 +89,21 @@ class ProblemFilter(View):
             url = reverse('judge:problem_list_tags', args=(tagsStr,))
         return HttpResponseRedirect(url)
 
-class ProblemDetails(View):
+class ProblemDetails(TemplateView):
     template_name = 'judge/problem_details.html'
 
-    def get(self, request, pk):
-        if not request.user.has_perm('judge.change_problem'):
+    def get_context_data(self, pk):
+        if not self.request.user.has_perm('judge.problem_hidden'):
             problem = get_object_or_404(Problem, pk = pk, visible = True)
         else:
             problem = get_object_or_404(Problem, pk = pk)
         solutions = []
         
-        if request.user.is_authenticated():
-            solutions = Solution.objects.filter(user = request.user,
+        if self.request.user.is_authenticated():
+            solutions = Solution.objects.filter(user = self.request.user,
                     problem = problem)[:20]
 
-        context = {'problem': problem, 'solutions': solutions}
-        return render(request, self.template_name, context)
+        return {'problem': problem, 'solutions': solutions}
 
 
 class ProblemForm(forms.ModelForm):

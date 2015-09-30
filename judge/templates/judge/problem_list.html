@@ -10,7 +10,7 @@
 
 {% block content %}
 	<div class="row">
-		<div class="col-md-9">
+		<div class="col-md-8">
 			<ul class="list-group">
 			{% for problem in page.object_list %}
 				<li class="list-group-item">
@@ -22,13 +22,18 @@
 							</a>
 						</div>
 						<div class="col-sm-8">
+							{% if not problem.visible %}
+							<span class="label label-warning tag-label">
+								Hidden
+							</span>
+							{% endif %}
 							{% if problem.status == 'solved' %}
 							<span class="label label-success tag-label">
 									Solved
 								</span>
 							{% elif problem.status == 'attempted' %}
 								<span class="label label-warning tag-label">
-									attempted
+									Attempted
 								</span>
 							{% endif %}
 
@@ -48,7 +53,8 @@
 			</ul>
 		{% bootstrap_paginate page url_extra_kwargs=paginate_extra_kwargs url_view_name=paginate_name range=20 %}
 		</div>
-		<div class="col-md-3">
+		<div class="col-md-4">
+			{% problem_admin_panel %}
 			<div class="panel panel-primary">
 				<div class="panel-heading">
 					<h3 class="panel-title">
