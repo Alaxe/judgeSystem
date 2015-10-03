@@ -3,12 +3,18 @@
 {% load bootstrap_pagination %}
 
 {% block title %}
-	<h1>Blog</h1>
+	<h1>
+		Blog
+		{% post_admin_panel %}
+	</h1>
 {% endblock %}
 
 {% block content %}
 	{% for post in page.object_list %}
-		<h2> {{ post.title }} </h2>
+		<h2> 
+			{{ post.title }} 
+			{% post_admin_panel post=post %}
+		</h2>
 		<p class="lead">
 			{{ post|post_subheading }}
 		</p>

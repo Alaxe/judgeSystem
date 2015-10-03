@@ -2,7 +2,10 @@
 {% load blog %}
 
 {% block title %}
-	<h1> {{ post.title }}</h1>
+	<h1> 
+		{{ post.title }}
+		{% post_admin_panel post=post %}
+	</h1>
 	<p class="lead">
 		{{ post|post_subheading }}
 	</p>

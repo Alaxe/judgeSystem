@@ -1,0 +1,13 @@
+{% if has_permission %}
+	{% if post %}
+		<a href="{% url 'blog:post_edit' post.pk %}"
+			style="float:right;" class="btn btn-info btn-sm">
+			Edit
+		</a>
+	{% else %}
+		<a href="{% url 'blog:post_new' %}"
+			style="float:right;" class="btn btn-info btn-sm">
+			New blog post
+		</a>
+	{% endif %}
+{% endif %}
