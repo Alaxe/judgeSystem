@@ -48,9 +48,9 @@
 								Edit test
 							</a>
 						</td>
-						<td> {{ test.time_limit}} sec </td>
+						<td> {{ test.time_limit|floatformat }} sec </td>
 						<td> {{ test.mem_limit }} MB </td>
-						<td> {{ test.score }} </td>
+						<td> {{ test.score|floatformat }} </td>
 						<td>
 							<a href="{% url 'judge:test_input' test.pk %}">
 								View input

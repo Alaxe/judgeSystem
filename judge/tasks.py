@@ -74,14 +74,18 @@ def check_output(test):
 
 def default_grader(test):
     outFilePath = get_box_loc() + 'std.out'
-    outFile = open(outFilePath, 'r')
-    curOut = outFile.read()
-    curOut = curOut.replace('\n', '\r\n')
-    outFile.close()
+    try:
+        outFile = open(outFilePath, 'r')
+        curOut = outFile.read()
+        curOut = curOut.replace('\r\n', '\n')
+        outFile.close()
 
-    corOut = test.stdout
+        corOut = test.stdout
+        corOut = corOut.replace('\r\n', '\n')
 
-    return curOut == corOut 
+        return curOut == corOut 
+    except FileNotFoundError:
+        return 0
 
 def custom_grader(test):
     problem = test.problem
@@ -164,9 +168,9 @@ def save_result(result, solution):
         for taskRes in result:
             taskRes.save()
 
-        solution.grader_message = 'Tested'
-        solution.update_score()
-        solution.save()
+    solution.grader_message = 'Tested'
+    solution.update_score()
+    solution.save()
 
     try:
         os.remove(get_sol_loc(solution))

@@ -9,7 +9,7 @@ from taggit.managers import TaggableManager
 class Problem(models.Model):
     title = models.CharField('Title', max_length = 64)
     statement = models.TextField('Problem statement')
-    maxScore = models.IntegerField(default = 0)
+    maxScore = models.DecimalField(max_digits = 8, decimal_places = 4, default = 0)
     visible = models.BooleanField(default = False)
     customChecker = models.BooleanField(default = False)
 
@@ -42,7 +42,7 @@ class Solution(models.Model):
 
     problem = models.ForeignKey(Problem)
     user = models.ForeignKey(User)
-    score = models.IntegerField(default = 0)
+    score = models.DecimalField(max_digits = 8, decimal_places = 4, default = 0)
 
     class Meta:
         ordering = ['-submit_date']
@@ -79,7 +79,7 @@ class Test(models.Model):
     #time limit in sec and memory limit in kB
     time_limit = models.DecimalField(max_digits = 6, decimal_places = 4)
     mem_limit  = models.IntegerField()
-    score = models.IntegerField()
+    score = models.DecimalField(max_digits = 8, decimal_places = 4)
     
     problem = models.ForeignKey(Problem)
 
@@ -98,7 +98,7 @@ class Test(models.Model):
 
 class TestResult(models.Model):
     message = models.CharField(max_length = 64)
-    score = models.IntegerField()
+    score = models.DecimalField(max_digits = 8, decimal_places = 4)
     exec_time = models.CharField(max_length = 16)
 
     solution = models.ForeignKey(Solution)
@@ -112,7 +112,7 @@ class UserProblemData(models.Model):
     user = models.ForeignKey(User)
     problem = models.ForeignKey(Problem)
 
-    maxScore = models.IntegerField(default = 0)
+    maxScore = models.DecimalField(max_digits = 8, decimal_places = 4, default = 0)
     last_submit = models.DateTimeField()
 
 class UserStatts(models.Model):

@@ -53,10 +53,10 @@
 						{% for sol in solutions %}
 							<tr class="{{ sol|status_class }}">
 
-								<td>{{forloop.counter }}</td>
-								<td>{{sol.grader_message}}</td>
-								<td>{{sol.score}} / 
-									{{sol.problem.maxScore}}</td>
+								<td>{{ forloop.counter }}</td>
+								<td>{{ sol.grader_message }}</td>
+								<td>{{ sol.score|floatformat }} / 
+									{{ sol.problem.maxScore|floatformat }}</td>
 								<td> 
 									<a href="
 									{% url 'judge:solution_details' sol.id %}">

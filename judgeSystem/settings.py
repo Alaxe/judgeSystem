@@ -29,7 +29,7 @@ DEBUG = False
 
 TEMPLATE_DEBUG = False
 
-ALLOWED_HOSTS = [sens.SITE_HOST]
+ALLOWED_HOSTS = [sens.SITE_HOST, '79.100.169.64']
 
 # Application definition
 

@@ -229,7 +229,7 @@ class TestDelete(View):
 class ProblemGlobalForm(forms.Form):
     timeLimit = forms.DecimalField(required = False, decimal_places = 4)
     memoryLimit = forms.IntegerField(required = False)
-    testScore = forms.IntegerField(required = False)
+    testScore = forms.DecimalField(required = False, decimal_places = 4)
 
 class TestList(View):
     template_name = 'judge/test_list.html'
