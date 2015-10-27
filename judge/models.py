@@ -14,7 +14,7 @@ class Problem(models.Model):
     visible = models.BooleanField(default = False)
     customChecker = models.BooleanField(default = False)
 
-    tags = TaggableManager()
+    tags = TaggableManager(blank = True)
 
     class Meta:
         ordering = ['-id']
