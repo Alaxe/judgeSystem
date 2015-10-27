@@ -9,6 +9,7 @@ judgeSystem/settings.py
 
 judge/graders/*
 judge/solutions/*
+judge/isolate
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
