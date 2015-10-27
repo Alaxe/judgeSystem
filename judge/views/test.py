@@ -79,6 +79,8 @@ class TestNew(View):
         test.problem = problem
         test.save()
 
+        problem.update_max_score()
+
         return True
 
     def add_zip_tests(self, form, problem, request):
@@ -123,6 +125,8 @@ class TestNew(View):
             os.remove(zipName)
 
             if testCount:
+                problem.update_max_score()
+
                 messageText = '{0} tests were added'.format(testCount)
                 messages.add_message(request, messages.SUCCESS, messageText)
             else:
@@ -192,6 +196,8 @@ class TestEdit(View):
         test.problem = problem
         test.save()
 
+        problem.update_max_score()
+
         url = reverse('judge:test_list', args = (problem.pk,))
         return HttpResponseRedirect(url)
 
@@ -219,6 +225,8 @@ class TestDelete(View):
         tests = self.get_tests(ids)
         problem = tests[0].problem
         tests.delete()
+
+        problem.update_max_score()
 
         messageText = 'You\'ve successfuly deleted the tests'
         messages.add_message(request, messages.SUCCESS, messageText)
@@ -273,14 +281,11 @@ class TestList(View):
             if memoryLimit != None:
                 test.mem_limit = memoryLimit
             if testScore != None:
-                problem.maxScore -= test.score
-                problem.maxScore += testScore
-
                 test.score = testScore
 
             test.save()
         
-        problem.save()
+        problem.update_max_score()
 
         if not testIds:
             messageText = 'No tests selected for update'

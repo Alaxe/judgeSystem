@@ -8,5 +8,7 @@ subprocess.call(['git', 'submodule', 'update'])
 subprocess.call(['make', '-C', 'isolate'])
 subprocess.call(['cp', 'isolate/isolate', 'judge/isolate'])
 
+subprocess.call(['mkdir', '-p', 'judge/solutions', 'judge/graders'])
+
 subprocess.call(['pip', 'install', '-r', 'requirements.txt', '--upgrade'])
 subprocess.call(['./manage.py', 'migrate'])

@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import F
 from django.dispatch import Signal
 from django.utils import timezone
 
@@ -27,11 +28,9 @@ class Problem(models.Model):
         return self.title
 
     def update_max_score(self):
-        awns = 0
-        for test in self.test_set.all():
-            awns += test.score
-
-        self.maxScore = awns
+        query = self.test_set.aggregate(models.Sum('score'))
+        print(query)
+        self.maxScore = query['score__sum']
         self.save()
     
 class Solution(models.Model):
@@ -55,22 +54,17 @@ class Solution(models.Model):
         return self.problem.title + ' --- Solution'
 
     def update_score(self):
-        self.score = 0
-        for res in self.testresult_set.all():
-            self.score += res.score
+        query = self.testresult_set.aggregate(models.Sum('score'))
+        self.score = query['score__sum']
         self.save()
 
         data = UserProblemData.objects.get(user = self.user,
-                                            problem = self.problem)
+                                        problem = self.problem)
 
-        if data.maxScore < self.score :
-            data.maxScore = self.score
-            data.save()
-
-            if data.maxScore == self.problem.maxScore :
-                statts = UserStatts.objects.get(user = data.user)
-                statts.solvedProblems += 1
-                statts.save()
+        data.update_score()
+        
+        statts = UserStatts.objects.get(user = self.user)
+        statts.update()
 
 class Test(models.Model):
     stdin = models.TextField()
@@ -92,10 +86,6 @@ class Test(models.Model):
     def __str__(self):
         return self.problem.title + ' --- Test'
 
-    def save(self, *args, **kwargs):
-        super(Test, self).save(*args, **kwargs)
-        self.problem.update_max_score()
-
 class TestResult(models.Model):
     message = models.CharField(max_length = 64)
     score = models.DecimalField(max_digits = 8, decimal_places = 4)
@@ -112,11 +102,28 @@ class UserProblemData(models.Model):
     user = models.ForeignKey(User)
     problem = models.ForeignKey(Problem)
 
-    maxScore = models.DecimalField(max_digits = 8, decimal_places = 4, default = 0)
+    maxScore = models.DecimalField(max_digits = 8, decimal_places = 4, 
+                                default = 0)
     last_submit = models.DateTimeField()
+
+    def update_score(self):
+        solutions = Solution.objects.filter(user = self.user, 
+                        problem = self.problem)
+        self.maxScore = solutions.aggregate(models.Max('score'))['score__max']
+        self.save()
+
+    def __str__(self):
+        return self.user.username + ' ' + self.problem.title + ' UPdata'
 
 class UserStatts(models.Model):
     user = models.OneToOneField(User)
 
     solvedProblems = models.IntegerField(default = 0)
     triedProblems = models.IntegerField(default = 0)
+
+    def update(self):
+        self.triedProblems = UserProblemData.objects.filter(
+                                    user = self.user).count()
+        self.solvedProblems = UserProblemData.objects.filter(user = self.user,
+                                    maxScore = F('problem__maxScore')).count()
+        self.save()

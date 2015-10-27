@@ -109,7 +109,7 @@ def custom_grader(test):
     return score
 
 
-@shared_task
+@shared_task(ignore_result = True) 
 def test_solution(solution):
     if not compile_solution(solution):
         solution.grader_message = 'Compilation error'
@@ -160,7 +160,7 @@ def run_test(solution, test):
     print('test passed')
     return result
 
-@shared_task
+@shared_task(ignore_result = True) 
 def save_result(result, solution):
     print('saving results')
 
@@ -179,7 +179,7 @@ def save_result(result, solution):
 
     print('results saved')
 
-@shared_task
+@shared_task(ignore_result = True) 
 def retest_problem(problem):
     solutions = problem.solution_set.all()
 

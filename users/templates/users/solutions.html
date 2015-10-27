@@ -37,7 +37,8 @@
 						{{ sol.grader_message }}
 					</td>
 					<td>
-						{{ sol.score }} / {{ sol.problem.maxScore }}	
+						{{ sol.score|floatformat }} / 
+							{{ sol.problem.maxScore|floatformat }}	
 					</td>
 				</tr>
 			{% endfor %}
