@@ -14,8 +14,8 @@ from zipfile import ZipFile, BadZipFile
 import os
 
 class TestEditForm(forms.ModelForm):
-    stdinFile = forms.FileField(required=False)
-    stdoutFile = forms.FileField(required=False)
+    stdinFile = forms.FileField(label = 'Input file', required=False)
+    stdoutFile = forms.FileField(label = 'Output file',required=False)
 
     class Meta:
         model = Test
@@ -38,7 +38,7 @@ class TestEditForm(forms.ModelForm):
         return valid
 
 class TestNewForm(TestEditForm):
-    zipFile = forms.FileField(required = False)
+    zipFile = forms.FileField(label = 'Test archive(zip)', required = False)
 
     def is_valid(self):
         super(TestEditForm, self).is_valid()
@@ -235,9 +235,12 @@ class TestDelete(View):
         return HttpResponseRedirect(url)
 
 class ProblemGlobalForm(forms.Form):
-    timeLimit = forms.DecimalField(required = False, decimal_places = 4)
-    memoryLimit = forms.IntegerField(required = False)
-    testScore = forms.DecimalField(required = False, decimal_places = 4)
+    timeLimit = forms.DecimalField(required = False, decimal_places = 4,
+                                        label = 'Time limit (sec)')
+    memoryLimit = forms.IntegerField(required = False, 
+                                        label = 'Memory limit (MB)')
+    testScore = forms.DecimalField(required = False, decimal_places = 4,
+                                        label = 'Points per test')
 
 class TestList(View):
     template_name = 'judge/test_list.html'

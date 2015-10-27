@@ -71,9 +71,10 @@ class Test(models.Model):
     stdout = models.TextField()
 
     #time limit in sec and memory limit in kB
-    time_limit = models.DecimalField(max_digits = 6, decimal_places = 4)
-    mem_limit  = models.IntegerField()
-    score = models.DecimalField(max_digits = 8, decimal_places = 4)
+    time_limit = models.DecimalField('Time limit (sec)', max_digits = 6,
+                                            decimal_places = 4)
+    mem_limit  = models.IntegerField('Memory limit (MB)')
+    score = models.DecimalField('Points', max_digits = 8, decimal_places = 4)
     
     problem = models.ForeignKey(Problem)
 
