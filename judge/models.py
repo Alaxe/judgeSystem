@@ -127,3 +127,6 @@ class UserStatts(models.Model):
         self.solvedProblems = UserProblemData.objects.filter(user = self.user,
                                     maxScore = F('problem__maxScore')).count()
         self.save()
+
+    def __str__(self):
+        return self.user.username + '\'s UserStatts'
