@@ -44,9 +44,10 @@ How to install:
   4. run setup.py What it does:
     * Installs the isolate submodule [Link](https://github.com/Alaxe/isolate)
     * Copies the sandbox to the correct folder
+    * Creates folders for graders and solutions
     * Installs required python modules
     * Creates the database
 
 How to run:
-  * Actual server : python manage.py runserver (you can add url parameters
+  * Actual server : python manage.py runserver (you can add url parameters)
   * Celery server : celery -A judgeSystem (you can mess with the parameters if you want) 
