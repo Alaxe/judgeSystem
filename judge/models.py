@@ -29,8 +29,12 @@ class Problem(models.Model):
 
     def update_max_score(self):
         query = self.test_set.aggregate(models.Sum('score'))
-        print(query)
-        self.maxScore = query['score__sum']
+
+        if query['score__sum']:
+            self.maxScore = query['score__sum']
+        else: 
+            self.maxScore = 0
+
         self.save()
     
 class Solution(models.Model):
@@ -55,7 +59,12 @@ class Solution(models.Model):
 
     def update_score(self):
         query = self.testresult_set.aggregate(models.Sum('score'))
-        self.score = query['score__sum']
+
+        if query['score__sum']:
+            self.score = query['score__sum']
+        else:
+            self.score = 0
+
         self.save()
 
         data = UserProblemData.objects.get(user = self.user,
