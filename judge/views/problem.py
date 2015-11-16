@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
@@ -240,7 +241,7 @@ class ProblemChecker(View):
         problem.save()
 
         if problem.customChecker:
-            dest = open('judge/graders/' + str(problem.pk), 'wb')
+            dest = open(settings.BASE_DIR + '/judge/graders/' + str(problem.pk), 'wb')
             dest.write(request.FILES['customChecker'].read())
             dest.close()
 

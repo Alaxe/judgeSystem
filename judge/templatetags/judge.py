@@ -65,7 +65,7 @@ def problem_admin_panel(context, *args, **kwargs):
 def status_class(obj, *args, **kwargs):
     maxScore = 1000
     if type(obj) is Solution:
-        if obj.grader_message == 'Testing':
+        if obj.grader_message == 'Testing' or obj.grader_message == 'In Queue':
             return 'info'
         else:
             maxScore = obj.problem.maxScore

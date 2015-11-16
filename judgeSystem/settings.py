@@ -27,9 +27,10 @@ SECRET_KEY = 'sw)@bzva4l4@%ol+&7d@(!!3)=k%*^jgkz=+3m4&5+uexot*wy'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-TEMPLATE_DEBUG = False
+TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = [sens.SITE_HOST]
+ALLOWED_HOSTS = [sens.SITE_HOST, 'www.' + sens.SITE_HOST]
+ADMINS = [('default', sens.EMAIL)]
 
 # Application definition
 
@@ -114,6 +115,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = '/etc/httpd/static/'
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
@@ -84,7 +85,7 @@ class TestNew(View):
         return True
 
     def add_zip_tests(self, form, problem, request):
-        zipName = 'tests.zip'
+        zipName = settings.BASE_DIR + '/tests.zip'
 
         with open(zipName, 'wb+') as zipFile:
             for chunk in request.FILES['zipFile'].chunks():

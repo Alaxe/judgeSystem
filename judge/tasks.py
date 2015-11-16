@@ -5,6 +5,7 @@ import subprocess, time, os
 from billiard import current_process
 from celery import shared_task
 from celery.task import chord, group
+from django.conf import settings
 from django.core.cache import cache
 from django.db import transaction
 
@@ -12,19 +13,19 @@ from judge.models import Test, TestResult, Solution, UserProblemData,\
                         UserStatts
 
 def get_sol_loc(solution):
-    solutionRoot = 'judge/solutions/'
-    return solutionRoot + str(solution.pk) + '-run'
+    solutionRoot = settings.BASE_DIR + '/judge/solutions/'
+    return solutionRoot + str(solution.pk)
 def get_box_id():
     return current_process().index
 def get_box_loc():
     return '/tmp/box/' + str(get_box_id()) + '/box/'
 def get_sandbox():
-    return 'judge/isolate'
+    return settings.BASE_DIR + '/judge/isolate'
 def get_grader_loc(problem):
-    return 'judge/graders/' + str(problem.pk)
+    return settings.BASE_DIR + '/judge/graders/' + str(problem.pk)
 
 def compile_solution(solution):
-    sourceName = str(solution.pk) + 'source.cpp'
+    sourceName = get_sol_loc(solution) + '.cpp'
     sourceFile = open(sourceName, 'w')
     sourceFile.write(solution.source)
     sourceFile.close()
@@ -199,7 +200,7 @@ def retest_problem(problem):
         for sol in solutions:
             sol.testresult_set.all().delete()
             sol.score = 0
-            sol.grader_message = 'retesting'
+            sol.grader_message = 'In Queue'
             sol.save()
 
             test_solution.delay(sol)
