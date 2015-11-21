@@ -6,6 +6,7 @@ run-celery
 run-server
 erl_crash.dump
 judgeSystem/settings.py
+celery.*
 
 judge/graders/*
 judge/solutions/*

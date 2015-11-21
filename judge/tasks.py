@@ -181,7 +181,6 @@ def save_result(result, solution):
     print('results saved')
 
 @shared_task(ignore_result = True) 
-
 def retest_problem(problem):
     solutions = problem.solution_set.all()
 
