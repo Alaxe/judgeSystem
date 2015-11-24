@@ -63,23 +63,29 @@ def problem_admin_panel(context, *args, **kwargs):
 
 @register.filter
 def status_class(obj, *args, **kwargs):
-    maxScore = 1000
     if type(obj) is Solution:
         if obj.grader_message == 'Testing' or obj.grader_message == 'In Queue':
             return 'info'
+
+        maxScore = obj.problem.maxScore
+        if obj.score == maxScore:
+            return 'success'
+        elif obj.score == 0:
+            return 'danger'
         else:
-            maxScore = obj.problem.maxScore
+            return 'warning'
 
     elif type(obj) is TestResult:
         maxScore = obj.test.score
+        if obj.message == 'Accepted':
+                if obj.score == maxScore:
+                    return 'success'
+                else: 
+                    return 'warning'
+        else:
+            return 'danger'
     
-    if obj.score == maxScore:
-        return 'success'
-    elif obj.score == 0:
-        return 'danger'
-    else:
-        return 'warning'
-
+    
 @register.filter
 def tags_url(tags, curTag = ''):
     remTag = False

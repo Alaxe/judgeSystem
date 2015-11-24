@@ -147,11 +147,11 @@ def run_test(solution, test):
     time = 'N\\A'
 
     if sandbox_msg[:2] == 'OK' :
-        msg = 'wrong awnser'
+        msg = 'Wrong awnser'
         time = sandbox_msg[4:9]
         
         if check_output(test):
-            msg = 'correct'
+            msg = 'Accepted'
             score = test.score
 
         sandbox_msg = msg
@@ -181,6 +181,7 @@ def save_result(result, solution):
     print('results saved')
 
 @shared_task(ignore_result = True) 
+
 def retest_problem(problem):
     solutions = problem.solution_set.all()
 

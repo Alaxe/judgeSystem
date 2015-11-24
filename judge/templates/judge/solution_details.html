@@ -33,7 +33,10 @@
 						{% for result in solution.testresult_set.all %}
 							<tr class="{{ result|status_class }}">
 								<th>{{ forloop.counter }}</th>
-								<td>{{ result.score|floatformat }}</td>
+								<td>
+									{{ result.score|floatformat }} /
+									{{ result.test.score|floatformat }}
+								</td>
 								<td>{{ result.message }}</td>
 								<td>{{ result.exec_time }}</td>
 							</tr>
