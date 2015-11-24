@@ -206,11 +206,13 @@ class TestDelete(View):
     template_name = 'judge/test_delete.html'
 
     def get_tests(self, ids):
-        if ids == '':
-            raise Http404
-
         idList = ids.split(',')
-        return Test.objects.filter(id__in = idList)
+        tests = Test.objects.filter(id__in = idList)
+
+        if tests:
+            return Test.objects.filter(id__in = idList)
+        else:
+            raise Http404
 
     def get(self, request, ids):
         tests = self.get_tests(ids)

@@ -38,7 +38,7 @@ class ProblemList(TemplateView):
             context['paginate_name'] = 'judge:problem_page'
             context['paginate_extra_kwargs'] = {}
 
-        paginator = Paginator(problems, 10)
+        paginator = Paginator(problems, 14)
 
         try:
             page = paginator.page(page)
