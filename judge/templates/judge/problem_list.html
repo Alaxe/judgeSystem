@@ -5,7 +5,10 @@
 {% load judge %}
 
 {% block title %}
-	<h1>Problem list</h1>
+	<h1>
+		Problem list
+		{% problem_admin_panel %}
+	</h1>
 {% endblock %}
 
 {% block content %}
@@ -54,7 +57,6 @@
 		{% bootstrap_paginate page url_extra_kwargs=paginate_extra_kwargs url_view_name=paginate_name range=20 %}
 		</div>
 		<div class="col-md-4">
-			{% problem_admin_panel %}
 			<div class="panel panel-primary">
 				<div class="panel-heading">
 					<h3 class="panel-title">
