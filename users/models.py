@@ -22,6 +22,8 @@ class UserLink(models.Model):
         self.code = gen_randcode()
 
 class Confirmation(UserLink):
-    pass
+    def __str__(self):
+        return self.user.username + ' confirm'
+
 class PassReset(UserLink):
     pass
