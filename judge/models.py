@@ -8,8 +8,8 @@ from django.utils import timezone
 from taggit.managers import TaggableManager
 
 class Problem(models.Model):
-    title = models.CharField('Title', max_length = 64)
-    statement = models.TextField('Problem statement')
+    title = models.CharField('Title', max_length = 64, default="New Problem")
+    statement = models.TextField('Problem statement', blank=True)
     maxScore = models.DecimalField(max_digits = 8, decimal_places = 4, default = 0)
     visible = models.BooleanField(default = False)
     customChecker = models.BooleanField(default = False)

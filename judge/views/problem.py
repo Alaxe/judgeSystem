@@ -116,25 +116,10 @@ class ProblemNew(View):
     template_name = 'judge/problem_edit.html'
     title = 'Add a problem'
 
-    def get_context(self, form):
-        return {
-            'form' : form,
-            'title' : self.title
-        }
-
     def get(self, request):
-        context = self.get_context(ProblemForm())
-        return render(request, self.template_name, context)
+        problem = Problem.objects.create()
 
-    def post(self, request):
-        form = ProblemForm(request.POST)
-
-        if not form.is_valid():
-            context = self.get_context(form)
-            return render(request, self.template_name, context)
-
-        problem = form.save()
-        url = reverse('judge:problem_details', args = (problem.pk,))
+        url = reverse('judge:problem_edit', args=(problem.pk,))
         return HttpResponseRedirect(url)
 
 class ProblemEdit(View):
