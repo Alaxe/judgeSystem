@@ -26,9 +26,9 @@ def get_grader_loc(problem):
 
 def compile_solution(solution):
     sourceName = get_sol_loc(solution) + '.cpp'
-    sourceFile = open(sourceName, 'w')
-    sourceFile.write(solution.source)
-    sourceFile.close()
+
+    with open(sourceName, 'w') as sourceFile:
+        sourceFile.write(solution.source)
 
     compileArgs = ['g++', '-O2', '--std=c++11',
                     '-o', get_sol_loc(solution), sourceName]
@@ -46,9 +46,9 @@ def setup_box(solution, test):
                     get_box_loc() + 'solution'])
 
     inFilePath = get_box_loc() + 'std.in'
-    inFile = open(inFilePath, 'w')
-    inFile.write(test.stdin)
-    inFile.close()
+
+    with open(inFilePath, 'w') as inFile:
+        inFile.write(test.stdin)
 
 def run_solution(test):
     sandbox = get_sandbox()
@@ -75,18 +75,16 @@ def check_output(test):
 
 def default_grader(test):
     outFilePath = get_box_loc() + 'std.out'
-    try:
-        outFile = open(outFilePath, 'r')
+
+    with open(outFilePath, 'r') as outFile:
         curOut = outFile.read()
         curOut = curOut.replace('\r\n', '\n')
-        outFile.close()
 
         corOut = test.stdout
         corOut = corOut.replace('\r\n', '\n')
 
         return curOut == corOut 
-    except FileNotFoundError:
-        return 0
+    return 0
 
 def custom_grader(test):
     problem = test.problem
@@ -96,14 +94,13 @@ def custom_grader(test):
     correctFilePath = get_box_loc() + 'cor.out'
     graderFilePath = get_box_loc() + 'grader'
 
-    correctFile = open(correctFilePath, 'w')
-    correctFile.write(test.stdout)
-    correctFile.close()
+    with open(correctFilePath, 'w') as correctFile:
+        correctFile.write(test.stdout)
 
     subprocess.call(['cp', get_grader_loc(problem), graderFilePath])
     subprocess.call(['chmod', '700', graderFilePath])
     scoreMessage = subprocess.check_output([graderFilePath, inFilePath, 
-            outFilePath, correctFilePath])
+            correctFilePath, outFilePath])
 
     score = float(scoreMessage.split()[0])
 
