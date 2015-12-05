@@ -10,4 +10,6 @@ urlpatterns = patterns('',
     url(r'', include('judge.urls', namespace = 'judge')),
     url(r'^account/', include('users.urls', namespace = 'users')),
     url(r'^blog/', include('blog.urls', namespace = 'blog')),
+    url(r'^media_manager/', include('media_manager.urls', 
+        namespace = 'media_manager')),
 )
