@@ -1,0 +1,18 @@
+{% extends 'judge/problem_edit_base.html' %}
+{% load bootstrap3 %}
+{% load judge %}
+{% load media_manager %}
+
+{% block title %}
+	<h1>Manage media</h1>
+{% endblock %}
+
+{% block edit_content %}
+	<h3>Upload Media</h3>
+	{% media_upload object=problem %}
+	<h3>Media for this problem</h3>
+{% endblock %}
+
+{% block edit_nav %}
+	{% problem_edit_nav page='media' %}
+{% endblock %}

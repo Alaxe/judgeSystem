@@ -114,7 +114,6 @@ class ProblemForm(forms.ModelForm):
 
 class ProblemNew(View):
     template_name = 'judge/problem_edit.html'
-    title = 'Add a problem'
 
     def get(self, request):
         problem = Problem.objects.create()
@@ -179,6 +178,16 @@ class ProblemDelete(View):
         
         url = reverse('judge:problem_list')
         return HttpResponseRedirect(url)
+
+class ProblemMedia(View):
+    template_name = 'judge/problem_media.html'
+
+    def get(self, request, pk):
+        context = {
+            'problem': get_object_or_404(Problem, pk = pk),
+            'problem_pk': pk
+        }
+        return render(request, self.template_name, context)
 
 class ProblemCheckerForm(forms.Form):
     useCustomChecker = forms.BooleanField(label = 'Use custom checker', 

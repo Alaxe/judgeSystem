@@ -21,6 +21,10 @@ def problem_edit_nav(context, *args, **kwargs):
             'url': reverse('judge:problem_edit', args = (problem_pk,)),
             'text': 'Edit statement'
         }, {
+            'name': 'media',
+            'url': reverse('judge:problem_media', args = (problem_pk,)),
+            'text': 'Upload Media'
+        }, {
             'name': 'tests',
             'url': reverse('judge:test_list', args = (problem_pk,)),
             'text': 'Edit tests'

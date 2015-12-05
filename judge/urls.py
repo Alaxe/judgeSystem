@@ -24,6 +24,9 @@ urlpatterns = patterns('',
     url(r'^problems/(?P<pk>\d+)/delete/$', permission_required(
        'judge.delete_problem')(views.ProblemDelete.as_view()),
        name = 'problem_delete'),
+    url(r'^problems/(?P<pk>\d+)/media/$', permission_required(
+        'judge.add_media_to_problem')(views.ProblemMedia.as_view()),
+        name = 'problem_media'),
     url(r'^problems/(?P<pk>\d+)/retest/$', permission_required(
        'judge.problem_retest')(views.ProblemRetest.as_view()),
        name = 'problem_retest'),
