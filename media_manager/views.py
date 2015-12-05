@@ -1,7 +1,8 @@
 from django import forms
+from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import View
 
@@ -34,17 +35,20 @@ class MediaUpload(View):
     def post(self, request, **kwargs):
         form = MediaUploadForm(request.POST, request.FILES)
         model = self.get_model(**kwargs)
+        redir_url = request.GET.get('redir_url', '/')
         permStr = '{0}.add_media_to.{1}'.format(model._meta.app_label, 
                 model.__class__.__name__.lower())
  
         if not form.is_valid():
-            return HttpResponse('Something went wrong')
+            messages.warning(request, 'No file to upload')
         elif not request.user.has_perm(permStr):
-            return HttpResponse('No permission')
+            messages.error(request, 'Missing permissions')
         else:
             media = MediaFile(content_object = model,
                 media = request.FILES['media'], 
                 filename = request.FILES['media'].name)
 
             media.save()
-            return HttpResponse('file should be uploaded successfully')
+            messages.success(request, 'Media uploaded successfully')
+
+        return HttpResponseRedirect(redir_url)
