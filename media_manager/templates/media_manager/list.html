@@ -1,0 +1,21 @@
+{% load staticfiles %}
+{% if media_list %} 
+	<table class="table">
+		<tr>
+			<th>Filename</th>
+			<th>Link</th>
+		</tr>
+		{% for media in media_list %}
+			<tr>
+				<td>{{ media.filename }}</td>
+				<td>
+					<a href="{% static media.media.url %}">
+						Link
+					</a>
+				</td>
+			</tr>
+		{% endfor %}
+	</table>
+{% else %}
+	<p>No media for current object</p>
+{% endif %}

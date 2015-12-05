@@ -116,9 +116,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR + '/static/'
 
-STATIC_ROOT = '/etc/httpd/static/'
-
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR + '/media/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
@@ -133,3 +134,5 @@ SITE_HOST = sens.SITE_HOST
 LOGIN_URL = '/account/login'
 
 TAGGIT_CASE_INSENSITIVE = True
+
+print(STATIC_ROOT)

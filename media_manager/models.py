@@ -8,7 +8,8 @@ def get_mediafile_loc(instance, filename):
     chars = string.ascii_uppercase + string.digits
     rand_str = ''.join(random.SystemRandom().choice(chars) for i in range(32))
 
-    return 'media/{0}.{1}'.format(rand_str, filename.split('.')[-1])
+    return '{0}.{1}'.format(rand_str, 
+        filename.split('.')[-1])
 
 class MediaFile(models.Model):
     content_type = models.ForeignKey(ContentType)
