@@ -134,5 +134,4 @@ SITE_HOST = sens.SITE_HOST
 LOGIN_URL = '/account/login'
 
 TAGGIT_CASE_INSENSITIVE = True
-
 print(STATIC_ROOT)

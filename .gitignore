@@ -5,9 +5,9 @@ db.sqlite3
 run-celery
 run-server
 erl_crash.dump
-judgeSystem/settings.py
 celery.*
 media/*
+static/*
 
 judge/graders/*
 judge/solutions/*
