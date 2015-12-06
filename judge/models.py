@@ -93,6 +93,11 @@ class Solution(models.Model):
         statts = UserStatts.objects.get(user = self.user)
         statts.update()
 
+class TestGroup(models.Model):
+    name = models.CharField('Name of test group', max_length = 32)
+    problem = models.ForeignKey(Problem)
+    score = models.DecimalField('Points', max_digits = 6, decimal_places = 2)
+
 class Test(models.Model):
     stdin = models.TextField()
     stdout = models.TextField()
@@ -101,9 +106,10 @@ class Test(models.Model):
     time_limit = models.DecimalField('Time limit (sec)', max_digits = 6,
                                             decimal_places = 4)
     mem_limit  = models.IntegerField('Memory limit (MB)')
-    score = models.DecimalField('Points', max_digits = 8, decimal_places = 4)
+    score = models.DecimalField('Points', max_digits = 6, decimal_places = 2)
     
     problem = models.ForeignKey(Problem)
+    test_group = models.ForeignKey(TestGroup, null = True)
 
     class Meta:
         permissions = (
