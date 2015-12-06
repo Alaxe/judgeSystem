@@ -25,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = 'sw)@bzva4l4@%ol+&7d@(!!3)=k%*^jgkz=+3m4&5+uexot*wy'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 TEMPLATE_DEBUG = False
 
@@ -42,9 +42,10 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'kombu.transport.django',
-    'djcelery',
     'bootstrap3',
     'bootstrap_pagination',
+    'markdown_deux',
+    'djcelery',
     'taggit',
     'taggit_templatetags',
     'judge',

@@ -1,5 +1,6 @@
 {% extends 'judge/base.html' %}
 {% load judge %}
+{% load markdown_deux_tags %}
 
 {% block title %}
 	<h1> 
@@ -14,7 +15,7 @@
 {% block content %}
 <div class="row">
 	<div class="col-md-8">
-		<p> {{ problem.statement|safe }} </p>
+		<p> {{ problem.statement_html|safe }} </p>
 	</div>
 
 	<div class="col-md-4">

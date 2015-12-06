@@ -5,11 +5,22 @@ from django.db.models import F
 from django.dispatch import Signal
 from django.utils import timezone
 
+from markdown_deux import markdown
 from taggit.managers import TaggableManager
 
 class Problem(models.Model):
     title = models.CharField('Title', max_length = 64, default="New Problem")
+
+    HTML = 'html'
+    MD = 'md'
+    STATEMENT_LANGUAGE_CHOICES = (
+        (HTML, 'HTML'),
+        (MD, 'Markdown'),
+    )
+    statement_language = models.CharField('Language', max_length = 8,
+            choices = STATEMENT_LANGUAGE_CHOICES, default = HTML)
     statement = models.TextField('Problem statement', blank=True)
+
     maxScore = models.DecimalField(max_digits = 8, decimal_places = 4, default = 0)
     visible = models.BooleanField(default = False)
     customChecker = models.BooleanField(default = False)
@@ -21,11 +32,18 @@ class Problem(models.Model):
         permissions = (
             ('problem_retest', 'Can start a retest'),
             ('problem_visibility', 'Can change problem\'s visibility'),
-            ('problem_hidden', 'Can see hidden problems')
+            ('problem_hidden', 'Can see hidden problems'),
+            ('add_media_to_problem', 'Can upload media for the problem'),
         )
 
     def __str__(self):  
         return self.title
+
+    def statement_html(self):
+        if self.statement_language == self.MD:
+            return markdown(self.statement)
+        else:
+            return self.statement
 
     def update_max_score(self):
         query = self.test_set.aggregate(models.Sum('score'))
