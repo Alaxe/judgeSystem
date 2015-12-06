@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 
 from users import views
 
-urlpatterns = patterns('',
+urlpatterns = [
    url(r'^login/$', views.Login.as_view(), 
        name = 'login'),
    url(r'^register/$', views.Register.as_view(),
@@ -28,5 +28,4 @@ urlpatterns = patterns('',
     url(r'^solutions/page/(?P<page>\d+)/$', login_required(
         views.Solutions.as_view()),
         name = 'solutions_page'),
-)
-
+]

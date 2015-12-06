@@ -1,9 +1,9 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.contrib.auth.decorators import login_required, permission_required
 
 from judge import views
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^$', views.ProblemList.as_view(), 
         name = 'problem_list'),
     url(r'^problems/page/(?P<page>\d+)/$', views.ProblemList.as_view(), 
@@ -69,4 +69,4 @@ urlpatterns = patterns('',
     url(r'^solutions/(?P<pk>\d+)/source/$', login_required(
         views.SolutionSource.as_view()),
         name = 'solution_source'),
-)
+]

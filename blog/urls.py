@@ -1,9 +1,9 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.contrib.auth.decorators import login_required, permission_required
 
 from blog import views
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^post/(?P<pk>\d+)/edit/$', permission_required(
         'blog.change_blogpost')(views.PostEdit.as_view()),
         name = 'post_edit'),
@@ -20,4 +20,4 @@ urlpatterns = patterns('',
         name = 'post_page'),
     url(r'^$', views.PostList.as_view(),
         name = 'post_list'),
-)
+]

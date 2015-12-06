@@ -4,5 +4,6 @@ django-celery
 django-bootstrap3
 django-bootstrap-pagination
 django-taggit
-django-taggit_templatetags
+git+https://github.com/fizista/django-taggit-templatetags2
 django-markdown-deux
+
