@@ -25,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = 'sw)@bzva4l4@%ol+&7d@(!!3)=k%*^jgkz=+3m4&5+uexot*wy'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 TEMPLATE_DEBUG = False
 
@@ -68,7 +68,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            'judgeSystem/templates',
+            BASE_DIR + '/judgeSystem/templates/',
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -146,4 +146,3 @@ SITE_HOST = sens.SITE_HOST
 LOGIN_URL = '/account/login'
 
 TAGGIT_CASE_INSENSITIVE = True
-print(STATIC_ROOT)
