@@ -25,12 +25,12 @@
 						<input type="checkbox" id="select-all">
 						Select all
 					</th>
-					<th>Edit</th>
 					<th>Time limit</th>
 					<th>Memory limit</th>
 					<th>Points</th>
 					<th>Input</th>
 					<th>Output</th>
+					<th>Edit</th>
 					<th class="text-warning">Delete</th>
 				</tr>
 			</thead>
@@ -42,11 +42,6 @@
 							  class="test-select"
 							  value="{{ test.pk }}">
 							{{ test.pk }}
-						</td>
-						<td>
-							<a href="{% url 'judge:test_edit' test.pk %}">
-								Edit test
-							</a>
 						</td>
 						<td> {{ test.time_limit|floatformat }} sec </td>
 						<td> {{ test.mem_limit }} MB </td>
@@ -61,6 +56,13 @@
 								View output
 							</a>
 						</td>
+						<td>
+							<a href="{% url 'judge:test_edit' test.pk %}"
+								class="btn btn-primary btn-xs btn-block">
+								Edit
+							</a>
+						</td>
+
 						<td>
 							<a href="{% url 'judge:test_delete' test.pk %}" 
 								class="btn btn-warning btn-xs btn-block">

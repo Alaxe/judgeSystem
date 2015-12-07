@@ -59,6 +59,14 @@ urlpatterns = [
         'judge.view_test')(views.TestOutput.as_view()),
         name = 'test_output'),
 
+    url(r'^problems/(?P<problem_id>\d+)/newtestgroup/$',
+            views.TestGroupNew.as_view(), name = 'test_group_new'),
+    url(r'^problems/(?P<problem_id>\d+)/testgroups/$',
+            views.TestGroupList.as_view(),
+            name = 'test_group_list'),
+    url(r'^testgroup/(?P<pk>\d+)/edit/$',
+            views.TestGroupEdit.as_view(),
+            name = 'test_group_edit'),
 
     url(r'^problems/(?P<pk>\d+)/submit/$', login_required(
         views.SolutionSubmit.as_view()), 

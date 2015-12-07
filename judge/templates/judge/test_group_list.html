@@ -1,0 +1,47 @@
+{% extends 'judge/problem_edit_base.html' %}
+{% load bootstrap3 %}
+{% load judge %}
+
+{% block title %}
+	<h1> Test groups</h1>
+{% endblock %}
+
+{% block edit_content %}
+{% if test_groups %}
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Points</th>
+				<th>Edit</th>
+				<th>Delete</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for group in test_groups %}
+			<tr>
+				<td>{{ group.name }}</td>
+				<td>{{ group.score }}</td>
+				<td>
+					<a href="{% url 'judge:test_group_edit' group.pk %}"
+						class="btn btn-primary btn-xs btn-block">
+						Edit
+					</a>
+				</td>
+				<td>
+					<a href=""
+						class="btn btn-warning btn-xs btn-block">
+						Delete
+					</a>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% else %}
+	<p>No test groups are found</p>	
+{% endif %}
+{% endblock %}
+
+{% block edit_nav %}
+	{% problem_edit_nav page='test_groups' %}
+{% endblock %}

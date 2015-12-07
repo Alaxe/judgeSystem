@@ -1,0 +1,23 @@
+{% extends 'judge/problem_edit_base.html' %}
+{% load bootstrap3 %}
+{% load judge %}
+
+{% block title %}
+	<h1> {{ title }} </h1>
+{% endblock %}
+
+{% block edit_content %}
+	<form method = "POST" action = "{{request.get_full_path}}">
+		{% csrf_token %}
+		{% bootstrap_form form %}
+
+		{% buttons %}
+			<input type="submit" value="Submit"
+				 class="btn btn-default btn-block"> 
+		{% endbuttons %}
+	</form>
+{% endblock %}
+
+{% block edit_nav %}
+	{% problem_edit_nav page='test_groups' %}
+{% endblock %}
