@@ -1,0 +1,24 @@
+{% extends 'judge/problem_edit_base.html' %}
+{% load bootstrap3 %}
+{% load judge %}
+
+{% block title %}
+	<h1> {{ title }} </h1>
+{% endblock %}
+
+{% block edit_content %}
+	<form method = "POST" action = "{{request.get_full_path}}">
+		{% csrf_token %}
+		<p class="lead">
+			Are you sure you want to delete Test group "{{ test_group }}" ? 
+		</p>
+		{% buttons %}
+			<input type="submit" value="Delete test group"
+				 class="btn btn-default btn-block"> 
+		{% endbuttons %}
+	</form>
+{% endblock %}
+
+{% block edit_nav %}
+	{% problem_edit_nav page='tests' %}
+{% endblock %}

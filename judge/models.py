@@ -98,6 +98,9 @@ class TestGroup(models.Model):
     problem = models.ForeignKey(Problem)
     score = models.DecimalField('Points', max_digits = 6, decimal_places = 2)
 
+    def __str__(self):
+        return self.name
+
 class Test(models.Model):
     stdin = models.TextField()
     stdout = models.TextField()
@@ -109,7 +112,7 @@ class Test(models.Model):
     score = models.DecimalField('Points', max_digits = 6, decimal_places = 2)
     
     problem = models.ForeignKey(Problem)
-    test_group = models.ForeignKey(TestGroup, null = True)
+    test_group = models.ForeignKey(TestGroup, null = True, blank = True)
 
     class Meta:
         permissions = (

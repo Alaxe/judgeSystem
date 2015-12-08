@@ -1,4 +1,5 @@
 from django.core.urlresolvers import reverse
+from django.contrib import messages
 from django.forms import ModelForm
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import View, TemplateView
@@ -36,32 +37,50 @@ class TestGroupEdit(View):
     def get(self, request, **kwargs):
         return render(request, self.temlpate_name, self.get_context(**kwargs))
 
-    def post(self, request, **kwargs):
-        testGroup = get_object_or_404(TestGroup, pk = kwargs['pk'])
+    def post(self, request, pk):
+        testGroup = get_object_or_404(TestGroup, pk = pk)
         form = TestGroupForm(request.POST, instance = testGroup)
 
         if form.is_valid():
             testGroup = form.save()
             return redirect(self.redir_pattern, problem_id = testGroup.problem.pk)
         else:
-            context = self.get_context(form = form, **kwargs)
+            context = self.get_context(form = form, pk = pk)
             return render(request, self.template_name, context)
 
 class TestGroupNew(TestGroupEdit):
     title = 'New Test group'
 
-    def post(self, request, **kwargs):
+    def post(self, request, problem_id):
         form = TestGroupForm(request.POST)
 
         if form.is_valid():
             testGroup = form.save(commit = False)
-            testGroup.problem = get_object_or_404(Problem, pk = kwargs['problem_id'])
+            testGroup.problem = get_object_or_404(Problem, pk = problem_id)
             testGroup.save()
             
-            return redirect(self.redir_pattern, problem_id = testGroup.problem.pk)
+            return redirect(self.redir_pattern, problem_id = problem_id)
         else:
-            context = self.get_context(form = form, **kwargs)
+            context = self.get_context(form = form, problem_id = problem_id)
             return render(request, self.template_name, context)
+
+class TestGroupDelete(View):
+    template_name = 'judge/test_group_delete.html'
+
+    def get(self, request, pk):
+        testGroup = get_object_or_404(TestGroup, pk = pk)
+        context = {
+            'test_group': testGroup,
+            'problem_pk': testGroup.problem.pk
+        }
+        return render(request, self.template_name, context)
+    
+    def post(self, request, pk):
+        testGroup = get_object_or_404(TestGroup, pk = pk)
+        testGroup.delete()
+
+        messages.success(request, 'Test group deleted successfully')
+        return redirect('judge:test_list', problem_id = testGroup.problem.pk)
 
 class TestGroupList(TemplateView):
     template_name = 'judge/test_group_list.html'

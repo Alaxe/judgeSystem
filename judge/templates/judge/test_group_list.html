@@ -29,7 +29,7 @@
 					</a>
 				</td>
 				<td>
-					<a href=""
+					<a href="{% url 'judge:test_group_delete' group.pk %}"
 						class="btn btn-warning btn-xs btn-block">
 						Delete
 					</a>
@@ -40,6 +40,10 @@
 {% else %}
 	<p>No test groups are found</p>	
 {% endif %}
+<a href="{% url 'judge:test_group_new' problem_pk %}"
+   class="btn btn-block btn-primary">
+	New Test group
+</a>
 {% endblock %}
 
 {% block edit_nav %}

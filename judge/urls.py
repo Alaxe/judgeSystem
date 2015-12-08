@@ -43,7 +43,7 @@ urlpatterns = [
     url(r'^problems/(?P<problem_id>\d+)/newtest/$', permission_required(
        'judge.add_test')(views.TestNew.as_view()), 
        name = 'test_new'),
-    url(r'^problems/(?P<pk>\d+)/tests/$', permission_required(
+    url(r'^problems/(?P<problem_id>\d+)/tests/$', permission_required(
        'judge.change_problem')(views.TestList.as_view()),
        name = 'test_list'),
     url(r'^test/(?P<pk>\d+)/edit/$', permission_required(
@@ -62,11 +62,11 @@ urlpatterns = [
     url(r'^problems/(?P<problem_id>\d+)/newtestgroup/$',
             views.TestGroupNew.as_view(), name = 'test_group_new'),
     url(r'^problems/(?P<problem_id>\d+)/testgroups/$',
-            views.TestGroupList.as_view(),
-            name = 'test_group_list'),
+            views.TestGroupList.as_view(), name = 'test_group_list'),
     url(r'^testgroup/(?P<pk>\d+)/edit/$',
-            views.TestGroupEdit.as_view(),
-            name = 'test_group_edit'),
+            views.TestGroupEdit.as_view(), name = 'test_group_edit'),
+    url(r'^testgroup/(?P<pk>\d+)/delete/$',
+            views.TestGroupDelete.as_view(), name = 'test_group_delete'),
 
     url(r'^problems/(?P<pk>\d+)/submit/$', login_required(
         views.SolutionSubmit.as_view()), 

@@ -1,0 +1,67 @@
+<h3>Select Tests</h3>
+<table class="table table-hover">
+	<thead>
+		<tr>
+			<th>
+				<input type="checkbox" id="select-all">
+				Select all
+			</th>
+			<th>Time limit</th>
+			<th>Memory limit</th>
+			<th>Points</th>
+			<th>Input</th>
+			<th>Output</th>
+			<th>Edit</th>
+			<th class="text-warning">Delete</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for test in tests %}
+			<tr>
+				<td>
+					<input type="checkbox" name="test-select"
+					  class="test-select"
+					  value="{{ test.pk }}">
+					{{ test.pk }}
+				</td>
+				<td> {{ test.time_limit|floatformat }} sec </td>
+				<td> {{ test.mem_limit }} MB </td>
+				<td> {{ test.score|floatformat }} </td>
+				<td>
+					<a href="{% url 'judge:test_input' test.pk %}">
+						Input
+					</a>
+				</td>
+				<td>
+					<a href="{% url 'judge:test_output' test.pk %}">
+						Output
+					</a>
+				</td>
+				<td>
+					<a href="{% url 'judge:test_edit' test.pk %}"
+						class="btn btn-primary btn-xs btn-block">
+						Edit
+					</a>
+				</td>
+
+				<td>
+					<a href="{% url 'judge:test_delete' test.pk %}" 
+						class="btn btn-warning btn-xs btn-block">
+						Delete
+					</a>
+				</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#select-all').click(function() {
+			newState = this.checked;
+			$('.test-select').each( function() {
+
+				this.checked = newState;
+			});
+		});
+	});
+</script>

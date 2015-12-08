@@ -69,6 +69,13 @@ def problem_admin_panel(context, *args, **kwargs):
 
     return pageContext
 
+@register.inclusion_tag('judge/test_select.html')
+def test_select(problem, **kwargs):
+    return {
+            'tests': problem.test_set.all(),
+            'selected': set(kwargs.get('selected', []))
+    }
+
 @register.filter
 def status_class(obj, *args, **kwargs):
     if type(obj) is Solution:

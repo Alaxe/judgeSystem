@@ -37,6 +37,7 @@
 		{% base_nav %}
 	{% endblock navbar %}
 
+	{% bootstrap_javascript jquery=1 %}
 	<div class="container">
 		{% bootstrap_messages %}
 
@@ -49,7 +50,6 @@
 		{% block content %}{% endblock %}
 	</div>
 
-	{% bootstrap_javascript jquery=1 %}
 	{% block javascript %}
 
 	{% endblock %}

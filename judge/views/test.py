@@ -4,9 +4,8 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django import forms
-from django.http import Http404, HttpResponse, HttpResponseRedirect,\
-            HttpResponseForbidden
-from django.shortcuts import render, get_object_or_404
+from django.http import Http404, HttpResponse, HttpResponseForbidden
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import View
 
 from judge.models import Problem, Test
@@ -152,8 +151,7 @@ class TestNew(View):
                 success = self.add_single_test(form, problem, request)
 
         if success:
-            url = reverse('judge:test_list', args = (problem.pk,))
-            return HttpResponseRedirect(url)
+            return redirect('judge:test_list', problem_id = problem_id)
         else:
             context = self.get_context(problem, form)
             return render(request, self.template_name, context)
@@ -199,8 +197,7 @@ class TestEdit(View):
 
         problem.update_max_score()
 
-        url = reverse('judge:test_list', args = (problem.pk,))
-        return HttpResponseRedirect(url)
+        return redirect('judge:test_list', problem_id = problem.pk)
 
 class TestDelete(View):
     template_name = 'judge/test_delete.html'
@@ -234,8 +231,7 @@ class TestDelete(View):
         messageText = 'You\'ve successfuly deleted the tests'
         messages.add_message(request, messages.SUCCESS, messageText)
 
-        url = reverse('judge:test_list', args=(problem.pk,))
-        return HttpResponseRedirect(url)
+        return redirect('judge:test_list', problem_id = problem.pk)
 
 class ProblemGlobalForm(forms.Form):
     timeLimit = forms.DecimalField(required = False, decimal_places = 4,
@@ -249,25 +245,24 @@ class TestList(View):
     template_name = 'judge/test_list.html'
     checkboxPrefix = 'test_sel_'
 
-    def get_context(self, pk, form = ProblemGlobalForm()):
-        problem = get_object_or_404(Problem, pk = pk)
+    def get_context(self, problem_id, form = ProblemGlobalForm()):
+        problem = get_object_or_404(Problem, pk = problem_id)
         tests = problem.test_set.all();
 
         return {
             'problem' : problem,
-            'tests' : tests,
-            'problem_pk': pk,
+            'problem_pk': problem_id,
             'form': form,
             'checkboxPrefix': self.checkboxPrefix
         }
     
-    def get(self, request, pk):
-        context = self.get_context(pk)
+    def get(self, request, problem_id):
+        context = self.get_context(problem_id)
         return render(request, self.template_name, context)
 
-    def update_tests(self, request, pk):
+    def update_tests(self, request, problem_id):
         form = ProblemGlobalForm(request.POST)
-        context = self.get_context(pk, form = form)
+        context = self.get_context(problem_id, form = form)
 
         if not form.is_valid():
             return render(request, self.template_name, context)
@@ -277,10 +272,10 @@ class TestList(View):
         testScore = form.cleaned_data['testScore']
 
         testIds = request.POST.getlist('test-select')
-        problem = get_object_or_404(Problem, pk = pk)
+        problem = get_object_or_404(Problem, pk = problem_id)
 
-        for curPk in testIds:
-            test = get_object_or_404(Test, pk = curPk)
+        for pk in testIds:
+            test = get_object_or_404(Test, pk = pk)
 
             if timeLimit != None:
                 test.time_limit = timeLimit
@@ -305,7 +300,7 @@ class TestList(View):
 
         return render(request, self.template_name, context)
 
-    def delete_tests(self, request, pk):
+    def delete_tests(self, request, problem_id):
         testIds = request.POST.getlist('test-select')
         testStr = ','.join(testIds)
 
@@ -313,18 +308,15 @@ class TestList(View):
             messageText = 'No tests selected for deletion'
             messages.add_message(request, messages.WARNING, messageText)
 
-            url = reverse('judge:test_list', args=(pk,))
+            return redirect('judge:test_list', problem_id = problem_id)
         else:
-            url = reverse('judge:test_delete', args=(testStr,))
+            return redirect('judge:test_delete', ids = testStr)
 
-        return HttpResponseRedirect(url)
-
-
-    def post(self, request, pk):
+    def post(self, request, problem_id):
         if 'update' in request.POST:
-            return self.update_tests(request, pk)
+            return self.update_tests(request, problem_id)
         elif 'delete' in request.POST:
-            return self.delete_tests(request, pk)
+            return self.delete_tests(request, problem_id)
         
 class TestInput(View):
     def get(self, request, pk):
