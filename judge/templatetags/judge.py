@@ -70,10 +70,11 @@ def problem_admin_panel(context, *args, **kwargs):
     return pageContext
 
 @register.inclusion_tag('judge/test_select.html')
-def test_select(problem, **kwargs):
+def test_select(tests, **kwargs):
     return {
-            'tests': problem.test_set.all(),
-            'selected': set(kwargs.get('selected', []))
+            'tests': tests,
+            'selected': set(kwargs.get('selected', [])),
+            'select_class': 'test-select' + str(kwargs.get('select_class', ''))
     }
 
 @register.filter

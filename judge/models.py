@@ -98,6 +98,9 @@ class TestGroup(models.Model):
     problem = models.ForeignKey(Problem)
     score = models.DecimalField('Points', max_digits = 6, decimal_places = 2)
 
+    class Meta:
+        ordering = ['pk']
+
     def __str__(self):
         return self.name
 
@@ -112,13 +115,14 @@ class Test(models.Model):
     score = models.DecimalField('Points', max_digits = 6, decimal_places = 2)
     
     problem = models.ForeignKey(Problem)
-    test_group = models.ForeignKey(TestGroup, null = True, blank = True)
+    test_group = models.ForeignKey(TestGroup, null = True, blank = True, 
+            on_delete = models.SET_DEFAULT, default = None)
 
     class Meta:
         permissions = (
             ('view_test', 'Can see input/output files'),
         )
-        ordering = ['pk']
+        ordering = ['-test_group', 'pk']
 
     def __str__(self):
         return self.problem.title + ' --- Test'

@@ -1,9 +1,9 @@
-<h3>Select Tests</h3>
 <table class="table table-hover">
 	<thead>
 		<tr>
 			<th>
-				<input type="checkbox" id="select-all">
+				<input type="checkbox" class="select-all" 
+						   selection=".{{ select_class }}">
 				Select all
 			</th>
 			<th>Time limit</th>
@@ -20,8 +20,8 @@
 			<tr>
 				<td>
 					<input type="checkbox" name="test-select"
-					  class="test-select"
-					  value="{{ test.pk }}">
+						class="{{ select_class }}" value="{{ test.pk }}"
+						{% if test in selected %} checked {% endif %}>
 					{{ test.pk }}
 				</td>
 				<td> {{ test.time_limit|floatformat }} sec </td>
@@ -56,9 +56,10 @@
 </table>
 <script type="text/javascript">
 	$(document).ready(function() {
-		$('#select-all').click(function() {
+		$('.select-all').click(function() {
+			console.log();
 			newState = this.checked;
-			$('.test-select').each( function() {
+			$($(this).attr('selection')).each( function() {
 
 				this.checked = newState;
 			});

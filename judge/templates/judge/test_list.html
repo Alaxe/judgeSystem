@@ -18,7 +18,21 @@
 		<input type="submit" name="delete" value="Delete tests"
 			class="btn btn-warning btn-block">
 
-		{% test_select problem %}
+
+		{% for group, tests in tests_by_group.items %}
+			<h3>
+				{% if group %}
+					{{ group.name }}
+				{% else %}
+					No Test group
+				{% endif %}
+			</h3>
+			{% if group %}
+				{% test_select tests select_class=group.pk %}
+			{% else %}
+				{% test_select tests %}
+			{% endif %}
+		{% endfor %}
 	</form>
 {% endblock %}
 
@@ -26,17 +40,4 @@
 	{% problem_edit_nav page='tests' %}
 {% endblock %}
 
-{% block javascript %}
-		<script type="text/javascript">
-			$(document).ready(function() {
-				$('#select-all').click(function() {
-					newState = this.checked;
-					$('.test-select').each( function() {
 
-						this.checked = newState;
-					});
-				});
-			});
-		</script>
-
-{% endblock %}

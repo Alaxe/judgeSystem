@@ -11,6 +11,8 @@
 		{% csrf_token %}
 		{% bootstrap_form form %}
 
+		{% test_select tests selected=selected %}
+
 		{% buttons %}
 			<input type="submit" value="Submit"
 				 class="btn btn-default btn-block"> 

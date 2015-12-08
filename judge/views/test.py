@@ -19,7 +19,7 @@ class TestEditForm(forms.ModelForm):
 
     class Meta:
         model = Test
-        exclude = ['stdin', 'stdout', 'problem']
+        exclude = ['stdin', 'stdout', 'problem', 'test_group']
 
     def is_valid(self, update=False):
         valid = super(TestEditForm, self).is_valid()
@@ -249,8 +249,16 @@ class TestList(View):
         problem = get_object_or_404(Problem, pk = problem_id)
         tests = problem.test_set.all();
 
+        groupedTests = {}
+
+        for test in tests:
+            if test.test_group in groupedTests:
+                groupedTests[test.test_group].append(test)
+            else:
+                groupedTests[test.test_group] = [test]
+
         return {
-            'problem' : problem,
+            'tests_by_group' : groupedTests,
             'problem_pk': problem_id,
             'form': form,
             'checkboxPrefix': self.checkboxPrefix
