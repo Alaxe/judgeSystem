@@ -27,7 +27,7 @@ class MediaUpload(View):
         model = get_model(kwargs['app_label'], kwargs['model'], kwargs['id'])
 
         redir_url = request.GET.get('redir_url', '/')
-        permStr = '{0}.add_media_to.{1}'.format(model._meta.app_label, 
+        permStr = '{0}.add_media_to_{1}'.format(model._meta.app_label, 
                 model.__class__.__name__.lower())
  
         if not form.is_valid():
