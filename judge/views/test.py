@@ -8,7 +8,7 @@ from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import View
 
-from judge.models import Problem, Test
+from judge.models import Problem, Test, TestGroup
 
 from zipfile import ZipFile, BadZipFile
 import os
@@ -256,6 +256,12 @@ class TestList(View):
                 groupedTests[test.test_group].append(test)
             else:
                 groupedTests[test.test_group] = [test]
+
+        testGroups = problem.testgroup_set.all()
+
+        for group in testGroups:
+            if not group in groupedTests:
+                groupedTests[group] = []
 
         return {
             'tests_by_group' : groupedTests,

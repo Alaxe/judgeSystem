@@ -15,7 +15,7 @@ class TestGroupForm(ModelForm):
 class TestGroupEdit(View):
     temlpate_name = 'judge/test_group_edit.html'
     title = 'Edit Test group'
-    redir_pattern = 'judge:test_group_list'
+    redir_pattern = 'judge:test_list'
 
     def get_context(self, **kwargs):
         context = {'title': self.title }
@@ -63,7 +63,9 @@ class TestGroupEdit(View):
 
         if form.is_valid():
             testGroup = form.save()
+
             self.update_tests(testGroup, request)
+            testGroup.problem.update_max_score()
 
             return redirect(self.redir_pattern, problem_id = testGroup.problem.pk)
         else:
@@ -82,6 +84,7 @@ class TestGroupNew(TestGroupEdit):
             testGroup.save()
 
             self.update_tests(testGroup, request)
+            testGroup.problem.update_max_score()
             
             return redirect(self.redir_pattern, problem_id = problem_id)
         else:
@@ -102,11 +105,11 @@ class TestGroupDelete(View):
     def post(self, request, pk):
         testGroup = get_object_or_404(TestGroup, pk = pk)
         testGroup.delete()
+        testGroup.problem.update_max_score()
 
         messages.success(request, 'Test group deleted successfully')
         return redirect('judge:test_list', problem_id = testGroup.problem.pk)
 
-class TestGroupList(TemplateView):
     template_name = 'judge/test_group_list.html'
 
     def get_context_data(self, **kwargs):

@@ -79,8 +79,7 @@ def status_class(obj, *args, **kwargs):
         if obj.grader_message == 'Testing' or obj.grader_message == 'In Queue':
             return 'info'
 
-        maxScore = obj.problem.maxScore
-        if obj.score == maxScore:
+        if obj.score == obj.problem.max_score:
             return 'success'
         elif obj.score == 0:
             return 'danger'
@@ -88,9 +87,8 @@ def status_class(obj, *args, **kwargs):
             return 'warning'
 
     elif type(obj) is TestResult:
-        maxScore = obj.test.score
         if obj.message == 'Accepted':
-                if obj.score == maxScore:
+                if obj.score == obj.test.score:
                     return 'success'
                 else: 
                     return 'warning'

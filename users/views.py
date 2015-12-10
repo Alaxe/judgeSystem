@@ -269,8 +269,8 @@ class UserDetails(TemplateView):
             from judge.models import UserStatts
             userStatts = UserStatts.objects.get(user = self.request.user)
             details.extend([
-                ('Attempted problems', userStatts.triedProblems),
-                ('Solved problems', userStatts.solvedProblems)
+                ('Attempted problems', userStatts.tried_problems),
+                ('Solved problems', userStatts.solved_problems)
             ])
         except ImportError:
             pass

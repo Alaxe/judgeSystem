@@ -54,7 +54,7 @@ class ProblemList(TemplateView):
                     solData = UserProblemData.objects.get(problem = prob, 
                                                         user = user)
                 
-                    if solData.maxScore == prob.maxScore:
+                    if solData.max_score == prob.max_score:
                         prob.status = 'solved'
                     else:
                         prob.status = 'attempted'
@@ -110,7 +110,7 @@ class ProblemDetails(TemplateView):
 class ProblemForm(forms.ModelForm):
     class Meta:
         model = Problem
-        exclude = ['maxScore', 'visible', 'customChecker']
+        exclude = ['max_score', 'visible', 'customChecker']
 
 class ProblemNew(View):
     template_name = 'judge/problem_edit.html'

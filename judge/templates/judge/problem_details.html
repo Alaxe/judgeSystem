@@ -57,7 +57,7 @@
 								<td>{{ forloop.counter }}</td>
 								<td>{{ sol.grader_message }}</td>
 								<td>{{ sol.score|floatformat }} / 
-									{{ sol.problem.maxScore|floatformat }}</td>
+									{{ sol.problem.max_score|floatformat }}</td>
 								<td> 
 									<a href="
 									{% url 'judge:solution_details' sol.id %}">

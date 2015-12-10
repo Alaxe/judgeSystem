@@ -21,9 +21,9 @@ class Problem(models.Model):
             choices = STATEMENT_LANGUAGE_CHOICES, default = HTML)
     statement = models.TextField('Problem statement', blank=True)
 
-    maxScore = models.DecimalField(max_digits = 8, decimal_places = 4, default = 0)
+    max_score = models.DecimalField(max_digits = 8, decimal_places = 4, default = 0)
     visible = models.BooleanField(default = False)
-    customChecker = models.BooleanField(default = False)
+    custom_checker = models.BooleanField(default = False)
 
     tags = TaggableManager(blank = True)
 
@@ -52,9 +52,13 @@ class Problem(models.Model):
         testGroups = self.testgroup_set
         testGroupsQ = testGroups.aggregate(models.Sum('score'))
 
-        self.maxScore = noTestGroupQ.get('score__sum', 0) + \
-                testGroupsQ.get('score__sum', 0)
+        self.max_score = 0
 
+        queries = [noTestGroupQ, testGroupsQ]
+        for q in queries:
+            if q['score__sum']:
+                self.max_score += q['score__sum']
+        
         self.save()
     
 class Solution(models.Model):
@@ -73,7 +77,6 @@ class Solution(models.Model):
             ('view_foreign_solution', 'Can see somebody else\'s solution'),
         )
 
-    #To do
     def __str__(self):
         return self.problem.title + ' --- Solution'
 
@@ -84,8 +87,12 @@ class Solution(models.Model):
         testGroups = self.testgroupresult_set
         testGroupsQ = testGroups.aggregate(models.Sum('score'))
 
-        self.score = noTestGroupsQ.get('score__sum', 0) + \
-            testGroupsQ.get('score__sum', 0)
+        self.score = 0
+
+        queries = [noTestGroup, testGroupsQ]
+        for q in queries:
+            if q['score__sum']:
+                self.score += q['score__sum']
 
         self.save()
 
@@ -156,14 +163,14 @@ class UserProblemData(models.Model):
     user = models.ForeignKey(User)
     problem = models.ForeignKey(Problem)
 
-    maxScore = models.DecimalField(max_digits = 8, decimal_places = 4, 
+    max_score = models.DecimalField(max_digits = 8, decimal_places = 4, 
                                 default = 0)
     last_submit = models.DateTimeField()
 
     def update_score(self):
         solutions = Solution.objects.filter(user = self.user, 
                         problem = self.problem)
-        self.maxScore = solutions.aggregate(models.Max('score'))['score__max']
+        self.max_score = solutions.aggregate(models.Max('score'))['score__max']
         self.save()
 
     def __str__(self):
@@ -172,14 +179,14 @@ class UserProblemData(models.Model):
 class UserStatts(models.Model):
     user = models.OneToOneField(User)
 
-    solvedProblems = models.IntegerField(default = 0)
-    triedProblems = models.IntegerField(default = 0)
+    solved_problems = models.IntegerField(default = 0)
+    tried_problems = models.IntegerField(default = 0)
 
     def update(self):
-        self.triedProblems = UserProblemData.objects.filter(
+        self.tried_problems = UserProblemData.objects.filter(
                                     user = self.user).count()
-        self.solvedProblems = UserProblemData.objects.filter(user = self.user,
-                                    maxScore = F('problem__maxScore')).count()
+        self.solved_problems = UserProblemData.objects.filter(user = self.user,
+                                    max_score = F('problem__max_score')).count()
         self.save()
 
     def __str__(self):

@@ -9,7 +9,7 @@ class TestInLine(admin.TabularInline):
 class ProblemAdmin(admin.ModelAdmin):
 	fieldsets = [
 		('Title', {'fields': ['title',]}),
-		(None, {'fields': ['statement', 'customChecker', 'maxScore'], 
+		(None, {'fields': ['statement', 'custom_checker', 'max_score'], 
                     'classes': ['wide',]}),]
 
 	inlines = [TestInLine]
