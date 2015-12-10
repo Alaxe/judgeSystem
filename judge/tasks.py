@@ -68,7 +68,7 @@ def run_solution(test):
     return err.decode('utf-8')
 
 def check_output(test):
-    if test.problem.customChecker:
+    if test.problem.custom_checker:
         return custom_grader(test)
     else:
         return default_grader(test)
@@ -142,6 +142,7 @@ def run_test(solution, test):
 
     score = 0
     time = 'N\\A'
+    passed = False
 
     if sandbox_msg[:2] == 'OK' :
         msg = 'Wrong awnser'
@@ -150,10 +151,12 @@ def run_test(solution, test):
         if check_output(test):
             msg = 'Accepted'
             score = test.score
+            passed = True
+
 
         sandbox_msg = msg
     
-    result = TestResult(message = sandbox_msg, score = score,
+    result = TestResult(message = sandbox_msg, score = score, passed = passed,
                         solution = solution, test = test, exec_time = time)
     print('test passed')
     return result
@@ -186,13 +189,8 @@ def retest_problem(problem):
         UPdata = UserProblemData.objects.filter(problem = problem)
 
         for data in UPdata:
-            if data.maxScore == problem.maxScore:
-                statts = UserStatts.objects.get(user = data.user)
-                statts.solvedProblems -= 1
-                statts.save()
-
-            data.maxScore = 0
-            data.save()
+            data.update_score()
+            UserStatts.objects.get(user = data.user).update()
 
         for sol in solutions:
             sol.testresult_set.all().delete()

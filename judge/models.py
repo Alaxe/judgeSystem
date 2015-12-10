@@ -81,7 +81,7 @@ class Solution(models.Model):
         return self.problem.title + ' --- Solution'
 
     def update_score(self):
-        noTestGroup = self.testresult_set.filter(test__sub_task__isnull = True)
+        noTestGroup = self.testresult_set.filter(test__test_group__isnull = True)
         noTestGroupQ = noTestGroup.aggregate(models.Sum('score'))
 
         testGroups = self.testgroupresult_set
@@ -89,7 +89,7 @@ class Solution(models.Model):
 
         self.score = 0
 
-        queries = [noTestGroup, testGroupsQ]
+        queries = [noTestGroupQ, testGroupsQ]
         for q in queries:
             if q['score__sum']:
                 self.score += q['score__sum']
