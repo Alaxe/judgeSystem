@@ -270,9 +270,9 @@ class TestList(View):
 
     def update_tests(self, request, problem_id):
         form = ProblemGlobalForm(request.POST)
-        context = self.get_context(problem_id, form = form)
 
         if not form.is_valid():
+            context = self.get_context(problem_id, form = form)
             return render(request, self.template_name, context)
 
         timeLimit = form.cleaned_data['timeLimit']
@@ -306,6 +306,7 @@ class TestList(View):
             messageText = '{0} tests updated successfully'.format(len(testIds))
             messages.add_message(request, messages.SUCCESS, messageText)
 
+        context = self.get_context(problem_id)
         return render(request, self.template_name, context)
 
     def delete_tests(self, request, problem_id):

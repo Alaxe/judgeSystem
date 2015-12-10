@@ -18,18 +18,42 @@
 		<input type="submit" name="delete" value="Delete tests"
 			class="btn btn-warning btn-block">
 
+		<hr>
+		<a href="{% url 'judge:test_group_new' problem_pk %}"
+			class="btn btn-block btn-primary">
+			New Test group
+		</a>
 
 		{% for group, tests in tests_by_group.items %}
-			<h3>
-				{% if group %}
-					{{ group.name }}
-				{% else %}
-					No Test group
-				{% endif %}
-			</h3>
+			<hr>
 			{% if group %}
+				<div class="row">
+					<div class="col-sm-3 col-md-6">
+						<p class="lead">
+							{{ group.name }}
+						</p>
+					</div>
+					<div class="col-sm-3 col-md-2" >
+							{{ group.score|floatformat }} points
+					</div>
+
+					<div class="col-sm-3 col-md-2">
+						<a href="{% url 'judge:test_group_edit' group.pk %}"
+							class="btn btn-primary btn-sm btn-block">
+							Edit
+						</a>
+					</div>
+					<div class="col-sm-3 col-md-2">
+						<a href="{% url 'judge:test_group_delete' group.pk %}"
+							class="btn btn-warning btn-sm btn-block">
+							Delete
+						</a>
+					</div>
+				</div>
 				{% test_select tests select_class=group.pk %}
+
 			{% else %}
+				<h3>No Test group</h3>
 				{% test_select tests %}
 			{% endif %}
 		{% endfor %}

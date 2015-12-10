@@ -46,12 +46,14 @@ class Problem(models.Model):
             return self.statement
 
     def update_max_score(self):
-        query = self.test_set.aggregate(models.Sum('score'))
+        noTestGroup = self.test_set.filter(test_group__isnull = True)
+        noTestGroupQ = noTestGroup.aggregate(models.Sum('score'))
 
-        if query['score__sum']:
-            self.maxScore = query['score__sum']
-        else: 
-            self.maxScore = 0
+        testGroups = self.testgroup_set
+        testGroupsQ = testGroups.aggregate(models.Sum('score'))
+
+        self.maxScore = noTestGroupQ.get('score__sum', 0) + \
+                testGroupsQ.get('score__sum', 0)
 
         self.save()
     
@@ -76,17 +78,19 @@ class Solution(models.Model):
         return self.problem.title + ' --- Solution'
 
     def update_score(self):
-        query = self.testresult_set.aggregate(models.Sum('score'))
+        noTestGroup = self.testresult_set.filter(test__sub_task__isnull = True)
+        noTestGroupQ = noTestGroup.aggregate(models.Sum('score'))
 
-        if query['score__sum']:
-            self.score = query['score__sum']
-        else:
-            self.score = 0
+        testGroups = self.testgroupresult_set
+        testGroupsQ = testGroups.aggregate(models.Sum('score'))
+
+        self.score = noTestGroupsQ.get('score__sum', 0) + \
+            testGroupsQ.get('score__sum', 0)
 
         self.save()
 
-        data = UserProblemData.objects.get(user = self.user,
-                                        problem = self.problem)
+        data = UserProblemData.objects.get(user = self.user, 
+            problem = self.problem)
 
         data.update_score()
         
@@ -104,11 +108,19 @@ class TestGroup(models.Model):
     def __str__(self):
         return self.name
 
+class TestGroupResult(models.Model):
+    test_group = models.ForeignKey(TestGroup)
+    solution = models.ForeignKey(Solution)
+
+    score = models.DecimalField('Points', max_digits = 6, decimal_places = 2)
+
+    class Meta:
+        ordering = ['test_group']
+
 class Test(models.Model):
     stdin = models.TextField()
     stdout = models.TextField()
 
-    #time limit in sec and memory limit in kB
     time_limit = models.DecimalField('Time limit (sec)', max_digits = 6,
                                             decimal_places = 4)
     mem_limit  = models.IntegerField('Memory limit (MB)')
@@ -129,8 +141,9 @@ class Test(models.Model):
 
 class TestResult(models.Model):
     message = models.CharField(max_length = 64)
-    score = models.DecimalField(max_digits = 8, decimal_places = 4)
+    score = models.DecimalField(max_digits = 6, decimal_places = 2)
     exec_time = models.CharField(max_length = 16)
+    passed = models.BooleanField(default = False)
 
     solution = models.ForeignKey(Solution)
     test = models.ForeignKey(Test)

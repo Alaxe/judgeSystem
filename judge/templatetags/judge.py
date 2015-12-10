@@ -33,10 +33,6 @@ def problem_edit_nav(context, *args, **kwargs):
             'url': reverse('judge:test_new', args = (problem_pk,)),
             'text': 'Add tests'
         }, {
-            'name': 'test_groups',
-            'url': reverse('judge:test_group_list', args = (problem_pk,)),
-            'text': 'Edit test groups'
-        }, {
             'name': 'checker',
             'url': reverse('judge:problem_checker', args = (problem_pk,)),
             'text': 'Configure a custom checker'
