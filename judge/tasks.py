@@ -9,8 +9,8 @@ from django.conf import settings
 from django.core.cache import cache
 from django.db import transaction
 
-from judge.models import Test, TestResult, Solution, UserProblemData,\
-                        UserStatts
+from judge.models import Test, TestResult, TestGroupResult, Solution, \
+        UserProblemData, UserStatts
 
 def get_sol_loc(solution):
     solutionRoot = settings.BASE_DIR + '/judge/solutions/'
@@ -166,7 +166,14 @@ def save_result(result, solution):
     print('saving results')
 
     with transaction.atomic():
+        for testGroup in solution.problem.testgroup_set.all():
+            TestGroupResult.objects.create(test_group = testGroup, 
+                solution = solution, score = testGroup.score)
+
         for taskRes in result:
+            if not taskRes.passed:
+                TestGroupResult.objects.filter(solution = solution,
+                    test_group = taskRes.test.test_group).update(score = 0)
             taskRes.save()
 
     solution.grader_message = 'Tested'
@@ -184,7 +191,6 @@ def save_result(result, solution):
 def retest_problem(problem):
     solutions = problem.solution_set.all()
 
-    # set_autocommit(False)
     with transaction.atomic():
         UPdata = UserProblemData.objects.filter(problem = problem)
 
@@ -194,6 +200,7 @@ def retest_problem(problem):
 
         for sol in solutions:
             sol.testresult_set.all().delete()
+            sol.testgroupresult_set.all().delete()
             sol.score = 0
             sol.grader_message = 'In Queue'
             sol.save()
