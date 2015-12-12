@@ -28,8 +28,21 @@ class SolutionDetails(View):
         sol = get_object_or_404(Solution, pk = pk)
         
         if may_view_solution(request.user, sol):
+            groupedResults = []
+
+            noTestGroup = sol.testresult_set \
+                .filter(test__test_group__isnull = True).all()
+            if noTestGroup:
+                groupedResults.append((None, noTestGroup))
+
+            for testGroupResult in sol.testgroupresult_set.all():
+                testResults = TestResult.objects.filter(solution = sol,
+                    test__test_group = testGroupResult.test_group)
+                groupedResults.append((testGroupResult, testResults))
+
             context = { 
                 'solution': sol,
+                'results_by_group': groupedResults,
                 'pk': sol.pk,
             }
             return render(request, self.template_name, context)

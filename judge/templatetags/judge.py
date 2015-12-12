@@ -1,7 +1,7 @@
 from django import template
 from django.core.urlresolvers import reverse
 
-from judge.models import Solution, TestResult
+from judge.models import Solution, TestResult, TestGroupResult
 
 register = template.Library()
 
@@ -87,13 +87,11 @@ def status_class(obj, *args, **kwargs):
             return 'warning'
 
     elif type(obj) is TestResult:
-        if obj.message == 'Accepted':
-                if obj.score == obj.test.score:
-                    return 'success'
-                else: 
-                    return 'warning'
-        else:
-            return 'danger'
+        return 'success' if obj.passed else 'danger'
+    elif type(obj) is TestGroupResult:
+        return 'success' if obj.passed else 'danger'
+    else: 
+        return ''
     
     
 @register.filter

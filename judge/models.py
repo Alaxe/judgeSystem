@@ -54,10 +54,10 @@ class Problem(models.Model):
 
         self.max_score = 0
 
-        queries = [noTestGroupQ, testGroupsQ]
-        for q in queries:
-            if q['score__sum']:
-                self.max_score += q['score__sum']
+        if noTestGroupQ['score__sum']:
+            self.max_score += noTestGroupQ['score__sum']
+        if testGroupsQ['score__sum']:
+            self.max_score += testGroupsQ['score__sum']
         
         self.save()
     
@@ -84,15 +84,15 @@ class Solution(models.Model):
         noTestGroup = self.testresult_set.filter(test__test_group__isnull = True)
         noTestGroupQ = noTestGroup.aggregate(models.Sum('score'))
 
-        testGroups = self.testgroupresult_set
-        testGroupsQ = testGroups.aggregate(models.Sum('score'))
+        testGroups = self.testgroupresult_set.filter(passed = True)
+        testGroupsQ = testGroups.aggregate(models.Sum('test_group__score'))
 
         self.score = 0
 
-        queries = [noTestGroupQ, testGroupsQ]
-        for q in queries:
-            if q['score__sum']:
-                self.score += q['score__sum']
+        if noTestGroupQ['score__sum']:
+            self.score += noTestGroup['score__sum']
+        if testGroupsQ['test_group__score__sum']:
+            self.score += testGroupsQ['test_group__score__sum']
 
         self.save()
 
@@ -119,7 +119,10 @@ class TestGroupResult(models.Model):
     test_group = models.ForeignKey(TestGroup)
     solution = models.ForeignKey(Solution)
 
-    score = models.DecimalField('Points', max_digits = 6, decimal_places = 2)
+    passed = models.BooleanField(default = True)
+    
+    def get_score(self):
+        return self.test_group.score if self.passed else 0
 
     class Meta:
         ordering = ['test_group']

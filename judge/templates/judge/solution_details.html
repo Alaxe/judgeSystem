@@ -17,36 +17,62 @@
 {% block content %}
 <div class="row">
 	<div class="col-md-8">
-		<div class="panel panel-default">
-			<div class="panel-heading"> Result </div>
-
-			<div class="panel-body">
-				<table class="table">
-					<thead>
-						<tr>
-							<th> # </th>
-							<th> Points </th>
-							<th> Message </th>
-							<th> Execution time</th>
-						</tr>
-					</thead>
-
-					<tbody>
-						{% for result in solution.testresult_set.all %}
-							<tr class="{{ result|status_class }}">
-								<th>{{ forloop.counter }}</th>
-								<td>
-									{{ result.score|floatformat }} /
-									{{ result.test.score|floatformat }}
-								</td>
-								<td>{{ result.message }}</td>
-								<td>{{ result.exec_time }}</td>
+		{% for group, results in results_by_group %}
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					{% if group %}
+						<div class="row">
+							<div class="col-sm-6">
+								<h3>
+									{{ group.test_group.name }}
+								</h3>
+							</div>
+							<div class="col-sm-6">
+								<span class="btn btn-block 
+									btn-{{ group|status_class }}">
+									{{ group.get_score|floatformat }} / 
+									{{ group.test_group.score|floatformat }}
+								</span>
+							</div>
+						</div>
+					{% else %}
+						<h3>
+							No test group
+						</h3>
+					{% endif %}
+				</div>
+				<div class="panel-body">
+					<table class="table">
+						<thead>
+							<tr>
+								<th> # </th>
+								<th> Points </th>
+								<th> Message </th>
+								<th> Execution time</th>
 							</tr>
-						{% endfor %}
-					</tbody>
-				</table>
+						</thead>
+
+						<tbody>
+							{% for res in results %}
+								<tr class="{{ res|status_class }}">
+									<th>{{ forloop.counter }}</th>
+									<td>
+										{% if res.test.test_group %}
+											-
+										{% else %}
+											{{ res.score|floatformat }} /
+											{{ res.test.score|floatformat }}
+										{% endif %}
+									</td>
+									<td>{{ res.message }}</td>
+									<td>{{ res.exec_time }}</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
 			</div>
-		</div>
+		{% endfor %}
 	</div>
 
 	<div class="col-md-4">

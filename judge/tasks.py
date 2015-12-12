@@ -168,12 +168,12 @@ def save_result(result, solution):
     with transaction.atomic():
         for testGroup in solution.problem.testgroup_set.all():
             TestGroupResult.objects.create(test_group = testGroup, 
-                solution = solution, score = testGroup.score)
+                solution = solution)
 
         for taskRes in result:
             if not taskRes.passed:
                 TestGroupResult.objects.filter(solution = solution,
-                    test_group = taskRes.test.test_group).update(score = 0)
+                    test_group = taskRes.test.test_group).update(passed = False)
             taskRes.save()
 
     solution.grader_message = 'Tested'

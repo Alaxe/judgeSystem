@@ -247,21 +247,15 @@ class TestList(View):
 
     def get_context(self, problem_id, form = ProblemGlobalForm()):
         problem = get_object_or_404(Problem, pk = problem_id)
-        tests = problem.test_set.all();
 
-        groupedTests = {}
+        groupedTests = []
+        noTestGroup = problem.test_set.filter(test_group__isnull = True).all()
 
-        for test in tests:
-            if test.test_group in groupedTests:
-                groupedTests[test.test_group].append(test)
-            else:
-                groupedTests[test.test_group] = [test]
+        if noTestGroup:
+            groupedTests.append((None, noTestGroup))
 
-        testGroups = problem.testgroup_set.all()
-
-        for group in testGroups:
-            if not group in groupedTests:
-                groupedTests[group] = []
+        for group in problem.testgroup_set.all():
+            groupedTests.append((group, group.test_set.all()))
 
         return {
             'tests_by_group' : groupedTests,
