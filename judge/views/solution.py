@@ -108,7 +108,7 @@ class SolutionSubmit(View):
                                     last_submit = timezone.now())
 
             data.save()
-            problem_tried.send(sender = self.__class__, data = data)
+            UserStatts.objects.get(user = user).update_statts()
 
         source = self.form.cleaned_data['source']
         solution = Solution(
