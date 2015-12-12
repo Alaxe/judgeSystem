@@ -184,6 +184,8 @@ def retest_problem(problem):
         UPdata = UserProblemData.objects.filter(problem = problem)
 
         for sol in solutions:
+            sol.testresult_set.all().delete()
+            sol.testgroupresult_set.all().delete()
             sol.score = 0
             sol.grader_message = 'In Queue'
             sol.save()
