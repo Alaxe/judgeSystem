@@ -23,39 +23,48 @@
 			class="btn btn-block btn-primary">
 			New Test group
 		</a>
+		<hr>
 
 		{% for group, tests in tests_by_group %}
-			<hr>
-			{% if group %}
-				<div class="row">
-					<div class="col-sm-3 col-md-6">
-						<p class="lead">
-							{{ group.name }}
-						</p>
-					</div>
-					<div class="col-sm-3 col-md-2" >
-							{{ group.score|floatformat }} points
-					</div>
+			<div class="panel panel-default">
+				{% if group %}
+					<div class="panel-heading">
+						<div class="row">
+							<div class="col-sm-3 col-md-6">
+								<p class="lead">
+									{{ group.name }}
+								</p>
+							</div>
+							<div class="col-sm-3 col-md-2" >
+									{{ group.score|floatformat }} points
+							</div>
 
-					<div class="col-sm-3 col-md-2">
-						<a href="{% url 'judge:test_group_edit' group.pk %}"
-							class="btn btn-primary btn-sm btn-block">
-							Edit
-						</a>
+							<div class="col-sm-3 col-md-2">
+								<a href="{% url 'judge:test_group_edit' group.pk %}"
+									class="btn btn-primary btn-sm btn-block">
+									Edit
+								</a>
+							</div>
+							<div class="col-sm-3 col-md-2">
+								<a href="{% url 'judge:test_group_delete' group.pk %}"
+									class="btn btn-warning btn-sm btn-block">
+									Delete
+								</a>
+							</div>
+						</div>
 					</div>
-					<div class="col-sm-3 col-md-2">
-						<a href="{% url 'judge:test_group_delete' group.pk %}"
-							class="btn btn-warning btn-sm btn-block">
-							Delete
-						</a>
+					<div class="panel-content">
+						{% test_select tests select_class=group.pk %}
 					</div>
-				</div>
-				{% test_select tests select_class=group.pk %}
-
-			{% else %}
-				<h3>No Test group</h3>
-				{% test_select tests %}
-			{% endif %}
+				{% else %}
+					<div class="pane-heading">
+						<h3>No Test group</h3>
+					</div>
+					<div class="panel-content"> 
+						{% test_select tests %}
+					</div>
+				{% endif %}
+			</div>
 		{% endfor %}
 	</form>
 {% endblock %}
