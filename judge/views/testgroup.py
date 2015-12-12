@@ -109,13 +109,3 @@ class TestGroupDelete(View):
 
         messages.success(request, 'Test group deleted successfully')
         return redirect('judge:test_list', problem_id = testGroup.problem.pk)
-
-    template_name = 'judge/test_group_list.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(TemplateView, self).get_context_data(**kwargs)
-
-        problem = get_object_or_404(Problem, pk = kwargs['problem_id'])
-        context['problem_pk'] = problem.pk
-        context['test_groups'] = problem.testgroup_set.all()
-        return context

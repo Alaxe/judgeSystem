@@ -123,22 +123,15 @@ def test_solution(solution):
         curSubTask = run_test.si(solution, t)
         taskList.append(curSubTask)
 
-    print(get_box_id())
-
     res = chord(group(taskList), save_result.s(solution))
     res.apply_async()
 
-    print('sheduled for testing')
-
 @shared_task
 def run_test(solution, test):
-    print('seting sandbox')
     boxId = get_box_id()
     
     setup_box(solution, test)
-    print('testing')
     sandbox_msg = run_solution(test)
-    print('grading')
 
     score = 0
     time = 'N\\A'
@@ -158,13 +151,10 @@ def run_test(solution, test):
     
     result = TestResult(message = sandbox_msg, score = score, passed = passed,
                         solution = solution, test = test, exec_time = time)
-    print('test passed')
     return result
 
 @shared_task(ignore_result = True) 
 def save_result(result, solution):
-    print('saving results')
-
     with transaction.atomic():
         for testGroup in solution.problem.testgroup_set.all():
             TestGroupResult.objects.create(test_group = testGroup, 
@@ -185,7 +175,6 @@ def save_result(result, solution):
     except FileNotFoundError:
         pass
 
-    print('results saved')
 
 @shared_task(ignore_result = True) 
 def retest_problem(problem):
@@ -194,15 +183,15 @@ def retest_problem(problem):
     with transaction.atomic():
         UPdata = UserProblemData.objects.filter(problem = problem)
 
-        for data in UPdata:
-            data.update_score()
-            UserStatts.objects.get(user = data.user).update()
-
         for sol in solutions:
-            sol.testresult_set.all().delete()
-            sol.testgroupresult_set.all().delete()
             sol.score = 0
             sol.grader_message = 'In Queue'
             sol.save()
 
             test_solution.delay(sol)
+
+        for data in UPdata:
+            data.max_score = 0
+            data.save()
+            UserStatts.objects.get(user = data.user).update_statts()
+

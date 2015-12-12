@@ -90,7 +90,7 @@ class Solution(models.Model):
         self.score = 0
 
         if noTestGroupQ['score__sum']:
-            self.score += noTestGroup['score__sum']
+            self.score += noTestGroupQ['score__sum']
         if testGroupsQ['test_group__score__sum']:
             self.score += testGroupsQ['test_group__score__sum']
 
@@ -102,7 +102,7 @@ class Solution(models.Model):
         data.update_score()
         
         statts = UserStatts.objects.get(user = self.user)
-        statts.update()
+        statts.update_statts()
 
 class TestGroup(models.Model):
     name = models.CharField('Name of test group', max_length = 32)
@@ -185,7 +185,7 @@ class UserStatts(models.Model):
     solved_problems = models.IntegerField(default = 0)
     tried_problems = models.IntegerField(default = 0)
 
-    def update(self):
+    def update_statts(self):
         self.tried_problems = UserProblemData.objects.filter(
                                     user = self.user).count()
         self.solved_problems = UserProblemData.objects.filter(user = self.user,
