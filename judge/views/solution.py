@@ -12,7 +12,6 @@ from django.views.generic import DetailView, View
 from django.utils import timezone
 
 from judge.models import *
-from judge.signals import problem_tried
 from judge.tasks import test_solution
 
 def may_view_solution(user, solution):
