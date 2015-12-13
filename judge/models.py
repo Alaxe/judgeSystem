@@ -8,6 +8,11 @@ from django.utils import timezone
 from markdown_deux import markdown
 from taggit.managers import TaggableManager
 
+score_field_kwargs = {
+    'max_digits': 6, 
+    'decimal_places': 2
+}
+
 class Problem(models.Model):
     title = models.CharField('Title', max_length = 64, default="New Problem")
 
@@ -21,8 +26,7 @@ class Problem(models.Model):
         choices = STATEMENT_LANGUAGE_CHOICES, default = HTML)
     statement = models.TextField('Problem statement', blank=True)
 
-    max_score = models.DecimalField(max_digits = 8, decimal_places = 4, 
-        default = 0)
+    max_score = models.DecimalField(default = 0, **score_field_kwargs)
     visible = models.BooleanField(default = False)
     custom_checker = models.BooleanField(default = False)
 
@@ -54,17 +58,17 @@ class Problem(models.Model):
 
         groupsMap[None] = []
         for group in testGroups:
-            groupsMap[group] = []
+            groupsMap[group.id] = []
 
         for test in tests:
-            groupsMap[test.test_group].append(test)
+            groupsMap[test.test_group_id].append(test)
         
         testsByGroup = []
         if groupsMap[None]:
             testsByGroup.append((None, groupsMap[None]))
 
         for group in testGroups:
-            testsByGroup.append((group, groupsMap[group]))
+            testsByGroup.append((group, groupsMap[group.id]))
         
         return testsByGroup
  
@@ -109,10 +113,11 @@ class Solution(models.Model):
 
         groupedResults = {None: []}
         for groupRes in groupResults:
-            groupedResults[groupRes.test_group] = []
+            groupedResults[groupRes.pk] = []
 
         for testRes in testResults:
-            groupedResults[testRes.test.test_group].append(testRes)
+            print(testRes.test_group_result.id)
+            groupedResults[testRes.test_group_result_id].append(testRes)
 
         resultsByGroup = []
         if groupedResults[None]:
@@ -120,7 +125,7 @@ class Solution(models.Model):
 
         for groupRes in groupResults:
             resultsByGroup.append((groupRes, 
-                groupedResults[groupRes.test_group]))
+                groupedResults[groupRes.pk]))
 
         return resultsByGroup
 
@@ -152,7 +157,7 @@ class Solution(models.Model):
 class TestGroup(models.Model):
     name = models.CharField('Name of test group', max_length = 32)
     problem = models.ForeignKey(Problem)
-    score = models.DecimalField('Points', max_digits = 6, decimal_places = 2)
+    score = models.DecimalField('Points', **score_field_kwargs)
 
     class Meta:
         ordering = ['pk']
@@ -160,26 +165,13 @@ class TestGroup(models.Model):
     def __str__(self):
         return self.name
 
-class TestGroupResult(models.Model):
-    test_group = models.ForeignKey(TestGroup)
-    solution = models.ForeignKey(Solution)
-
-    passed = models.BooleanField(default = True)
-    
-    def get_score(self):
-        return self.test_group.score if self.passed else 0
-
-    class Meta:
-        ordering = ['test_group']
-
 class Test(models.Model):
     stdin = models.TextField()
     stdout = models.TextField()
 
-    time_limit = models.DecimalField('Time limit (sec)', max_digits = 6,
-                                            decimal_places = 4)
+    time_limit = models.DecimalField('Time limit (sec)', **score_field_kwargs)
     mem_limit  = models.IntegerField('Memory limit (MB)')
-    score = models.DecimalField('Points', max_digits = 6, decimal_places = 2)
+    score = models.DecimalField('Points', **score_field_kwargs)
     
     problem = models.ForeignKey(Problem)
     test_group = models.ForeignKey(TestGroup, null = True, blank = True, 
@@ -194,14 +186,25 @@ class Test(models.Model):
     def __str__(self):
         return self.problem.title + ' --- Test'
 
+class TestGroupResult(models.Model):
+    test_group = models.ForeignKey(TestGroup)
+    solution = models.ForeignKey(Solution)
+
+    score = models.DecimalField(default = 0, **score_field_kwargs)
+    passed = models.BooleanField(default = True)
+
+    class Meta:
+        ordering = ['test_group']
+
 class TestResult(models.Model):
     message = models.CharField(max_length = 64)
-    score = models.DecimalField(max_digits = 6, decimal_places = 2)
+    score = models.DecimalField(**score_field_kwargs)
     exec_time = models.CharField(max_length = 16)
     passed = models.BooleanField(default = False)
 
     solution = models.ForeignKey(Solution)
     test = models.ForeignKey(Test)
+    test_group_result = models.ForeignKey(TestGroupResult, null = True)
 
     class Meta:
         ordering = ['test']
@@ -211,8 +214,7 @@ class UserProblemData(models.Model):
     user = models.ForeignKey(User)
     problem = models.ForeignKey(Problem)
 
-    max_score = models.DecimalField(max_digits = 8, decimal_places = 4, 
-                                default = 0)
+    max_score = models.DecimalField(default = 0, **score_field_kwargs)
     last_submit = models.DateTimeField()
 
     def update_score(self):

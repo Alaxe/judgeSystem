@@ -156,15 +156,35 @@ def run_test(solution, test):
 @shared_task(ignore_result = True) 
 def save_result(result, solution):
     with transaction.atomic():
+        failedTestGroups = set()
+        
+        testGroupResults = {None: None}
         for testGroup in solution.problem.testgroup_set.all():
-            TestGroupResult.objects.create(test_group = testGroup, 
-                solution = solution)
+            testGroupResults[testGroup.pk] = TestGroupResult(
+                    test_group = testGroup, solution = solution)
 
-        for taskRes in result:
-            if not taskRes.passed:
-                TestGroupResult.objects.filter(solution = solution,
-                    test_group = taskRes.test.test_group).update(passed = False)
-            taskRes.save()
+        for testResult in result:
+            if not testResult.passed:
+                failedTestGroups.add(testResult.test.test_group_id)
+
+
+        for groupId, groupResult in testGroupResults.items():
+            if not groupId:
+                continue
+
+            if groupId in failedTestGroups:
+                groupResult.passed = False
+                groupResult.score = 0
+            else:
+                groupResult.passed = True
+                groupResult.score = groupResult.test_group.score
+
+            groupResult.save()
+
+        for testResult in result:
+            test_group_id = testResult.test.test_group_id
+            testResult.test_group_result = testGroupResults[test_group_id]
+            testResult.save()
 
     solution.grader_message = 'Tested'
     solution.update_score()
@@ -196,4 +216,3 @@ def retest_problem(problem):
             data.max_score = 0
             data.save()
             UserStatts.objects.get(user = data.user).update_statts()
-
