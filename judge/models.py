@@ -116,7 +116,6 @@ class Solution(models.Model):
             groupedResults[groupRes.pk] = []
 
         for testRes in testResults:
-            print(testRes.test_group_result.id)
             groupedResults[testRes.test_group_result_id].append(testRes)
 
         resultsByGroup = []

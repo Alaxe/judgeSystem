@@ -110,7 +110,7 @@ class ProblemDetails(TemplateView):
 class ProblemForm(forms.ModelForm):
     class Meta:
         model = Problem
-        exclude = ['max_score', 'visible', 'customChecker']
+        exclude = ['max_score', 'visible', 'custom_checker']
 
 class ProblemNew(View):
     template_name = 'judge/problem_edit.html'
@@ -212,7 +212,7 @@ class ProblemChecker(View):
         if not form:
             problem = get_object_or_404(Problem, pk = pk)
             form = ProblemCheckerForm()
-            form.fields['useCustomChecker'].initial = problem.customChecker
+            form.fields['useCustomChecker'].initial = problem.custom_checker
 
         return {
             'form': form,
@@ -231,13 +231,13 @@ class ProblemChecker(View):
             context = self.get_context(pk, form = form)
             return render(request, self.template_name, context)
 
-        problem.customChecker = form.cleaned_data.get('useCustomChecker')
+        problem.custom_checker = form.cleaned_data.get('useCustomChecker')
         problem.save()
 
-        if problem.customChecker:
-            dest = open(settings.BASE_DIR + '/judge/graders/' + str(problem.pk), 'wb')
-            dest.write(request.FILES['customChecker'].read())
-            dest.close()
+        if problem.custom_checker:
+            with open(settings.BASE_DIR + '/judge/graders/' + str(problem.pk),
+                'wb') as dest:
+                dest.write(request.FILES['customChecker'].read())
 
         messageText = 'Checker successfully updated'
         messages.add_message(request, messages.SUCCESS, messageText)
