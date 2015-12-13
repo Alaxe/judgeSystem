@@ -248,17 +248,8 @@ class TestList(View):
     def get_context(self, problem_id, form = ProblemGlobalForm()):
         problem = get_object_or_404(Problem, pk = problem_id)
 
-        groupedTests = []
-        noTestGroup = problem.test_set.filter(test_group__isnull = True).all()
-
-        if noTestGroup:
-            groupedTests.append((None, noTestGroup))
-
-        for group in problem.testgroup_set.all():
-            groupedTests.append((group, group.test_set.all()))
-
         return {
-            'tests_by_group' : groupedTests,
+            'tests_by_group' : problem.get_tests_by_group(),
             'problem_pk': problem_id,
             'form': form,
             'checkboxPrefix': self.checkboxPrefix

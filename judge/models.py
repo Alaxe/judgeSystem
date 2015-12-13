@@ -18,10 +18,11 @@ class Problem(models.Model):
         (MD, 'Markdown'),
     )
     statement_language = models.CharField('Language', max_length = 8,
-            choices = STATEMENT_LANGUAGE_CHOICES, default = HTML)
+        choices = STATEMENT_LANGUAGE_CHOICES, default = HTML)
     statement = models.TextField('Problem statement', blank=True)
 
-    max_score = models.DecimalField(max_digits = 8, decimal_places = 4, default = 0)
+    max_score = models.DecimalField(max_digits = 8, decimal_places = 4, 
+        default = 0)
     visible = models.BooleanField(default = False)
     custom_checker = models.BooleanField(default = False)
 
@@ -45,6 +46,28 @@ class Problem(models.Model):
         else:
             return self.statement
 
+    def get_tests_by_group(self):
+        groupsMap = {}
+
+        testGroups = self.testgroup_set.all()
+        tests = self.test_set.all()
+
+        groupsMap[None] = []
+        for group in testGroups:
+            groupsMap[group] = []
+
+        for test in tests:
+            groupsMap[test.test_group].append(test)
+        
+        testsByGroup = []
+        if groupsMap[None]:
+            testsByGroup.append((None, groupsMap[None]))
+
+        for group in testGroups:
+            testsByGroup.append((group, groupsMap[group]))
+        
+        return testsByGroup
+ 
     def update_max_score(self):
         noTestGroup = self.test_set.filter(test_group__isnull = True)
         noTestGroupQ = noTestGroup.aggregate(models.Sum('score'))
@@ -79,6 +102,28 @@ class Solution(models.Model):
 
     def __str__(self):
         return self.problem.title + ' --- Solution'
+
+    def get_results_by_group(self):
+        testResults = self.testresult_set.all()
+        groupResults = self.testgroupresult_set.all()
+
+        groupedResults = {None: []}
+        for groupRes in groupResults:
+            groupedResults[groupRes.test_group] = []
+
+        for testRes in testResults:
+            groupedResults[testRes.test.test_group].append(testRes)
+
+        resultsByGroup = []
+        if groupedResults[None]:
+            resultsByGroup.append((None, groupedResults[None]))
+
+        for groupRes in groupResults:
+            resultsByGroup.append((groupRes, 
+                groupedResults[groupRes.test_group]))
+
+        return resultsByGroup
+
 
     def update_score(self):
         noTestGroup = self.testresult_set.filter(test__test_group__isnull = True)
