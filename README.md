@@ -34,8 +34,10 @@ A python/django based system for testing c/c++ solutions to algoritmic problems
         * SITE_HOST - used for some links
         * Email backend and server
         * TIME_ZONE
-4. run setup.py
+4. run setup.py (as root)
 
 How to run:
-  * Actual server : python manage.py runserver (you can add url parameters)
-  * Celery server : celery -A judgeSystem (you can mess with the parameters if you want) 
+  * Web server: `python manage.py runserver` (you can add `url:port` as 
+    a parameter)
+  * Celery server (as root): `sudo -- sh -c  'export C_FORCE_ROOT="true"; celery -A
+   judgeSystem worker`
