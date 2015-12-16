@@ -25,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = 'sw)@bzva4l4@%ol+&7d@(!!3)=k%*^jgkz=+3m4&5+uexot*wy'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 TEMPLATE_DEBUG = False
 
@@ -45,6 +45,7 @@ INSTALLED_APPS = (
     'bootstrap3',
     'bootstrap_pagination',
     'markdown_deux',
+    'debug_toolbar',
     'djcelery',
     'taggit',
     'taggit_templatetags2',

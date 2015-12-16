@@ -77,11 +77,8 @@ def default_grader(test):
     outFilePath = get_box_loc() + 'std.out'
 
     with open(outFilePath, 'r') as outFile:
-        curOut = outFile.read()
-        curOut = curOut.replace('\r\n', '\n')
-
-        corOut = test.stdout
-        corOut = corOut.replace('\r\n', '\n')
+        curOut = outFile.read().split()
+        corOut = test.stdout.split()
 
         return curOut == corOut 
     return 0
