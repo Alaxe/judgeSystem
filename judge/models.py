@@ -152,7 +152,7 @@ class Solution(models.Model):
 
         data.update_score()
         
-        statts = UserStatts.objects.get(user = self.user)
+        statts = UserStatts.get_for_user(self.user)
         statts.update_statts()
 
 class TestGroup(models.Model):
@@ -232,6 +232,13 @@ class UserStatts(models.Model):
 
     solved_problems = models.IntegerField(default = 0)
     tried_problems = models.IntegerField(default = 0)
+
+    @staticmethod
+    def get_for_user(user):
+        if not hasattr(user, 'userstatts'):
+            user.get_userstatts = UserStatts.objects.create(user = user)
+
+        return user.userstatts
 
     def update_statts(self):
         self.tried_problems = UserProblemData.objects.filter(

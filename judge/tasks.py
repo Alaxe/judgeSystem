@@ -212,4 +212,4 @@ def retest_problem(problem):
         for data in UPdata:
             data.max_score = 0
             data.save()
-            UserStatts.objects.get(user = data.user).update_statts()
+            UserStatts.get_for_user(data.user).update_statts()

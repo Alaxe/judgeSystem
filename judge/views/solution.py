@@ -95,7 +95,7 @@ class SolutionSubmit(View):
                                     last_submit = timezone.now())
 
             data.save()
-            UserStatts.objects.get(user = user).update_statts()
+            UserStatts.get_for_user(user).update_statts()
 
         source = self.form.cleaned_data['source']
         solution = Solution(
