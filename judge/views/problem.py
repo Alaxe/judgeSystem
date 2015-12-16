@@ -21,9 +21,11 @@ class ProblemList(TemplateView):
     def get_context_data(self, page = 1, tags = ''):
         context = super(ProblemList, self).get_context_data()
 
-        problems = Problem.objects.all()
+        problems = Problem.objects.defer('statement')
         if not self.request.user.has_perm('judge.problem_hidden'):
             problems = problems.filter(visible = True)
+
+        
 
         context['curTags'] = []
         if tags != '':

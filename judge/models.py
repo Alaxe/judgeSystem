@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import F
+from django.db.models import F, Prefetch
 from django.dispatch import Signal
 from django.utils import timezone
 
@@ -54,7 +54,7 @@ class Problem(models.Model):
         groupsMap = {}
 
         testGroups = self.testgroup_set.all()
-        tests = self.test_set.all()
+        tests = self.test_set.defer('stdin', 'stdout')
 
         groupsMap[None] = []
         for group in testGroups:
@@ -108,8 +108,10 @@ class Solution(models.Model):
         return self.problem.title + ' --- Solution'
 
     def get_results_by_group(self):
-        testResults = self.testresult_set.all()
-        groupResults = self.testgroupresult_set.all()
+        testResults = self.testresult_set.all().prefetch_related(Prefetch(
+            'test', queryset = Test.objects.defer('stdin', 'stdout')))
+        groupResults = self.testgroupresult_set.all().select_related(
+                'test_group')
 
         groupedResults = {None: []}
         for groupRes in groupResults:
@@ -174,7 +176,7 @@ class Test(models.Model):
     
     problem = models.ForeignKey(Problem)
     test_group = models.ForeignKey(TestGroup, null = True, blank = True, 
-            on_delete = models.SET_DEFAULT, default = None)
+            on_delete = models.SET_DEFAULT, default = None, db_index = True)
 
     class Meta:
         permissions = (
@@ -187,7 +189,7 @@ class Test(models.Model):
 
 class TestGroupResult(models.Model):
     test_group = models.ForeignKey(TestGroup)
-    solution = models.ForeignKey(Solution)
+    solution = models.ForeignKey(Solution, db_index = True)
 
     score = models.DecimalField(default = 0, **score_field_kwargs)
     passed = models.BooleanField(default = True)
@@ -201,7 +203,7 @@ class TestResult(models.Model):
     exec_time = models.CharField(max_length = 16)
     passed = models.BooleanField(default = False)
 
-    solution = models.ForeignKey(Solution)
+    solution = models.ForeignKey(Solution, db_index = True)
     test = models.ForeignKey(Test)
     test_group_result = models.ForeignKey(TestGroupResult, null = True)
 

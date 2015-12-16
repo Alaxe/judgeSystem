@@ -13,6 +13,7 @@ from judge.models import Problem, Test, TestGroup
 from zipfile import ZipFile, BadZipFile
 import os
 
+
 class TestEditForm(forms.ModelForm):
     stdinFile = forms.FileField(label = 'Input file', required=False)
     stdoutFile = forms.FileField(label = 'Output file',required=False)
@@ -170,14 +171,14 @@ class TestEdit(View):
         }
 
     def get(self, request, pk):
-        test = get_object_or_404(Test, pk = pk)
+        test = get_object_or_404(Test.objects.defer('stdin', 'stdout'), pk = pk)
         form = TestEditForm(instance = test)
 
         context = self.get_context(form, test)
         return render(request, self.template_name, context)
 
     def post(self, request, pk):
-        test = get_object_or_404(Test, pk = pk)
+        test = get_object_or_404(Test.objects.defer('stdin', 'stdout'), pk = pk)
         form = TestEditForm(request.POST, request.FILES, instance = test)
         problem = test.problem
 
@@ -187,9 +188,9 @@ class TestEdit(View):
 
         test = form.save(commit = False)
 
-        if not form.cleaned_data['stdinFile'] == None:
+        if form.cleaned_data['stdinFile']:
             test.stdin = request.FILES['stdinFile'].read()
-        if not form.cleaned_data['stdoutFile'] == None:
+        if form.cleaned_data['stdoutFile']:
             test.stdout = request.FILES['stdoutFile'].read()
 
         test.problem = problem
@@ -246,7 +247,8 @@ class TestList(View):
     checkboxPrefix = 'test_sel_'
 
     def get_context(self, problem_id, form = ProblemGlobalForm()):
-        problem = get_object_or_404(Problem, pk = problem_id)
+        problem = get_object_or_404(Problem.objects.defer('statement'),
+            pk = problem_id)
 
         return {
             'tests_by_group' : problem.get_tests_by_group(),
@@ -266,31 +268,32 @@ class TestList(View):
             context = self.get_context(problem_id, form = form)
             return render(request, self.template_name, context)
 
-        timeLimit = form.cleaned_data['timeLimit']
-        memoryLimit = form.cleaned_data['memoryLimit']
-        testScore = form.cleaned_data['testScore']
-
-        testIds = request.POST.getlist('test-select')
         problem = get_object_or_404(Problem, pk = problem_id)
 
-        for pk in testIds:
-            test = get_object_or_404(Test, pk = pk)
+        form_data = form.cleaned_data
+        update_kwargs = {}
+        field_selected = False
 
-            if timeLimit != None:
-                test.time_limit = timeLimit
-            if memoryLimit != None:
-                test.mem_limit = memoryLimit
-            if testScore != None:
-                test.score = testScore
+        if form_data['timeLimit']:
+            update_kwargs['time_limit'] = form_data['timeLimit']
+            field_selected = True
+        if form_data['memoryLimit']:
+            update_kwargs['mem_limit'] = form_data['memoryLimit']
+            field_selected = True
+        if form_data['testScore']:
+            update_kwargs['score'] = form_data['testScore']
+            field_selected = True
 
-            test.save()
+        testIds = request.POST.getlist('test-select')
+        tests = Test.objects.filter(id__in = testIds).update(**update_kwargs)
         
-        problem.update_max_score()
+        if form_data['testScore']:
+            problem.update_max_score()
 
         if not testIds:
             messageText = 'No tests selected for update'
             messages.add_message(request, messages.WARNING, messageText)
-        elif (not timeLimit) and (not memoryLimit) and (not testScore):
+        elif not field_selected:
             messageText = 'No fields selected for update'
             messages.add_message(request, messages.WARNING, messageText)
         else:
@@ -320,10 +323,10 @@ class TestList(View):
         
 class TestInput(View):
     def get(self, request, pk):
-        test = get_object_or_404(Test, pk = pk)
+        test = get_object_or_404(Test.objects.only('stdin'), pk = pk)
         return HttpResponse(test.stdin, content_type = 'text/plain')
 
 class TestOutput(View):
     def get(self, request, pk):
-        test = get_object_or_404(Test, pk = pk)
+        test = get_object_or_404(Test.objects.only('stdout'), pk = pk)
         return HttpResponse(test.stdout, content_type = 'text/plain')

@@ -57,7 +57,7 @@
 								<tr class="{{ res|status_class }}">
 									<th>{{ forloop.counter }}</th>
 									<td>
-										{% if res.test.test_group %}
+										{% if res.test.test_group_id %}
 											-
 										{% else %}
 											{{ res.score|floatformat }} /

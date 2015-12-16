@@ -28,7 +28,7 @@
 				<td> {{ test.time_limit|floatformat }} sec </td>
 				<td> {{ test.mem_limit }} MB </td>
 				<td> 
-					{% if test.test_group %}
+					{% if test.test_group_id %}
 						-
 					{% else %}
 						{{ test.score|floatformat }} 
