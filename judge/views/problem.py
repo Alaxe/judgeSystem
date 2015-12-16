@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.paginator import InvalidPage, Paginator
@@ -179,7 +180,8 @@ class ProblemDelete(View):
         url = reverse('judge:problem_list')
         return HttpResponseRedirect(url)
 
-class ProblemMedia(View):
+class ProblemMedia(PermissionRequiredMixin, View):
+    permission_required =  'judge.add_media_to_problem'
     template_name = 'judge/problem_media.html'
 
     def get(self, request, pk):

@@ -1,5 +1,6 @@
 from django.core.urlresolvers import reverse
 from django.contrib import messages
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Q
 from django.forms import ModelForm
 from django.shortcuts import render, get_object_or_404, redirect
@@ -12,8 +13,10 @@ class TestGroupForm(ModelForm):
         model = TestGroup
         exclude = ['problem']
 
-class TestGroupEdit(View):
+class TestGroupEdit(PermissionRequiredMixin, View):
+    permission_required = 'judge.change_testgroup'
     temlpate_name = 'judge/test_group_edit.html'
+
     title = 'Edit Test group'
     redir_pattern = 'judge:test_list'
 
@@ -73,6 +76,7 @@ class TestGroupEdit(View):
             return render(request, self.template_name, context)
 
 class TestGroupNew(TestGroupEdit):
+    permission_required = 'judge.add_testgroup'
     title = 'New Test group'
 
     def post(self, request, problem_id):
@@ -91,7 +95,8 @@ class TestGroupNew(TestGroupEdit):
             context = self.get_context(form = form, problem_id = problem_id)
             return render(request, self.template_name, context)
 
-class TestGroupDelete(View):
+class TestGroupDelete(PermissionRequiredMixin, View):
+    permission_required = 'judge.delete_problem'
     template_name = 'judge/test_group_delete.html'
 
     def get(self, request, pk):
