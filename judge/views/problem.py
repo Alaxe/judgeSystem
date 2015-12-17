@@ -22,7 +22,7 @@ class ProblemList(TemplateView):
         context = super(ProblemList, self).get_context_data()
 
         problems = Problem.objects.defer('statement')
-        if not self.request.user.has_perm('judge.problem_hidden'):
+        if not self.request.user.has_perm('judge.see_hidden_problems'):
             problems = problems.filter(visible = True)
 
         
@@ -115,7 +115,8 @@ class ProblemForm(forms.ModelForm):
         model = Problem
         exclude = ['max_score', 'visible', 'custom_checker']
 
-class ProblemNew(View):
+class ProblemNew(PermissionRequiredMixin, View):
+    permission_required = 'judge.add_problem'
     template_name = 'judge/problem_edit.html'
 
     def get(self, request):
@@ -124,15 +125,14 @@ class ProblemNew(View):
         url = reverse('judge:problem_edit', args=(problem.pk,))
         return HttpResponseRedirect(url)
 
-class ProblemEdit(View):
+class ProblemEdit(PermissionRequiredMixin, View):
+    permission_required = 'judge.add_problem'
     template_name = 'judge/problem_edit.html'
-    title = 'Edit statement'
 
     def get_context(self, problem, form):
         pk = problem.pk
         return {
             'form' : form,
-            'title': self.title,
             'tests': problem.test_set,
             'problem_pk'   : pk
         }
@@ -158,7 +158,8 @@ class ProblemEdit(View):
         url = reverse('judge:problem_details', args = (pk,))
         return HttpResponseRedirect(url)
 
-class ProblemDelete(View):
+class ProblemDelete(PermissionRequiredMixin, View):
+    permission_required = 'judge.delete_problem'
     template_name = 'judge/problem_delete.html'
 
     def get(self, request, pk):
@@ -209,7 +210,8 @@ class ProblemCheckerForm(forms.Form):
 
         return valid
 
-class ProblemChecker(View):
+class ProblemChecker(PermissionRequiredMixin, View):
+    permission_required = 'judge.add_checker_to_problem'
     template_name = 'judge/problem_checker.html'
 
     def get_context(self, pk, form = None):
@@ -249,7 +251,8 @@ class ProblemChecker(View):
         url = reverse('judge:problem_edit', args=(pk,))
         return HttpResponseRedirect(url)
 
-class ProblemRetest(View):
+class ProblemRetest(PermissionRequiredMixin, View):
+    permission_required = 'judge.retest_problem'
     template_name = 'judge/problem_retest.html'
 
     def get(self, request, pk):
@@ -277,7 +280,8 @@ class ProblemRetest(View):
         problem = get_object_or_404(Problem, pk = pk)
         return HttpResponse(problem.stdin, content_type="text/plain")
 
-class ProblemVisibility(View):
+class ProblemVisibility(PermissionRequiredMixin, View):
+    permission_required = 'judge.change_visibility_of_problem'
     template_name = 'judge/problem_visibility.html'
 
     def get(self, request, pk):

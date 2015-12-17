@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.auth.models import Permission
 
 from judge.models import *
 
@@ -23,3 +24,5 @@ admin.site.register(TestGroup)
 admin.site.register(TestGroupResult)
 admin.site.register(UserProblemData)
 admin.site.register(UserStatts)
+
+admin.site.register(Permission)

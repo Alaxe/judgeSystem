@@ -35,10 +35,12 @@ class Problem(models.Model):
     class Meta:
         ordering = ['-id']
         permissions = (
-            ('problem_retest', 'Can start a retest'),
-            ('problem_visibility', 'Can change problem\'s visibility'),
-            ('problem_hidden', 'Can see hidden problems'),
-            ('add_media_to_problem', 'Can upload media for the problem'),
+            ('retest_problem', 'Can start a retest'),
+            ('change_visibility_of_problem', 
+                'Can change the visibility of a problem'),
+            ('see_hidden_problems', 'Can see hidden problems'),
+            ('add_media_to_problem', 'Can upload media for a problem'),
+            ('add_checker_to_problem', 'Can add a checker for a problem'),
         )
 
     def __str__(self):  
@@ -92,7 +94,7 @@ class Solution(models.Model):
     source = models.TextField()
     submit_date = models.DateTimeField('Date of submition')
 
-    grader_message = models.CharField(max_length = 32)
+    grader_message = models.CharField(max_length = 32, default = 'In Queue')
 
     problem = models.ForeignKey(Problem)
     user = models.ForeignKey(User)

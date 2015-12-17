@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django import forms
@@ -12,7 +13,6 @@ from judge.models import Problem, Test, TestGroup
 
 from zipfile import ZipFile, BadZipFile
 import os
-
 
 class TestEditForm(forms.ModelForm):
     stdinFile = forms.FileField(label = 'Input file', required=False)
@@ -55,8 +55,10 @@ class TestNewForm(TestEditForm):
 
         return valid
 
-class TestNew(View):
+class TestNew(PermissionRequiredMixin, View):
+    permission_required = 'judge.add_test'
     template_name = 'judge/test_edit.html'
+
     title = 'Add a test'
 
     def get_context(self, problem, form  = TestNewForm()):
@@ -157,7 +159,8 @@ class TestNew(View):
             context = self.get_context(problem, form)
             return render(request, self.template_name, context)
 
-class TestEdit(View):
+class TestEdit(PermissionRequiredMixin, View):
+    permission_required = 'judge.change_test'
     template_name = 'judge/test_edit.html'
     title = 'Edit test'
 
@@ -200,7 +203,8 @@ class TestEdit(View):
 
         return redirect('judge:test_list', problem_id = problem.pk)
 
-class TestDelete(View):
+class TestDelete(PermissionRequiredMixin, View):
+    permission_required = 'judge.delete_test'
     template_name = 'judge/test_delete.html'
 
     def get_tests(self, ids):
@@ -242,7 +246,8 @@ class ProblemGlobalForm(forms.Form):
     testScore = forms.DecimalField(required = False, decimal_places = 4,
                                         label = 'Points per test')
 
-class TestList(View):
+class TestList(PermissionRequiredMixin, View):
+    permission_required = 'judge.change_test'
     template_name = 'judge/test_list.html'
     checkboxPrefix = 'test_sel_'
 
@@ -321,12 +326,16 @@ class TestList(View):
         elif 'delete' in request.POST:
             return self.delete_tests(request, problem_id)
         
-class TestInput(View):
+class TestInput(PermissionRequiredMixin, View):
+    permission_required = 'judge.view_test'   
+
     def get(self, request, pk):
         test = get_object_or_404(Test.objects.only('stdin'), pk = pk)
         return HttpResponse(test.stdin, content_type = 'text/plain')
 
-class TestOutput(View):
+class TestOutput(PermissionRequiredMixin, View):
+    permission_required = 'judge.view_test'   
+
     def get(self, request, pk):
         test = get_object_or_404(Test.objects.only('stdout'), pk = pk)
         return HttpResponse(test.stdout, content_type = 'text/plain')
