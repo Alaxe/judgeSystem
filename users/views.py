@@ -1,7 +1,8 @@
 from django.conf import settings
-from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import EmailMultiAlternatives
 from django.core.paginator import InvalidPage, Paginator
 from django.core.urlresolvers import reverse
@@ -19,14 +20,14 @@ def send_email(template, context, subject, to):
     sender = settings.EMAIL_HOST_USER
 
     plaintext = get_template(template + '.txt')
-    html      = get_template(template + '.html')
+    html = get_template(template + '.html')
     
     text_content = plaintext.render(context)
     html_content = html.render(context)
 
-    msg = EmailMultiAlternatives(subject, text_content, sender, to)
-    msg.attach_alternative(html_content, 'text/html')
-    msg.send()
+    email = EmailMultiAlternatives(subject, text_content, sender, to)
+    email.attach_alternative(html_content, 'text/html')
+    email.send()
 
 class Login(View):
     def render_form(self, request, form):
@@ -129,6 +130,27 @@ class ResetPassword(View):
         context = {'form': ResetForm()}
         return render(request, self.template_name, context)
 
+    def send_reset_email(self, user):
+        resetQs = PassReset.objects.filter(user = user)
+        if resetQs.exists():
+            reset = resetQs[0]
+        else:
+            reset = PassReset.objects.create(user = user, created = 
+                timezone.now())
+
+        reset_loc_url = reverse('users:password_set', args=(reset.code,))
+        reset_url = settings.SITE_HOST + reset_loc_url
+
+        context = {
+            'username': user.username,
+            'reset_link': reset_url
+        }
+        
+        template = 'users/email/password_reset'
+        subject = 'Password reset'
+
+        send_email(template, context, subject, [user.email])
+
     def post(self, request):
         form = ResetForm(request.POST)
         
@@ -137,35 +159,10 @@ class ResetPassword(View):
             return render(request, self.template_name, context)
 
         email = form.cleaned_data.get('email')
-        
-        try:
-            user = User.objects.get(email = email)
+        self.send_reset_email(user = User.objects.get(email = email))
 
-            try:
-                reset = PassReset.objects.get(user = user)
-            except PassReset.DoesNotExist:
-                reset = PassReset(user = user)
-                reset.created = timezone.now()
-            reset.save()
-
-            reset_loc_url = reverse('users:password_set', args=(reset.code,))
-            reset_url = settings.SITE_HOST + reset_loc_url
-
-            context = Context({
-                'username': user.username, 'reset_link': reset_url})
-            
-            template = 'users/email/password_reset'
-            subject = 'Password reset'
-
-            send_email(template, context, subject, [email])
-            
-        except User.DoesNotExist:
-            pass
-
-        messageText = 'An email was send with instructions. \
-                    If you didn\' receive it make sure you entered \
-                    the correct email address.'
-        messages.add_message(request, messages.INFO, messageText)
+        messages.info(request, 'An email was send with instructions. If you \
+            didn\' receive it make sure you entered the correct email address.')
 
         redir_url = reverse('judge:problem_list')
         return HttpResponseRedirect(redir_url)
@@ -227,7 +224,7 @@ class Confirm(View):
             return HttpResponseRedirect(error_url)
 
 
-class PasswordChange(View):
+class PasswordChange(LoginRequiredMixin, View):
     template_name = 'users/change_password.html'
 
     def get(self, request):
@@ -256,7 +253,7 @@ class PasswordChange(View):
         context = {'passwordForm': form}
         return render(request, self.template_name, context)
 
-class UserDetails(TemplateView):
+class UserDetails(LoginRequiredMixin, TemplateView):
     template_name = 'users/user_details.html'
 
     def get_context_data(self, **kwargs):
@@ -286,7 +283,7 @@ class UserDetails(TemplateView):
 try:
     from judge.models import Solution
 
-    class Solutions(TemplateView):
+    class Solutions(LoginRequiredMixin, TemplateView):
         template_name = 'users/solutions.html'
 
         def get_context_data(self, **kwargs):

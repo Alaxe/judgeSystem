@@ -82,3 +82,13 @@ class RegisterForm(Form):
 
 class ResetForm(Form):
      email = EmailField(**email_kwargs)
+
+     def is_valid(self):
+        valid = super(ResetForm, self).is_valid()
+
+        email = self.cleaned_data.get('email')
+        if not User.objects.filter(email = email).exists():
+            self.add_error('email', 'No such email')
+            valid = False
+            
+        return valid

@@ -10,20 +10,21 @@ def gen_randcode():
     return ''.join(random.SystemRandom().choice(chars) for i in range(32))
 
 class UserLink(models.Model):
-    code = models.CharField(max_length = 32, default = '')
+    code = models.CharField(max_length = 32, default = gen_randcode)
     user = models.OneToOneField(User)
     created = models.DateTimeField(default = timezone.now)
+
+    def gen_new_code(self):
+        self.code = gen_randcode()
+        self.save()
 
     class Meta:
         abstract = True
 
-    def __init__(self, *args, **kwargs):
-        super(UserLink, self).__init__(*args, **kwargs)
-        self.code = gen_randcode()
-
 class Confirmation(UserLink):
     def __str__(self):
-        return self.user.username + ' confirm'
+        return self.user.username + ' confirmation ' + self.code
 
 class PassReset(UserLink):
-    pass
+    def __str__(self):
+        return self.user.username + ' password reset ' + self.code
