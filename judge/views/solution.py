@@ -11,7 +11,7 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect,\
 from django.views.generic import DetailView, View
 from django.utils import timezone
 
-from judge.models import Solution, Problem, UserProblemData
+from judge.models import Solution, Problem, UserProblemData, UserStatts
 from judge.tasks import test_solution
 
 class MayViewSolutionMixin(UserPassesTestMixin):
