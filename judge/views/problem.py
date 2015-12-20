@@ -183,16 +183,16 @@ class ProblemDelete(PermissionRequiredMixin, View):
         url = reverse('judge:problem_list')
         return HttpResponseRedirect(url)
 
-class ProblemMedia(PermissionRequiredMixin, View):
+class ProblemMedia(PermissionRequiredMixin, TemplateView):
     permission_required =  'judge.add_media_to_problem'
     template_name = 'judge/problem_media.html'
 
-    def get(self, request, pk):
-        context = {
-            'problem': get_object_or_404(Problem, pk = pk),
-            'problem_pk': pk
-        }
-        return render(request, self.template_name, context)
+    def get_context_data(self, **kwargs):
+        context = super(ProblemMedia, self).get_context_data(**kwargs)
+
+        context['problem'] = get_object_or_404(Problem, pk = kwargs['pk'])
+        context['problem_pk'] = kwargs['pk']
+        return context
 
 class ProblemCheckerForm(forms.Form):
     useCustomChecker = forms.BooleanField(label = 'Use custom checker', 

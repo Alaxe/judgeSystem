@@ -1,0 +1,18 @@
+{% extends 'blog/post_edit_base.html' %}
+{% load blog %}
+{% load media_manager %}
+
+{% block title %}
+	<h1>Manage media</h1>
+{% endblock %}
+
+{% block edit_content %}
+	<h3>Upload Media</h3>
+	{% media_upload post %}
+	<h3>Media for this blog post</h3>
+	{% media_list post %}
+{% endblock %}
+
+{% block edit_nav %}
+	{% blog_post_edit_nav pk=post.pk page='media' %}
+{% endblock %}

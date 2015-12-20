@@ -26,6 +26,7 @@ class BlogPost(models.Model):
         ordering = ('-post_time',)
         permissions = (
             ('change_foreign_blogpost', 'Edit someone else\'s post'),
+            ('add_media_to_blogpost', 'Upload media to a blog post'),
         )
 
     def get_content_html(self):

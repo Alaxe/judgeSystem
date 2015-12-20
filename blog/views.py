@@ -55,6 +55,19 @@ class PostNew(PermissionRequiredMixin, View):
         post = BlogPost.objects.create(author = request.user)
         return redirect(reverse('blog:post_edit', args = (post.pk,)))
 
+class PostMedia(PermissionRequiredMixin, TemplateView):
+    permission_required = 'blog.add_media_to_blogpost'
+    template_name = 'blog/post_media.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(PostMedia, self).get_context_data(**kwargs)
+        context['post'] = get_object_or_404(BlogPost, pk = kwargs['pk'])
+
+        if not context['post'].may_edit(self.request.user):
+            raise Http404
+
+        return context
+
 class PostDetails(DetailView):
     model = BlogPost
     context_object_name = 'post'

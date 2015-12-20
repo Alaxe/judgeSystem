@@ -39,7 +39,7 @@ def blog_post_edit_nav(*args, **kwargs):
                 'text': 'Edit blog post'
             }, {
                 'name': 'media',
-                'url': '#',
+                'url': reverse('blog:post_media', args = (blog_pk,)),
                 'text': 'Upload Media'
             }, {
                 'name': 'delete',
