@@ -1,0 +1,22 @@
+{% extends 'judge/base.html' %}
+{% load bootstrap3 %}
+{% load judge %}
+
+{% block title %}
+<h1> 
+	Import problem
+</h1>
+{% endblock %}
+
+{% block content %}
+<p class="lead">
+	A previously serialized problem can be imported from here.
+</p>
+<form method="POST" enctype="multipart/form-data" 
+	action="{{ request.get_full_path}}">
+	{% csrf_token %}
+	{% bootstrap_form form %}
+	<input type="submit" class="btn btn-primary btn-block" 
+		  value="Import">
+</form>
+{% endblock %}

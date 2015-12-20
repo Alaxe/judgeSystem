@@ -31,6 +31,10 @@ urlpatterns = [
         views.ProblemVisibility.as_view(), name = 'problem_visibility'),
     url(r'^problems/(?P<pk>\d+)/checker/$', views.ProblemChecker.as_view(),
         name = 'problem_checker'),
+    url(r'^problems/import/$', views.PorblemImport.as_view(),
+        name = 'problem_import'),
+    url(r'problems/(?P<pk>\d+)/export/$', views.ProblemExport.as_view(),
+        name = 'problem_export'),
 
     url(r'^problems/(?P<problem_id>\d+)/newtest/$', views.TestNew.as_view(), 
        name = 'test_new'),

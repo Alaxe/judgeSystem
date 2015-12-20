@@ -45,6 +45,10 @@ def problem_edit_nav(context, *args, **kwargs):
             'url': reverse('judge:problem_retest', args = (problem_pk,)),
             'text': 'Retest problem'
         }, {
+            'name': 'export',
+            'url': reverse('judge:problem_export', args = (problem_pk,)),
+            'text': 'Export'
+        }, {
             'name': 'delete',
             'url': reverse('judge:problem_delete', args = (problem_pk,)),
             'text': 'Delete problem'

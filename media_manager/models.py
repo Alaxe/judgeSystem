@@ -21,3 +21,9 @@ class MediaFile(models.Model):
 
     def __str__(self):
         return self.filename
+
+    @staticmethod
+    def get_for_object(obj):
+        model_type = ContentType.objects.get_for_model(type(obj))
+        return MediaFile.objects.filter(content_type = model_type, 
+            object_id = obj.id)

@@ -5,8 +5,13 @@
 			Edit statement
 		</a>
 	{% else %}
-		<a href="{% url 'judge:problem_new' %}"
-			class="btn btn-info btn-sm" style="float:right;">
+		<a href="{% url 'judge:problem_import' %}"
+			style="float:right; margin-left: 10px;" class="btn btn-info btn-sm">
+			Import problem
+		</a>
+	
+		<a href="{% url 'judge:problem_new' %}" class="btn btn-info btn-sm"
+			style="float:right; margin-left: 10px;">
 			New problem
 		</a>
 	{% endif %}

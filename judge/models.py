@@ -41,6 +41,7 @@ class Problem(models.Model):
             ('see_hidden_problems', 'Can see hidden problems'),
             ('add_media_to_problem', 'Can upload media for a problem'),
             ('add_checker_to_problem', 'Can add a checker for a problem'),
+            ('import_problem', 'Can import problems'),
         )
 
     def __str__(self):  
