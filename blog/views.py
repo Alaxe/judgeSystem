@@ -18,37 +18,16 @@ class BlogPostForm(ModelForm):
         model = BlogPost
         exclude = ['author', 'post_time']
 
-class PostBase(View):
+class PostEdit(PermissionRequiredMixin, View):
+    permission_required = 'blog.change_blogpost'
     template_name = 'blog/post_edit.html'
-    title = 'Edit blog post'
 
     def get_response(self, request, form = BlogPostForm(), pk = None):
         context = {
-            'title': self.title,
             'form': form,
             'pk': pk
         }
         return render(request, self.template_name, context)
-
-    @abc.abstractmethod
-    def get_blog_post_form(self, *, request, pk):
-        pass
-
-    @abc.abstractmethod
-    def save_blog_post(self, *args, **kwargs):
-        pass
-
-    def post(self, request, pk = None):
-        form = self.get_blog_post_form(request = request, pk = pk)
-
-        if not form.is_valid():
-            return self.get_response(request, form = form, pk = pk)
-        else:
-            post = self.save_blog_post(request = request, form = form, pk = pk)
-            return redirect(reverse('blog:post_details', args = (post.pk,)))
-
-class PostEdit(PermissionRequiredMixin, PostBase):
-    permission_required = 'blog.change_blogpost'
 
     def get(self, request, pk):
         post = get_object_or_404(BlogPost, pk = pk)
@@ -59,30 +38,22 @@ class PostEdit(PermissionRequiredMixin, PostBase):
             form = BlogPostForm(instance = post)
             return self.get_response(request, form = form, pk = pk)
 
-    def get_blog_post_form(self, *args, **kwargs):
-        post = get_object_or_404(BlogPost, pk = kwargs['pk'])
-        return BlogPostForm(kwargs['request'].POST, instance = post)
+    def post(self, request, pk):
+        post = get_object_or_404(BlogPost, pk = pk)
+        form = BlogPostForm(request.POST, instance = post)
 
-    def save_blog_post(self, *args, **kwargs):
-        return kwargs['form'].save()
+        if not form.is_valid():
+            return self.get_response(request, form = form, pk = pk)
+        else:
+            form.save()
+            return redirect(reverse('blog:post_details', args = (post.pk,)))
 
-class PostNew(PermissionRequiredMixin, PostBase):
+class PostNew(PermissionRequiredMixin, View):
     permission_required = 'blog.add_blogpost'
-    title = 'New blog post'
 
     def get(self, request):
-        return self.get_response(request)
-
-    def get_blog_post_form(self, *args, **kwargs):
-        return BlogPostForm(kwargs['request'].POST)
-
-    def save_blog_post(self, *args, **kwargs):
-        post = kwargs['form'].save(commit = False)
-        post.author = kwargs['request'].user
-        post.save()
-
-        return post
-
+        post = BlogPost.objects.create(author = request.user)
+        return redirect(reverse('blog:post_edit', args = (post.pk,)))
 
 class PostDetails(DetailView):
     model = BlogPost
@@ -122,15 +93,14 @@ class PostDelete(PermissionRequiredMixin, View):
         if not post.may_edit(request.user):
             raise Http404
 
-        context = {'post': post }
+        context = {
+            'pk': post.pk
+        }
         return render(request, self.template_name, context)
 
     def post(self, request, pk):
         post = get_object_or_404(BlogPost, pk = pk)
         post.delete()
 
-        messageText = 'Blog post deleted successfully'
-        messages.add_message(request, messages.SUCCESS, messageText)
-
-        url = reverse('blog:post_list')
-        return HttpResponseRedirect(url)
+        messages.success(request, 'Blog post deleted successfully')
+        return redirect(reverse('blog:post_list'))

@@ -1,0 +1,10 @@
+<ul class="nav nav-pills nav-stacked">
+	{% for page in pages %}
+		<li {% if page.name == curPage %} class="active" {%endif%}>
+			<a href="{{ page.url }}">
+				{{ page.text }}
+			</a>
+		</li>
+	{% endfor %}
+</ul>
+

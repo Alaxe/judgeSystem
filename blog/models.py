@@ -5,7 +5,7 @@ from django.utils import timezone
 from markdown_deux import markdown
 
 class BlogPost(models.Model):
-    title = models.CharField('Title', max_length = 64)
+    title = models.CharField('Title', max_length = 64, default = 'New Draft')
 
     HTML = 'html'
     MD = 'md'
@@ -16,7 +16,7 @@ class BlogPost(models.Model):
     content_language = models.CharField('Language', max_length = 8,
         choices = CONTENT_LANGUAGE_CHOICES, default = HTML)
 
-    content = models.TextField('Content')
+    content = models.TextField('Content', blank = True, default = '')
     author = models.ForeignKey(User)
 
     public = models.BooleanField(default = False)

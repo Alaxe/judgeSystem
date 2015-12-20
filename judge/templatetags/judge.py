@@ -9,13 +9,13 @@ register = template.Library()
 def problem_edit_nav(context, *args, **kwargs):
     page = kwargs.get('page', '')
     problem_pk = context['problem_pk']
-
+    
     return {
         'curPage': page,
         'pages': [ {
             'name': 'preview',
-             'url': reverse('judge:problem_details', args = (problem_pk,)),
-             'text': 'Preview'
+            'url': reverse('judge:problem_details', args = (problem_pk,)),
+            'text': 'Preview'
         },{
             'name': 'statement',
             'url': reverse('judge:problem_edit', args = (problem_pk,)),

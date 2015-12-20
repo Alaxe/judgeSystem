@@ -1,27 +1,20 @@
-{% extends 'blog/base.html' %}
+{% extends 'blog/post_edit_base.html' %}
 {% load bootstrap3 %}
+{% load blog %}
 
 {% block title %}
-	<h1>{{ title }}</h1>
+	<h1>Edit blog post</h1>
 {% endblock %}
 
-{% block content %}
+{% block edit_nav %}
+	{% blog_post_edit_nav pk=pk page='edit' %}
+{% endblock %}
+
+{% block edit_content %}
 	<form method="POST" action="{{ request.get_full_path }}">
 		{% bootstrap_form form %}
 		{% csrf_token %}
 
-		<div class="row">
-			<div class="col-md-6">
-				<input type="submit" value="Save" class="btn btn-default btn-block">
-			</div>
-			{% if pk %}
-				<div class="col-md-6">
-					<a href="{% url 'blog:post_delete' pk %}"
-						class="btn btn-warning btn-block">
-						Delete blog post
-					</a>
-				</div>
-			{% endif %}
-		</div>
+		<input type="submit" value="Save" class="btn btn-default btn-block">
 	</form>
 {% endblock %}

@@ -1,27 +1,22 @@
-{% extends 'blog/base.html' %}
+{% extends 'blog/post_edit_base.html' %}
+{% load blog %}
 
 {% block title %}
 	<h1> Delete blog post </h1>
 {% endblock %}
 
-{% block content %}
+{% block edit_content %}
 	<p class="lead">
 		Are you sure you want to delete this blog post ?
 		It will be deleted <span class="text-danger">FOREVER</span>
 	</p>
-	<div class="row">
-		<div class="col-md-6">
-			<form method="POST" action="{{ request.get_full_path }}">
-				{% csrf_token %}
-				<input type="submit" value="Delete blog post"
-					class="btn btn-default btn-block">
-			</form>
-		</div>
-		<div class="col-md-6">
-			<a href="{% url 'blog:post_edit' post.pk %}" 
-			  class="btn btn-primary btn-block">
-				I've changed my mind...
-			</a>
-		</div>
-	</div>
+	<form method="POST" action="{{ request.get_full_path }}">
+		{% csrf_token %}
+		<input type="submit" value="Delete blog post"
+			class="btn btn-default btn-block">
+	</form>
+{% endblock %}
+
+{% block edit_nav %}
+	{% blog_post_edit_nav pk=pk page='delete' %}
 {% endblock %}
