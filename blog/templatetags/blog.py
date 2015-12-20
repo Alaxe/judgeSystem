@@ -9,10 +9,16 @@ def post_admin_panel(context, *args, **kwargs):
 
     templateContext = {}
     if 'post' in kwargs:
-        templateContext['has_permission'] = user.has_perm('blog.change_post')
+        if kwargs['post'].author == user:
+            templateContext['has_permission'] = user.has_perm(
+                'blog.change_blogpost')
+        else:
+            templateContext['has_permission'] = user.has_perm(
+                'blog.change_foreign_blogpost')
+
         templateContext['post'] = kwargs['post']
     else:
-        templateContext['has_permission'] = user.has_perm('blog.create_post')
+        templateContext['has_permission'] = user.has_perm('blog.add_blogpost')
     return templateContext
 
 @register.filter

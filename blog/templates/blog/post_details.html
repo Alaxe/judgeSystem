@@ -4,6 +4,9 @@
 {% block title %}
 	<h1> 
 		{{ post.title }}
+		{% if not post.public %}
+			<small>Draft</small>
+		{% endif %}
 		{% post_admin_panel post=post %}
 	</h1>
 	<p class="lead">
@@ -12,5 +15,5 @@
 {% endblock %}
 
 {% block content %}
-	{{ post.content|safe}}
+	{{ post.get_content_html|safe }}
 {% endblock %}

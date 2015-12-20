@@ -33,7 +33,8 @@ def base_nav(context, *args, **kwargs):
         navRight =  [{
             'name': 'login',
             'text': 'Log in',
-            'url': reverse('users:login')
+            'url': '{0}?next={1}'.format(reverse('users:login'),
+                context.request.get_full_path()) 
         }, {
             'name': 'register',
             'text': 'Register',
