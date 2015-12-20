@@ -239,11 +239,11 @@ class TestDelete(PermissionRequiredMixin, View):
         return redirect('judge:test_list', problem_id = problem.pk)
 
 class ProblemGlobalForm(forms.Form):
-    timeLimit = forms.DecimalField(required = False, decimal_places = 4,
+    timeLimit = forms.DecimalField(required = False, decimal_places = 1,
                                         label = 'Time limit (sec)')
     memoryLimit = forms.IntegerField(required = False, 
                                         label = 'Memory limit (MB)')
-    testScore = forms.DecimalField(required = False, decimal_places = 4,
+    testScore = forms.DecimalField(required = False, decimal_places = 2,
                                         label = 'Points per test')
 
 class TestList(PermissionRequiredMixin, View):

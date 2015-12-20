@@ -108,7 +108,8 @@ class Solution(models.Model):
         )
 
     def __str__(self):
-        return self.problem.title + ' --- Solution'
+        return '{0}\'s solution for {1}'.format(self.user.username,
+            self.problem.title)
 
     def get_results_by_group(self):
         testResults = self.testresult_set.all().prefetch_related(Prefetch(
@@ -132,7 +133,6 @@ class Solution(models.Model):
                 groupedResults[groupRes.pk]))
 
         return resultsByGroup
-
 
     def update_score(self):
         noTestGroup = self.testresult_set.filter(test__test_group__isnull = True)
@@ -173,7 +173,8 @@ class Test(models.Model):
     stdin = models.TextField()
     stdout = models.TextField()
 
-    time_limit = models.DecimalField('Time limit (sec)', **score_field_kwargs)
+    time_limit = models.DecimalField('Time limit (sec)', decimal_places = 1,
+        max_digits = 3)
     mem_limit  = models.IntegerField('Memory limit (MB)')
     score = models.DecimalField('Points', **score_field_kwargs)
     
@@ -188,7 +189,7 @@ class Test(models.Model):
         ordering = ['-test_group', 'pk']
 
     def __str__(self):
-        return self.problem.title + ' --- Test'
+        return 'Test id:{0} for {1}'.format(self.pk, self.problem.title)
 
 class TestGroupResult(models.Model):
     test_group = models.ForeignKey(TestGroup)
@@ -236,6 +237,10 @@ class UserStatts(models.Model):
     solved_problems = models.IntegerField(default = 0)
     tried_problems = models.IntegerField(default = 0)
 
+    class Meta:
+        verbose_name = 'User statistic'
+        verbose_name_plural = 'User statistics'
+
     @staticmethod
     def get_for_user(user):
         if not hasattr(user, 'userstatts'):
@@ -251,4 +256,4 @@ class UserStatts(models.Model):
         self.save()
 
     def __str__(self):
-        return self.user.username + '\'s UserStatts'
+        return self.user.username + '\'s user statistics'
