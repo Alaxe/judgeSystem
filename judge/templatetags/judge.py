@@ -77,6 +77,13 @@ def test_select(tests, **kwargs):
             'select_class': 'test-select' + str(kwargs.get('select_class', ''))
     }
 
+@register.inclusion_tag('judge/solution_list.html')
+def list_solutions(solutions, **kwargs):
+    return {
+        'solutions': solutions,
+        'show_problem': kwargs.get('show_problem', False)
+    }
+
 @register.filter
 def status_class(obj, *args, **kwargs):
     if type(obj) is Solution:

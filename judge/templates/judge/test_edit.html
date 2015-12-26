@@ -15,6 +15,6 @@
 			 method = "POST" action ="{{request.get_full_path}}">
 		{% csrf_token %}
 		{% bootstrap_form form %}
-		<input class="btn btn-default btn-block" type="submit" value="submit">
+		<input class="btn btn-primary btn-block" type="submit" value="submit">
 	</form>
 {% endblock %}

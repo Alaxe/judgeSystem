@@ -14,13 +14,13 @@
 		{% bootstrap_form form %}
 
 		<input type="submit" name="update" value="Set settings" 
-				class="btn btn-default btn-block">
+				class="btn btn-primary btn-block">
 		<input type="submit" name="delete" value="Delete tests"
 			class="btn btn-warning btn-block">
 
 		<hr>
 		<a href="{% url 'judge:test_group_new' problem_pk %}"
-			class="btn btn-block btn-primary">
+			class="btn btn-block btn-default">
 			New Test group
 		</a>
 		<hr>

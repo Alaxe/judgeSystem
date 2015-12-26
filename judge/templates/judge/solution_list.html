@@ -1,0 +1,42 @@
+{% load judge %}
+
+{% if not solutions %} 
+	You haven't submited any solutions.
+{% else %}
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<th> # </th>
+				{% if show_problem %}
+					<th> Problem </th>
+				{% endif %}
+				<th> Message </th>
+				<th> Points </th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for sol in solutions %}
+			<tr class="{{ sol|status_class }}">
+				<td>{{ forloop.counter }}</td>
+				{% if show_problem %}
+					<td>
+						<a href="{% url 'judge:problem_details' sol.problem.id %}">
+							{{ sol.problem.title }}
+						</a>
+					</td>
+				{% endif %}
+				<td>
+					<a href="{% url 'judge:solution_details' sol.id %}">
+						{{ sol.grader_message }}
+					</a>
+				</td>
+				<td>
+					{{ sol.score|floatformat }} / 
+					{{ sol.problem.max_score|floatformat }}
+				</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+{% endif %}
+

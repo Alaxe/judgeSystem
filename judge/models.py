@@ -67,12 +67,12 @@ class Problem(models.Model):
             groupsMap[test.test_group_id].append(test)
         
         testsByGroup = []
+        for group in testGroups:
+            testsByGroup.append((group, groupsMap[group.id]))
+
         if groupsMap[None]:
             testsByGroup.append((None, groupsMap[None]))
 
-        for group in testGroups:
-            testsByGroup.append((group, groupsMap[group.id]))
-        
         return testsByGroup
  
     def update_max_score(self):
@@ -125,12 +125,12 @@ class Solution(models.Model):
             groupedResults[testRes.test_group_result_id].append(testRes)
 
         resultsByGroup = []
-        if groupedResults[None]:
-            resultsByGroup.append((None, groupedResults[None]))
-
         for groupRes in groupResults:
             resultsByGroup.append((groupRes, 
                 groupedResults[groupRes.pk]))
+
+        if groupedResults[None]:
+            resultsByGroup.append((None, groupedResults[None]))
 
         return resultsByGroup
 

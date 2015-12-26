@@ -17,6 +17,8 @@
 					{{ tag.name }}
 					<span class="badge">{{ tag.num_times }}</span>
 				</li>
+			{% empty %}
+				There aren't any tags to filter with.
 			{% endfor %}
 		</ul>
 		{% csrf_token %}

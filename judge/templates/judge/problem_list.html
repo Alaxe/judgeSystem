@@ -76,12 +76,16 @@
 
 							</div>
 							</a>
+						{% empty %}
+							There aren't any tags to filter with
 						{% endfor %}
 					</div>
 
+					{% if tags %}
 					<a class="btn btn-block btn-info" href="{% url 'judge:problem_filter' %}">
 						Advanced options
 					</a>
+					{% endif %}
 			</div>
 			</div>
 		</div>

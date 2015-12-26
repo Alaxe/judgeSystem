@@ -33,43 +33,12 @@
 				</a> 
 				to submit a soltion	
 			{% else %}
-				<a class="btn btn-default form-control"
+				<a class="btn btn-primary form-control"
 						href="{% url 'judge:solution_submit' problem.id %}">
 					Submit a solution
 				</a>
-
-				{% if not solutions %} 
-					You haven't submited any solutions.
-				{% else %}
-					<table class="table">
-						<thead>
-							<tr>
-								<th> # </th>
-								<th> Message </th>
-								<th> Points </th>
-								<th> Details  </th>
-							</tr>
-						</thead>
-						<tbody>
-						{% for sol in solutions %}
-							<tr class="{{ sol|status_class }}">
-
-								<td>{{ forloop.counter }}</td>
-								<td>{{ sol.grader_message }}</td>
-								<td>{{ sol.score|floatformat }} / 
-									{{ sol.problem.max_score|floatformat }}</td>
-								<td> 
-									<a href="
-									{% url 'judge:solution_details' sol.id %}">
-										view
-									</a>
-								</td>
-							</tr>
-						{% endfor %}
-						</tbody>
-				{% endif %}
+				{% list_solutions solutions %}
 			{% endif %}
-
 		</div>
 	</div>
 	</div>

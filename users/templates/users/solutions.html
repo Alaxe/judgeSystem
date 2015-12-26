@@ -9,41 +9,7 @@
 {% endblock %}
 
 {% block user_content %}
-	<table class="table table-hover">
-		<thead>
-			<tr>
-				<th>View</th>
-				<th>Problem</th>
-				<th>Message</th>
-				<th>Score</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for sol in page.object_list %}
-
-				<tr class="{{ sol|status_class }}">
-					<td>
-						<a href="{% url 'judge:solution_details' sol.pk %}">
-							view solution
-						</a>
-					</td>
-					<td>
-						<a href="
-							{% url 'judge:problem_details' sol.problem.pk%}">
-							{{ sol.problem.title }}
-						</a>
-					</td>
-					<td>
-						{{ sol.grader_message }}
-					</td>
-					<td>
-						{{ sol.score|floatformat }} / 
-							{{ sol.problem.max_score|floatformat }}	
-					</td>
-				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
+	{% list_solutions page.object_list show_problem=True %}
 	{% bootstrap_paginate page url_view_name='users:solutions_page' range=5 %}
 {% endblock %}
 
