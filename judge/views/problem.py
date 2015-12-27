@@ -122,6 +122,7 @@ class ProblemForm(forms.ModelForm):
     class Meta:
         model = Problem
         exclude = ['max_score', 'visible', 'custom_checker']
+        #w1dgets = {'tags': forms.HiddenInput() }
 
 class ProblemNew(PermissionRequiredMixin, View):
     permission_required = 'judge.add_problem'
@@ -140,8 +141,8 @@ class ProblemEdit(PermissionRequiredMixin, View):
         pk = problem.pk
         return {
             'form' : form,
-            'tests': problem.test_set,
-            'problem_pk'   : pk
+            'curTags': problem.tags.names(),
+            'problem_pk': pk
         }
 
     def get(self, request, pk = 0):

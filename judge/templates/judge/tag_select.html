@@ -1,0 +1,14 @@
+{% load taggit_templatetags2_tags %}
+
+{% get_taglist as tags for 'judge.problem' %}
+<div class="form-group">
+	<label class="control-label" for="tag-select">
+		Select tags
+	</label>
+	<select class="form-control tag-select" multiple
+		id="tag-select" name="tags">
+		{% for tag in tags %}
+			<option value="{{ tag }}">{{ tag }}</option>
+		{% endfor %}
+	</select>
+</div>

@@ -64,31 +64,25 @@
 					</h3>
 				</div>
 				<div class="panel-body">
-					<div class="list-group">
-						{% get_taglist as tags for 'judge.problem' %}
-						{% for tag in tags|slice:":10" %}
-							<a href="{{ curTags|tags_url:tag.name }}">
-							<div class="list-group-item tag-selector
-										{% if tag.name in curTags %}active{% endif %}">
-
-								{{ tag.name }}
-								<span class="badge"> {{ tag.num_times }} </span>
-
-							</div>
-							</a>
-						{% empty %}
-							There aren't any tags to filter with
-						{% endfor %}
+					{% tag_select %}
+					<div class="form-group">
+						<button class="btn btn-primary form-control tag-search">
+							Search
+						</button>
 					</div>
-
-					{% if tags %}
-					<a class="btn btn-block btn-info" href="{% url 'judge:problem_filter' %}">
-						Advanced options
-					</a>
-					{% endif %}
-			</div>
+				</div>
 			</div>
 		</div>
 	</div>
-	
 {% endblock content %}
+
+{% block javascript %}
+{{ block.super }}
+<script>
+	$(document).ready(function() {
+		$('.tag-select').select2({
+			placeholder: 'choose tags'
+		}).val({{ curTags|safe }}).trigger('change');
+	});
+</script>
+{% endblock %}

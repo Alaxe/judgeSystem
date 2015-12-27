@@ -22,6 +22,9 @@
 	rel='stylesheet' type='text/css'>
 
 	<link rel="stylesheet" href="{% static 'bootstrap.min.css' %}">
+
+	<link rel="stylesheet"
+	   href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/css/select2.min.css"/>
 	<link rel="stylesheet" href="{% static 'core.css' %}">
 
 	{% block stylesheet %} {% endblock %}
@@ -54,6 +57,9 @@
 	</div>
 
 	{% bootstrap_javascript jquery=1 %}
+	<script 
+		src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/js/select2.min.js"></script>
+
 	<script type="text/javascript" src="{% static 'core.js' %}"></script>
 
 	{% block javascript %}
