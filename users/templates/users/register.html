@@ -1,4 +1,4 @@
-{% extends base_template %}
+{% extends 'users/base_narrow.html' %}
 
 {% load base %}
 {% load bootstrap3 %}
@@ -11,21 +11,25 @@
 	<h1>Register</h1> 
 {% endblock %}
 
-{% block content %}
+{% block content_narrow %}
 	<form method="POST" action="{{ request.get_full_path}}">
 		{% csrf_token %}
 		{% bootstrap_form form %}
 
 		<div class="row">
 			<div class="col-md-6">
-				<input type="submit" value="Register"
-					  class="btn btn-primary btn-block">
+				{% buttons %}
+					<input type="submit" value="Register"
+						  class="btn btn-primary btn-block">
+				{% endbuttons %}
 			</div> 
 			<div class="col-md-6">
-				<a href="{% url 'users:login' %}" 
-					class="btn btn-default btn-block">
-					Log in
-				</a>
+				{% buttons %}
+					<a href="{% url 'users:login' %}" 
+						class="btn btn-default btn-block">
+						Log in
+					</a>
+				{% endbuttons %}
 			</div>
 		</div>
 	</form>

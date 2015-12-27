@@ -61,19 +61,6 @@
 		{% endfor %}
 	</tbody>
 </table>
-<script type="text/javascript">
-	$(document).ready(function() {
-		$('.select-all').click(function() {
-			console.log();
-			newState = this.checked;
-			$($(this).attr('selection')).each( function() {
-
-				this.checked = newState;
-			});
-		});
-	});
-</script>
-
 {% else %}
 <p>No tests</p>
 {% endif %}

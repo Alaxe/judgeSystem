@@ -1,0 +1,15 @@
+.tag-label {
+	margin: 5px;
+	float: right;
+}
+.admin-panel-btn {
+	float:right;
+	margin-left: 10px;
+}
+.tr-link:hover {
+	cursor: pointer;
+}
+.narrow {
+	margin: auto;
+	max-width: 500px;
+}

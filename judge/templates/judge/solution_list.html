@@ -16,7 +16,8 @@
 		</thead>
 		<tbody>
 		{% for sol in solutions %}
-			<tr class="{{ sol|status_class }}">
+			<tr class="tr-link {{ sol|status_class }}"
+				data-href="{% url 'judge:solution_details' sol.id %}">
 				<td>{{ forloop.counter }}</td>
 				{% if show_problem %}
 					<td>
@@ -26,9 +27,7 @@
 					</td>
 				{% endif %}
 				<td>
-					<a href="{% url 'judge:solution_details' sol.id %}">
-						{{ sol.grader_message }}
-					</a>
+					{{ sol.grader_message }}
 				</td>
 				<td>
 					{{ sol.score|floatformat }} / 

@@ -66,6 +66,7 @@ def problem_admin_panel(context, *args, **kwargs):
         pageContext['has_permission'] = user.has_perm('judge.change_problem')
     else:
         pageContext['has_permission'] = user.has_perm('judge.add_problem')
+        pageContext['may_import'] = user.has_perm('judge.import_problem')
 
     return pageContext
 

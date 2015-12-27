@@ -28,11 +28,13 @@
 								</h3>
 							</div>
 							<div class="col-sm-6">
-								<span class="btn btn-block 
-									btn-{{ group|status_class }}">
+								<h3>
+								<span style="display:block;" class="label 
+									label-{{ group|status_class }}">
 									{{ group.score|floatformat }} / 
 									{{ group.test_group.score|floatformat }}
 								</span>
+								</h3>
 							</div>
 						</div>
 					{% else %}
@@ -46,7 +48,9 @@
 						<thead>
 							<tr>
 								<th> # </th>
-								<th> Points </th>
+								{% if not group %}
+									<th> Points </th>
+								{% endif %}
 								<th> Message </th>
 								<th> Execution time</th>
 							</tr>
@@ -56,14 +60,12 @@
 							{% for res in results %}
 								<tr class="{{ res|status_class }}">
 									<th>{{ forloop.counter }}</th>
-									<td>
-										{% if res.test.test_group_id %}
-											-
-										{% else %}
+									{% if not group %}
+										<td>
 											{{ res.score|floatformat }} /
 											{{ res.test.score|floatformat }}
-										{% endif %}
-									</td>
+										</td>
+									{% endif %}
 									<td>{{ res.message }}</td>
 									<td>{{ res.exec_time }}</td>
 								</tr>

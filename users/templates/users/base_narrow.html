@@ -1,0 +1,16 @@
+{% extends base_template %}
+{% load static %}
+
+{% block header-div %}
+	<div class="page-header narrow">
+		{% block title %}
+		{% endblock %}
+	</div>
+{% endblock %}
+
+{% block content %}
+	<div class="narrow">
+		{% block content_narrow %}
+		{% endblock %}
+	</div>
+{% endblock %}

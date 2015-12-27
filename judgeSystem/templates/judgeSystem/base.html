@@ -14,18 +14,17 @@
 	<!-- Bootstrap -->
 	<!--<link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.4/cosmo/bootstrap.min.css"
 	   rel="stylesheet">-->
+	<link
+	href='https://fonts.googleapis.com/css?family=Roboto&subset=latin,cyrillic'
+	rel='stylesheet' type='text/css'>
+	<link
+	href='https://fonts.googleapis.com/css?family=Roboto+Mono&subset=latin,cyrillic'
+	rel='stylesheet' type='text/css'>
+
 	<link rel="stylesheet" href="{% static 'bootstrap.min.css' %}">
-	{% block stylesheets %}
-	{% endblock %}
-	<style>
-		.tag-label {
-			margin: 5px;
-			float: right;
-		}
-		textarea {
-			font-family:monospace;
-		}
-	</style>
+	<link rel="stylesheet" href="{% static 'core.css' %}">
+
+	{% block stylesheet %} {% endblock %}
 
 	<script>
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -46,18 +45,18 @@
 
 		{% block header-div %}
 			<div class="page-header">
-				{% block title %}{% endblock %}
+				{% block title %}
+				{% endblock %}
 			</div>
 		{% endblock %}
-
-		{% block content %}{% endblock %}
+		{% block content %}
+		{% endblock %}
 	</div>
 
-	<script type="text/javascript" src="{% static 'jquery.min.js' %}"></script>
-	<script type="text/javascript" src="{% static 'bootstrap.min.js' %}"></script>
+	{% bootstrap_javascript jquery=1 %}
+	<script type="text/javascript" src="{% static 'core.js' %}"></script>
 
 	{% block javascript %}
-
 	{% endblock %}
 </body>
 </html>
