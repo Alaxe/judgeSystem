@@ -1,8 +1,10 @@
+from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User, Group
+from django.contrib.auth.mixins import LoginRequiredMixin, \
+    PermissionRequiredMixin
 from django.core.mail import EmailMultiAlternatives
 from django.core.paginator import InvalidPage, Paginator
 from django.core.urlresolvers import reverse
@@ -278,6 +280,72 @@ class UserDetails(LoginRequiredMixin, TemplateView):
         }
 
         return context
+
+class UserManageForm(forms.Form):
+    group_id = forms.IntegerField(widget = forms.HiddenInput)
+    user_id = forms.IntegerField(widget = forms.HiddenInput)
+    action = forms.CharField(widget = forms.HiddenInput)
+
+class UserManage(PermissionRequiredMixin, View):
+    template_name = 'users/user_manage.html'
+    permission_required = 'auth.change_group'
+
+    def render(self, request):
+        groups = []
+        for g in Group.objects.all():
+            users = User.objects.filter(groups = g)
+            entries = []
+
+            for user in users: 
+                entries.append({
+                    'name': user.username,
+                    'form': UserManageForm(initial = {
+                        'group_id': g.id,
+                        'user_id': user.id,
+                        'action': 'remove'
+                    })
+                })
+
+            groups.append({
+                'name': g.name,
+                'form': UserManageForm(initial = {
+                    'group_id': g.id,
+                    'action': 'add',
+                }),
+                'entries': entries,
+                'users': set(users)
+            })
+
+
+        context = {
+            'groups': groups,
+            'allUsers': User.objects.all()
+        }
+        return render(request, self.template_name, context)
+    
+    def get(self, request):
+        return self.render(request)
+
+    def post(self, request):
+        form = UserManageForm(request.POST)
+        
+        if form.is_valid():
+            data = form.cleaned_data
+
+            user = get_object_or_404(User, pk = data['user_id'])
+            group = get_object_or_404(Group, pk = data['group_id'])
+
+            print(data['action'])
+            if data['action'] == 'add':
+                print('adding')
+                user.groups.add(group)
+            else:
+                user.groups.remove(group)
+                        
+        else:
+            print('nivalid')
+
+        return self.render(request)
 
 # if judge app is also installed
 try:

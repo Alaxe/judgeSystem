@@ -27,6 +27,13 @@ def user_nav(context, *args, **kwargs):
     except ImportError:
         pass
 
+    if context.request.user.has_perm('auth.change_group'):
+        pages.append({
+            'name': 'manage',
+            'url': reverse('users:manage'),
+            'text': 'Manage users'
+        })
+
     return {
         'curPage': curPage,
         'pages': pages

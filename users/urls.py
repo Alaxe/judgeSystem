@@ -17,6 +17,7 @@ urlpatterns = [
     url(r'^changepassword/$', views.PasswordChange.as_view(), name = 
         'change_password'),
     url(r'^$', views.UserDetails.as_view(), name = 'details'),
+    url(r'^manage/$', views.UserManage.as_view(), name = 'manage'),
 
     url(r'^solutions/$', views.Solutions.as_view(), name = 'solutions'),
     url(r'^solutions/page/(?P<page>\d+)/$', views.Solutions.as_view(), name = 

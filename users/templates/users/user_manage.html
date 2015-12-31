@@ -1,0 +1,84 @@
+{% extends details_base %}
+{% load bootstrap3 %}
+{% load users %}
+
+{% block title %}
+	<h1>Manage users</h1>
+{% endblock %}
+
+{% block user_nav %}
+	{% user_nav page='manage' %}
+{% endblock %}
+
+{% block user_content %}
+	{% csrf_token %}
+	{% for group in groups %}
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			{{ group.name }}
+		</div>
+
+		<div class="panel-body">
+		<div class="row">	
+			<div class="col-md-4">
+				<h4> Add users </h4>
+				<form method="POST" action="{{ request.get_full_path }}">
+					{{ group.form }}
+					<div class="form-group">
+						<select class="user-select form-control" name="user_id">
+							{% for user in allUsers %}
+								{% if not user in group.users %}
+									<option value="{{ user.id }}">
+										{{ user.username }}
+									</option>
+								{% endif %}
+							{% endfor %}
+						</select>
+					</div>
+					{% csrf_token %}
+					<div class="form-group">
+						<input type="submit" value="Add"
+						   class="btn btn-primary form-control">
+					</div>
+				</form>
+			</div>
+			<div class="col-md-8">
+				<h4>Current users</h4>
+				<ul class="list-group">
+
+				{% for entry in group.entries %}
+				<li class="list-group-item">
+					<form method="POST" action="{{ request.get_full_path }}">
+						{{ entry.name }}
+						{{ entry.form }}
+						{% csrf_token %}
+
+						<a class="btn-right a-submit" href="#">
+							<span class="glyphicon glyphicon-remove text-danger">
+							</span>
+						</a>
+
+					</form>
+				</li>
+				{% endfor %}
+				</ul>
+			</div>
+		</div>
+		</div>
+	</div>
+	{% endfor %}
+
+{% endblock %}
+{% block javascript %}
+{{ block.super }}
+<script>
+	$(document).ready(function() {
+		$('.user-select').select2({
+			placeholder: 'Add a user'
+		});
+		$('.a-submit').click(function() {
+			$(this).parent().submit();
+		});
+	});
+</script>
+{% endblock %}

@@ -13,3 +13,8 @@
 	margin: auto;
 	max-width: 500px;
 }
+
+.btn-right {
+	float: right;
+	margin: 0px;
+}
