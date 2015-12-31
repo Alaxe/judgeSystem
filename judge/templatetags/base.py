@@ -18,12 +18,6 @@ def base_nav(context, *args, **kwargs):
     }]
 
     user = context.get('user', None)
-    if user.is_staff:
-        navLeft.append({
-            'name': 'admin',
-            'text': 'Admin',
-            'url': '/admin/'
-        })
 
     if user.is_authenticated():
         navRight = [{

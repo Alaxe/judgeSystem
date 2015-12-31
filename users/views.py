@@ -9,7 +9,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.core.paginator import InvalidPage, Paginator
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.template import Context
 from django.template.loader import get_template
 from django.utils import timezone
@@ -37,9 +37,15 @@ class Login(View):
         context = {'form': form}
 
         return render(request, template_name, context)
+    
+    def redirect_url(self, request):
+        return request.GET.get('next', reverse('judge:problem_list'))
 
     def get(self, request):
-        return self.render_form(request, LoginForm())
+        if request.user.is_authenticated():
+            return redirect(self.redirect_url(request))
+        else:
+            return self.render_form(request, LoginForm())
 
     def post(self, request, *args, **kwargs):
         form = LoginForm(request.POST)
@@ -63,8 +69,7 @@ class Login(View):
 
         else:
             login(request, user)
-            redir_url = request.GET.get('next', reverse('judge:problem_list'))
-            return HttpResponseRedirect(redir_url)
+            return redirect(self.redirect_url(request))
 
 class Register(View):
     template_name = 'users/register.html'
@@ -111,19 +116,11 @@ class Register(View):
         self.confirm = Confirmation(user = self.user)
         self.confirm.save()
 
-        try:
-            from judge.models import UserStatts
-            UserStatts(user = self.user).save()
-        except ImportError:
-            pass
-
         self.send_conf_mail()
 
-        messageText = 'You have been successfuly registered. Check your \
-                    e-mail for further instructions.'
-        messages.add_message(request, messages.SUCCESS, messageText)
-        redir_url = reverse('judge:problem_list')
-        return HttpResponseRedirect(redir_url)
+        messageText = messages.success(request, 'You have been successfuly \
+            registered. Check your e-mail for further instructions.')
+        return redirect(reverse('judge:problem_list'))
 
 class ResetPassword(View):
     template_name = 'users/password_reset.html'
@@ -166,8 +163,7 @@ class ResetPassword(View):
         messages.info(request, 'An email was send with instructions. If you \
             didn\' receive it make sure you entered the correct email address.')
 
-        redir_url = reverse('judge:problem_list')
-        return HttpResponseRedirect(redir_url)
+        return redirect(reverse('judge:problem_list'))
     
 class SetPassword(View):
     template_name = 'users/password_set.html'
@@ -192,38 +188,34 @@ class SetPassword(View):
         user.save() 
         reset.delete()
 
-        messageText = 'Your password has been successfuly changed.\
-                    You can now log in.'
-        messages.add_message(request, messages.SUCCESS, messageText)
+#faking authenticate
+        user.backend = 'django.contrib.auth.backends.ModelBackend'
+        login(request, user)
+        messages.success(request, 'Your password has been successfuly changed.')
 
-        return HttpResponseRedirect(settings.LOGIN_URL)
+        return redirect(reverse('judge:problem_list'))
 
 class Logout(View):
     def get(self, request):
         logout(request)
-        url = reverse('judge:problem_list')
-        return HttpResponseRedirect(url)
+        return redirect(reverse('judge:problem_list'))
 
 class Confirm(View):
     def get(self, request, code):
-        try :
-            conf = Confirmation.objects.get(code = code)
-            conf.delete()
+        conf = get_object_or_404(Confirmation, code = code)
+        conf.delete()
 
-            user = conf.user
-            user.is_active = True
-            user.save()
+        user = conf.user
+        user.is_active = True
+        user.save()
 
-            messageText = 'Your account has been confirmed.\
-                           Feel free to log in.'
-            messages.add_message(request, messages.SUCCESS, messageText)
+#faking authenticate
+        user.backend = 'django.contrib.auth.backends.ModelBackend'
+        login(request, user)
 
-            redir_url = reverse('users:login')
-            return HttpResponseRedirect(redir_url)
+        messages.success(request, 'Your account has been activated')
 
-        except Confirmation.DoesNotExist:
-            error_url = reverse('judge:problem_list')
-            return HttpResponseRedirect(error_url)
+        return redirect(reverse('judge:problem_list'))
 
 
 class PasswordChange(LoginRequiredMixin, View):
@@ -249,8 +241,8 @@ class PasswordChange(LoginRequiredMixin, View):
 
             form = PasswordForm()
 
-            messageText = 'Your password has been changed successfully'
-            messages.add_message(request, messages.SUCCESS, messageText)
+            messages.success(request, 'Your password has been changed \
+                successfully')
 
         context = {'passwordForm': form}
         return render(request, self.template_name, context)

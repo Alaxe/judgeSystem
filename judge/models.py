@@ -244,9 +244,9 @@ class UserStatts(models.Model):
     @staticmethod
     def get_for_user(user):
         if not hasattr(user, 'userstatts'):
-            user.get_userstatts = UserStatts.objects.create(user = user)
-
-        return user.userstatts
+            return UserStatts.objects.create(user = user)
+        else:
+            return user.userstatts
 
     def update_statts(self):
         self.tried_problems = UserProblemData.objects.filter(
