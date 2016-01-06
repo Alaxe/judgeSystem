@@ -285,7 +285,7 @@ class TestList(PermissionRequiredMixin, View):
         if form_data['memoryLimit']:
             update_kwargs['mem_limit'] = form_data['memoryLimit']
             field_selected = True
-        if form_data['testScore']:
+        if form_data['testScore'] != None:
             update_kwargs['score'] = form_data['testScore']
             field_selected = True
 
