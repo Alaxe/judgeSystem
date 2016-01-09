@@ -4,3 +4,4 @@ from judge.models import *
 
 admin.site.register(UserProblemData)
 admin.site.register(UserStatts)
+admin.site.register(Solution)
