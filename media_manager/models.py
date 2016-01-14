@@ -17,7 +17,7 @@ class MediaFile(models.Model):
     content_object = GenericForeignKey('content_type', 'object_id')
 
     media = models.FileField(upload_to = get_mediafile_loc)
-    filename = models.CharField(max_length = 64
+    filename = models.CharField(max_length = 64)
 
     def __str__(self):
         return self.filename
