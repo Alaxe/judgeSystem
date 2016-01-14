@@ -25,12 +25,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = 'sw)@bzva4l4@%ol+&7d@(!!3)=k%*^jgkz=+3m4&5+uexot*wy'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 TEMPLATE_DEBUG = False
 
-SITE_HOST = 'judgesystem.tk'
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', SITE_HOST, 'www.' + SITE_HOST]
+SITE_HOST = 'https://judgesystem.tk'
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'judgesystem.tk', 
+    'www.judgesystem.tk']
 ADMINS = [('default', sens.EMAIL)]
 
 # Application definition

@@ -292,7 +292,7 @@ class TestList(PermissionRequiredMixin, View):
         testIds = request.POST.getlist('test-select')
         tests = Test.objects.filter(id__in = testIds).update(**update_kwargs)
         
-        if form_data['testScore']:
+        if form_data['testScore'] != None:
             problem.update_max_score()
 
         if not testIds:
