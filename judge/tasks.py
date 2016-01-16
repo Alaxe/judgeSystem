@@ -33,10 +33,14 @@ def compile_solution(solution):
     compileArgs = ['g++', '-O2', '--std=c++11',
                     '-o', get_sol_loc(solution), sourceName]
 
-    returnCode = subprocess.call(compileArgs)
-    os.remove(sourceName)
+    try:
+        returnCode = subprocess.run(compileArgs, timeout = 3)
+        return True
+    except subprocess.SubprocessError:
+        return False
+    finally:
+        os.remove(sourceName)
 
-    return (returnCode == 0)
 
 def setup_box(solution, test):
     sandbox = get_sandbox()
