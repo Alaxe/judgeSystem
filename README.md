@@ -4,12 +4,12 @@ A python/django based system for testing c/c++ solutions to algoritmic problems
 ##What it does now:
 * Basic Login/register funtionality
 * Task/test editing
-* Testing  solutions
+* Testing solutions
 * A simple blog
 * Searching by tags
 
 ##Required software:
-* Python 3.\*
+* Python 3 (tested only with 3.5)
 * Python modules: view requirements.txt
 * g++ compiler
 * postgreSQL
@@ -20,20 +20,17 @@ A python/django based system for testing c/c++ solutions to algoritmic problems
 1. Setup database - you have a few options
     * install postgreSQL `pacman -S postgresql` on Arch Linux
     * setup database and user
-    ```
-    sudo su postgres
-    createuser admin -P
-    cretadb judgeSystemDB -U admin
-    ```
 2. Install rabbitmq `pacman -S rabbitmq` on Arch Linux
 3. Setup settings 
     * create variables in judgeSystem/sens.py
-        * `EMAIL` - used for account confirmation
-        * `EMAIL_PASSWORD` - password for that account
+        * `EMAIL_HOST_USER` - used for account confirmation
+        * `EMAIL_HOST_PASSWORD` - password for that account
+        * `RECAPTCHA_PRIVATE_KEY` - the private key for recaptcha
     * judgeSystem/settings.py
         * `SITE_HOST` - used for some links
-        * Email backend and server
-        * `TIME_ZONE`
+        * Email backend and server (default is gmail)
+        * `TIME_ZONE` - default one is different from Easter Europe's
+        * `RECAPTCHA_PUBLIC_KEY` - the public key for recaptcha
 4. run `sudo python setup.py` (as root)
 
 ##How to run:
