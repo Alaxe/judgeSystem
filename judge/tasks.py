@@ -34,13 +34,10 @@ def compile_solution(solution):
                     '-o', get_sol_loc(solution), sourceName]
 
     try:
-        returnCode = subprocess.run(compileArgs, timeout = 3)
-        return True
-    except subprocess.SubprocessError:
-        return False
+        subprocess.run(compileArgs, timeout = settings.JUDGE_COMPILE_TL,
+                check = True)
     finally:
         os.remove(sourceName)
-
 
 def setup_box(solution, test):
     sandbox = get_sandbox()
@@ -110,23 +107,26 @@ def custom_grader(test):
 
 @shared_task(ignore_result = True) 
 def test_solution(solution):
-    if not compile_solution(solution):
-        solution.grader_message = 'Compilation error'
+    try:
+        compile_solution(solution)
+        solution.grader_message = 'Testing'
+
+        taskList = []
+        tests = solution.problem.test_set.all()
+        for t in tests:
+            curSubTask = run_test.si(solution, t)
+            taskList.append(curSubTask)
+
+        res = chord(group(taskList), save_result.s(solution))
+        res.apply_async()
+
+    except subprocess.CalledProcessError:
+        solution.grader_message = 'Compilation error (syntax)'
+    except subprocess.TimeoutExpired:
+        solution.grader_message = 'Compilation error (timeout)'
+    finally:
         solution.save()
-        return
     
-    solution.grader_message = 'Testing'
-    solution.save()
-
-    taskList = list()
-    tests = solution.problem.test_set.all()
-    for t in tests:
-        curSubTask = run_test.si(solution, t)
-        taskList.append(curSubTask)
-
-    res = chord(group(taskList), save_result.s(solution))
-    res.apply_async()
-
 @shared_task
 def run_test(solution, test):
     boxId = get_box_id()
