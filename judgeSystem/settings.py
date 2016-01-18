@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import os
 
 #Sensitive data not commited to version control
-from judgeSystem import sens
+from judgeSystem.sens import *
 
 from kombu import Exchange, Queue
 
@@ -32,7 +32,7 @@ TEMPLATE_DEBUG = False
 SITE_HOST = 'https://judgesystem.tk'
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'judgesystem.tk', 
     'www.judgesystem.tk']
-ADMINS = [('default', sens.EMAIL)]
+ADMINS = [('default', EMAIL_HOST_USER)]
 
 # Application definition
 
@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'taggit',
     'taggit_templatetags2',
     'judge',
+    'captcha',
     'users',
     'blog',
     'media_manager',
@@ -142,11 +143,13 @@ EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 
-EMAIL_HOST_USER = sens.EMAIL
-EMAIL_HOST_PASSWORD = sens.EMAIL_PASSWORD
+#EMAIL_HOST_USER = sens.EMAIL
+#EMAIL_HOST_PASSWORD = sens.EMAIL_PASSWORD
 
 LOGIN_URL = '/account/login/'
 JUDGE_COMPILE_TL = 3
 
 TAGGIT_CASE_INSENSITIVE = True
 
+NOCAPTCHA = True
+RECAPTCHA_PUBLIC_KEY = '6LeEqxUTAAAAAO3X-rpxVp-Lc_XHWTt_23jsAH_8'

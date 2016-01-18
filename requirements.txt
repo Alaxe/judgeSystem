@@ -6,4 +6,5 @@ django-bootstrap-pagination
 django-taggit
 git+https://github.com/fizista/django-taggit-templatetags2
 django-markdown-deux
+django-recaptcha
 

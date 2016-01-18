@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from django.forms import Form, CharField, PasswordInput, EmailField
 
+from captcha.fields import ReCaptchaField
+
 password1_kwargs = {
     'label': 'Password',
     'min_length': 6, 
@@ -61,6 +63,8 @@ class RegisterForm(Form):
     email = EmailField(**email_kwargs)
     password1 = CharField(**password1_kwargs)
     password2 = CharField(**password2_kwargs)
+
+    captcha = ReCaptchaField()
 
     def is_valid(self):
         valid = super(RegisterForm, self).is_valid()
