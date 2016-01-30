@@ -11,7 +11,7 @@ $(document).ready(function() {
 		tags: true
 	});
 	$('.tag-search').click(function() {
-		if ($('.tag-select-search').val() === null) {
+		if ($('.tag-select').val() === null) {
 			window.location = '/';
 		} else {
 			tagStr = $('.tag-select').val().join(',');
