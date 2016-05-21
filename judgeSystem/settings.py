@@ -19,17 +19,16 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'sw)@bzva4l4@%ol+&7d@(!!3)=k%*^jgkz=+3m4&5+uexot*wy'
+SECRET_KEY = 'secretsecretsecretsecretsecretsecretsecretsecretse'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 TEMPLATE_DEBUG = False
 
 SITE_HOST = 'https://judgesystem.tk'
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'judgesystem.tk', 
     'www.judgesystem.tk']
-ADMINS = [('default', EMAIL_HOST_USER)]
 
 # Application definition
 
@@ -142,6 +141,8 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
 
+ADMINS = [('default', EMAIL_HOST_USER)]
+
 LOGIN_URL = '/account/login/'
 JUDGE_COMPILE_TL = 3
 
@@ -150,3 +151,4 @@ TAGGIT_CASE_INSENSITIVE = True
 NOCAPTCHA = True
 RECAPTCHA_PUBLIC_KEY = ''
 RECAPTCHA_PRIVATE_KEY = ''
+

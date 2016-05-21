@@ -26,6 +26,7 @@ A python/django based system for testing c/c++ solutions to algoritmic problems
     * `RECAPTCHA_PRIVATE_KEY` and `RECAPTCHA_PUBLIC_KEY` - self explanatory,
       You can get them from [their website][recaptcha]
     * `SITE_HOST` the domain / ip of the server; used for some links
+    * `ALLOWED_HOSTS`
     * `SECRET_KEY` 
     * `TIME_ZONE` 
 
@@ -37,6 +38,7 @@ A python/django based system for testing c/c++ solutions to algoritmic problems
 5. Other dependencies
     * Python modules `sudo pip install -r requirements.txt --upgrade`
     * Static files `python manage.py collectstatic`
+    * (optinal) create a super user `python manage.py createsuperuser`
 4. Install rabbitmq
     * `sudo apt-get install rabbitmq`
     * Start the service `sudo systemctl start rabbitmq-server` and enable it
