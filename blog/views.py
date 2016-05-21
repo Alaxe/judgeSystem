@@ -22,10 +22,10 @@ class PostEdit(PermissionRequiredMixin, View):
     permission_required = 'blog.change_blogpost'
     template_name = 'blog/post_edit.html'
 
-    def get_response(self, request, form = BlogPostForm(), pk = None):
+    def get_response(self, request, form = BlogPostForm(), post = None):
         context = {
             'form': form,
-            'pk': pk
+            'post': post
         }
         return render(request, self.template_name, context)
 
@@ -36,14 +36,14 @@ class PostEdit(PermissionRequiredMixin, View):
             raise Http404
         else:
             form = BlogPostForm(instance = post)
-            return self.get_response(request, form = form, pk = pk)
+            return self.get_response(request, form = form, post = post)
 
     def post(self, request, pk):
         post = get_object_or_404(BlogPost, pk = pk)
         form = BlogPostForm(request.POST, instance = post)
 
         if not form.is_valid():
-            return self.get_response(request, form = form, pk = pk)
+            return self.get_response(request, form = form, post = post)
         else:
             form.save()
             return redirect(reverse('blog:post_details', args = (post.pk,)))
@@ -107,7 +107,7 @@ class PostDelete(PermissionRequiredMixin, View):
             raise Http404
 
         context = {
-            'pk': post.pk
+            'post': post
         }
         return render(request, self.template_name, context)
 

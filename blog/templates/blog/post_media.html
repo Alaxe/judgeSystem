@@ -6,6 +6,10 @@
 	<h1>Manage media</h1>
 {% endblock %}
 
+{% block breadcrumb_active %}
+    Manage media
+{% endblock %}
+
 {% block edit_content %}
 	<h3>Upload Media</h3>
 	{% media_upload post %}
@@ -14,5 +18,5 @@
 {% endblock %}
 
 {% block edit_nav %}
-	{% blog_post_edit_nav pk=post.pk page='media' %}
+	{% blog_post_edit_nav post=post page='media' %}
 {% endblock %}

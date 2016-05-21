@@ -6,6 +6,10 @@
 	<h1> {{ title }} </h1>
 {% endblock %}
 
+{% block breadcrumb_active %}
+    {{ title }}
+{% endblock %}
+
 {% block edit_nav %}
 	{% problem_edit_nav page='test_new' %}
 {% endblock %}

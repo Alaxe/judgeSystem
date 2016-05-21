@@ -2,6 +2,10 @@
 {% load blog %}
 
 {% block title %}
+    <ol class="breadcrumb">
+        <li><a href="{% url 'blog:post_list' %}">Blog</a></li>
+        <li class="active">{{ post.title }}</li>
+    </ol>
 	<h1> 
 		{{ post.title }}
 		{% if not post.public %}

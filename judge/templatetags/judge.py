@@ -8,7 +8,7 @@ register = template.Library()
 @register.inclusion_tag('judge/problem_edit_nav.html', takes_context = True)
 def problem_edit_nav(context, *args, **kwargs):
     page = kwargs.get('page', '')
-    problem_pk = context['problem_pk']
+    problem_pk = context['problem'].pk
     
     return {
         'curPage': page,

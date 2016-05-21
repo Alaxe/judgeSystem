@@ -3,8 +3,12 @@
 
 {% block title %}
 <h1> 
-	Delete {{ title }}
+    Delete {{ problem.title }}
 </h1>
+{% endblock %}
+
+{% block breadcrumb_active %}
+    Delete problem
 {% endblock %}
 
 {% block edit_content %}

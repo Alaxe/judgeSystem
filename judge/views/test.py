@@ -65,7 +65,6 @@ class TestNew(PermissionRequiredMixin, View):
         return {
             'form' : form,
             'problem': problem,
-            'problem_pk': problem.pk,
             'title' : self.title
         }
     
@@ -170,7 +169,6 @@ class TestEdit(PermissionRequiredMixin, View):
             'problem': test.problem,
             'title': self.title,
             'pk': test.pk,
-            'problem_pk': test.problem.pk
         }
 
     def get(self, request, pk):
@@ -220,7 +218,7 @@ class TestDelete(PermissionRequiredMixin, View):
         tests = self.get_tests(ids)
 
         context = {
-            'problem_pk': tests[0].problem.pk,
+            'problem': tests[0].problem,
             'test_count': tests.count()
         }
 
@@ -257,7 +255,7 @@ class TestList(PermissionRequiredMixin, View):
 
         return {
             'tests_by_group' : problem.get_tests_by_group(),
-            'problem_pk': problem_id,
+            'problem': problem,
             'form': form,
             'checkboxPrefix': self.checkboxPrefix
         }

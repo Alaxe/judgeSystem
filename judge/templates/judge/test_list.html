@@ -7,6 +7,10 @@
 	<h1>Edit tests</h1>
 {% endblock %}
 
+{% block breadcrumb_active %}
+    Edit tests
+{% endblock %}
+
 {% block edit_content %}
 
 	<form method="POST" action="{{ request.get_full_path }}">
@@ -19,7 +23,7 @@
 			class="btn btn-warning btn-block">
 
 		<hr>
-		<a href="{% url 'judge:test_group_new' problem_pk %}"
+		<a href="{% url 'judge:test_group_new' problem.pk %}"
 			class="btn btn-block btn-default">
 			New Test group
 		</a>

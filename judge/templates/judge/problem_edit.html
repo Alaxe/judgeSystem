@@ -7,6 +7,10 @@
 	<h1> Edit statement </h1>
 {% endblock %}
 
+{% block breadcrumb_active %}
+    Edit statement
+{% endblock %}
+
 {% block edit_content %}
 	<form method = "POST" action = "{{request.get_full_path}}">
 		{% csrf_token %}

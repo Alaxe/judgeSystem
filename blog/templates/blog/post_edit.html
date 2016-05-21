@@ -7,7 +7,11 @@
 {% endblock %}
 
 {% block edit_nav %}
-	{% blog_post_edit_nav pk=pk page='edit' %}
+	{% blog_post_edit_nav post=post page='edit' %}
+{% endblock %}
+
+{% block breadcrumb_active %}
+    Edit
 {% endblock %}
 
 {% block edit_content %}

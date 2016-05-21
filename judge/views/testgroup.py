@@ -25,11 +25,11 @@ class TestGroupEdit(PermissionRequiredMixin, View):
 
         if 'pk' in kwargs:
             context['test_group'] = get_object_or_404(TestGroup, pk = kwargs['pk'])
-            context['problem_pk'] = context['test_group'].problem.pk
+            problem = context['test_group'].problem
         else:
-            context['problem_pk'] = kwargs['problem_id']
+            problem = get_object_or_404(Problem, pk = kwargs['problem_id'])
 
-        problem = get_object_or_404(Problem, pk = context['problem_pk'])
+        context['problem'] = problem
 
         if 'form' in kwargs:
             context['form'] = kwargs['form']
@@ -103,7 +103,7 @@ class TestGroupDelete(PermissionRequiredMixin, View):
         testGroup = get_object_or_404(TestGroup, pk = pk)
         context = {
             'test_group': testGroup,
-            'problem_pk': testGroup.problem.pk
+            'problem': testGroup.problem
         }
         return render(request, self.template_name, context)
     

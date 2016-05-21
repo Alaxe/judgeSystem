@@ -25,7 +25,7 @@ def post_admin_panel(context, *args, **kwargs):
 @register.inclusion_tag('blog/post_edit_nav.html')
 def blog_post_edit_nav(*args, **kwargs):
     page = kwargs.get('page', '')
-    blog_pk = kwargs.get('pk')
+    blog_pk = kwargs.get('post').pk
 
     return {
         'curPage': kwargs.get('page', ''),
@@ -48,8 +48,6 @@ def blog_post_edit_nav(*args, **kwargs):
             }
         ]
     }
-
-
 
 @register.filter
 def post_subheading(post):

@@ -161,7 +161,8 @@ class ResetPassword(View):
         self.send_reset_email(user = User.objects.get(email = email))
 
         messages.info(request, 'An email was send with instructions. If you \
-            didn\' receive it make sure you entered the correct email address.')
+            haven\'t received it make sure you\'ve entered the correct email \
+            address.')
 
         return redirect(reverse('judge:problem_list'))
     

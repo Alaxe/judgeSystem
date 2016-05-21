@@ -2,6 +2,24 @@
 {% load judge %}
 
 {% block content %}
+    {% block breadcrumb %}
+        <ol class="breadcrumb">
+            <li>
+                <a href="{% url 'judge:problem_list' %}">
+                    Problems
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'judge:problem_details' problem.pk %}">
+                    {{ problem.title }}
+                </a>
+            </li>
+            <li class="active">
+                {% block breadcrumb_active %} {% endblock %}
+            </li>
+        </ol>
+    {% endblock breadcrumb %}
+
 	<div class="row">
 		<div class="col-md-3">
 			{% block edit_nav %}

@@ -16,6 +16,19 @@
 
 {% block content %}
 <div class="row">
+    <ol class="breadcrumb">
+        <li>
+            <a href="{% url 'judge:problem_list' %}">
+                Problems
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'judge:problem_details' solution.problem.id %}">
+                {{ solution.problem.title }}
+            </a>
+        </li>
+        <li class="active">Solution</li>
+    </ol>
 	<div class="col-md-8">
 		{% for group, results in results_by_group %}
 			<div class="panel panel-default">

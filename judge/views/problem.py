@@ -33,8 +33,6 @@ class ProblemList(TemplateView):
         if not self.request.user.has_perm('judge.see_hidden_problems'):
             problems = problems.filter(visible = True)
 
-        
-
         context['curTags'] = []
         if tags != '':
             context['curTags'] = tags.split(',')
@@ -117,12 +115,10 @@ class ProblemDetails(TemplateView):
 
         return {'problem': problem, 'solutions': solutions}
 
-
 class ProblemForm(forms.ModelForm):
     class Meta:
         model = Problem
         exclude = ['max_score', 'visible', 'custom_checker']
-        #w1dgets = {'tags': forms.HiddenInput() }
 
 class ProblemNew(PermissionRequiredMixin, View):
     permission_required = 'judge.add_problem'
@@ -138,11 +134,10 @@ class ProblemEdit(PermissionRequiredMixin, View):
     template_name = 'judge/problem_edit.html'
 
     def get_context(self, problem, form):
-        pk = problem.pk
         return {
             'form' : form,
             'curTags': problem.tags.names(),
-            'problem_pk': pk
+            'problem': problem
         }
 
     def get(self, request, pk = 0):
@@ -176,7 +171,7 @@ class ProblemDelete(PermissionRequiredMixin, View):
             'modelName': problem.title,
             'modelType': 'problem',
             'cancelUrl': reverse('judge:problem_edit', args = (pk,)),
-            'problem_pk': pk
+            'problem': problem
         }
         return render(request, self.template_name, context)
 
@@ -197,7 +192,6 @@ class ProblemMedia(PermissionRequiredMixin, TemplateView):
         context = super(ProblemMedia, self).get_context_data(**kwargs)
 
         context['problem'] = get_object_or_404(Problem, pk = kwargs['pk'])
-        context['problem_pk'] = kwargs['pk']
         return context
 
 class ProblemCheckerForm(forms.Form):
@@ -228,7 +222,7 @@ class ProblemChecker(PermissionRequiredMixin, View):
 
         return {
             'form': form,
-            'problem_pk': pk
+            'problem': problem
         }
 
     def get(self, request, pk):
@@ -265,7 +259,7 @@ class ProblemRetest(PermissionRequiredMixin, View):
         solCnt = Solution.objects.filter(problem = problem).count()
 
         context = {
-            'problem_pk': pk,
+            'problem': problem,
             'solutionCount': solCnt
         }
 
@@ -286,11 +280,11 @@ class ProblemVisibility(PermissionRequiredMixin, View):
     template_name = 'judge/problem_visibility.html'
 
     def get(self, request, pk):
-        prob = get_object_or_404(Problem, pk = pk)
+        problem = get_object_or_404(Problem, pk = pk)
 
         context = { 
-            'visible': prob.visible,
-            'problem_pk': prob.pk
+            'visible': problem.visible,
+            'problem': problem
         }
         return render(request, self.template_name, context)
 

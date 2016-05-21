@@ -85,9 +85,10 @@ class RegisterForm(Form):
         return valid
 
 class ResetForm(Form):
-     email = EmailField(**email_kwargs)
+    email = EmailField(**email_kwargs)
+    captcha = ReCaptchaField()
 
-     def is_valid(self):
+    def is_valid(self):
         valid = super(ResetForm, self).is_valid()
 
         email = self.cleaned_data.get('email')

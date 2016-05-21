@@ -6,6 +6,10 @@
 	<h1> {{ title }} </h1>
 {% endblock %}
 
+{% block breadcrumb_active %}
+    {{ title }}
+{% endblock %}
+
 {% block edit_content %}
 	<form method = "POST" action = "{{request.get_full_path}}">
 		{% csrf_token %}
