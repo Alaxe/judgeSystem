@@ -16,18 +16,19 @@
 		The solutions could be graded with the default checker (matches
 		their output directly to the correct one) or you could provide 
 		a custom one. This is useful when there's more than one correct answer. 
-		You should upload a staticly compiled binary(with -static) which 
-		takes as parameters 3  files - the input file, the corect output 
-		and the contestant's  output. On the first line it should 
-		print 1.0 if the contestant's  output is correct and 0.0 otherwise.
-		For more info you can reference
+		You should upload the source code of the checker or a staticly compiled 
+        binary (with -static) which  takes as parameters 3  files - the input 
+        file, the corect output and the contestant's  output. On the first line
+        it should print 1.0 if the contestant's  output is correct and 0.0 
+        otherwise. For more info you can reference
 		<a href="https://cms.readthedocs.org/en/v1.2/Task%20types.html#batch">
 			CMS' graders</a>, whose format we use here.
+    </p>
 
-	<form method="POST" enctype="multipart/form-data"
+    <form method="POST" enctype="multipart/form-data"
 					 action="{{ request.get_full_path }}">
-		{% csrf_token %}
-		{% bootstrap_form form %}
+        {% csrf_token %}
+        {% bootstrap_form form %}
 		<input type="submit" value="Set settings" 
 				class="btn btn-primary btn-block">
 	</form>

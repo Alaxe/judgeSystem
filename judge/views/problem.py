@@ -1,5 +1,6 @@
 import io
 import os
+import subprocess
 
 from zipfile import ZipFile, BadZipFile
 
@@ -118,7 +119,8 @@ class ProblemDetails(TemplateView):
 class ProblemForm(forms.ModelForm):
     class Meta:
         model = Problem
-        exclude = ['max_score', 'visible', 'custom_checker']
+        exclude = ['max_score', 'visible', 'custom_checker', 'custom_grader', 
+                'grader_header_filename', 'grader_header', 'grader_source']
 
 class ProblemNew(PermissionRequiredMixin, View):
     permission_required = 'judge.add_problem'
@@ -198,7 +200,7 @@ class ProblemCheckerForm(forms.Form):
     useCustomChecker = forms.BooleanField(label = 'Use custom checker', 
                     required = False)
     customChecker = forms.FileField(required = False, 
-                    label = 'Upload checker (if used)')
+                    label = 'Upload checker source (c++) / binary (if used)')
 
     def is_valid(self):
         valid = super(ProblemCheckerForm, self).is_valid()
@@ -238,15 +240,42 @@ class ProblemChecker(PermissionRequiredMixin, View):
             return render(request, self.template_name, context)
 
         problem.custom_checker = form.cleaned_data.get('useCustomChecker')
-        problem.save()
 
         if problem.custom_checker:
-            with open(settings.BASE_DIR + '/judge/graders/' + str(problem.pk),
-                'wb') as dest:
-                dest.write(request.FILES['customChecker'].read())
+            name = form.cleaned_data.get('customChecker').name
+            grader = settings.BASE_DIR + '/judge/graders/' + str(problem.pk)
 
-        messageText = 'Checker successfully updated'
-        messages.add_message(request, messages.SUCCESS, messageText)
+            if name.endswith('.cpp'):
+                with open(grader + '.cpp', 'wb') as dest:
+                    dest.write(request.FILES['customChecker'].read())
+
+                compileArgs = ['g++', '--std=c++11', '-static',
+                    '-o', grader, grader + '.cpp']
+
+                try:
+                    subprocess.run(compileArgs, timeout =
+                            settings.JUDGE_COMPILE_TL, check = True)
+                    problem.save()
+
+                    messages.success(request, 'Checker successfully compiled')
+                    
+                except subprocess.CalledProcessError:
+                    messages.error(request, 'Compilation error (syntax)')
+                except subprocess.TimeoutExpired:
+                    messages.error(request, 'Compilation error (timeout)')
+                finally:
+                    os.remove(grader + '.cpp')
+
+            else:
+                with open(grader, 'wb') as dest:
+                    dest.write(request.FILES['customChecker'].read())
+
+                problem.save()
+                messages.success(request, 'Checker successfully uploaded')
+        else:
+            problem.save()
+
+            messages.success(request, 'Checker removed successfully')
 
         return redirect(reverse('judge:problem_edit', args=(pk,)))
 

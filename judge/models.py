@@ -30,6 +30,12 @@ class Problem(models.Model):
     visible = models.BooleanField(default = False)
     custom_checker = models.BooleanField(default = False)
 
+    custom_grader = models.BooleanField(default = False)
+    grader_header_filename = models.CharField('Filename for the grader header \
+        file', blank = True, max_length = 32)
+    grader_header = models.TextField('Grader header code', blank = True)
+    grader_source = models.TextField('Grader source code', blank = True)
+
     tags = TaggableManager(blank = True)
 
     class Meta:
@@ -41,6 +47,7 @@ class Problem(models.Model):
             ('see_hidden_problems', 'Can see hidden problems'),
             ('add_media_to_problem', 'Can upload media for a problem'),
             ('add_checker_to_problem', 'Can add a checker for a problem'),
+            ('add_grader_to_problem', 'Can add a custom grader for a problem'),
             ('import_problem', 'Can import problems'),
         )
 
