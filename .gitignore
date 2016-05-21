@@ -1,17 +1,11 @@
-judgeSystem/sens.py
+judgeSystem/settings.py
 db.sqlite3
 *.swp
 *.swo
-run-celery
 run-server
 erl_crash.dump
 celery.*
-media/*
-static/*
-
-judge/graders/*
-judge/solutions/*
-judge/isolate
+*.sock
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

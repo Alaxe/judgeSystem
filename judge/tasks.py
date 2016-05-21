@@ -12,15 +12,15 @@ from django.db import transaction
 from judge.models import Test, TestResult, TestGroupResult, Solution, \
         UserProblemData, UserStatts
 
+sandbox = 'isolate'
+
 def get_sol_loc(solution):
     solutionRoot = settings.BASE_DIR + '/judge/solutions/'
     return solutionRoot + str(solution.pk)
 def get_box_id():
     return current_process().index
 def get_box_loc():
-    return '/tmp/box/' + str(get_box_id()) + '/box/'
-def get_sandbox():
-    return settings.BASE_DIR + '/judge/isolate'
+    return '/var/local/lib/isolate/' + str(get_box_id()) + '/box/'
 def get_grader_loc(problem):
     return settings.BASE_DIR + '/judge/graders/' + str(problem.pk)
 
@@ -40,7 +40,6 @@ def compile_solution(solution):
         os.remove(sourceName)
 
 def setup_box(solution, test):
-    sandbox = get_sandbox()
     boxId = get_box_id()
     subprocess.call([sandbox, '-b', str(boxId), '--init'])
     subprocess.call(['cp', get_sol_loc(solution), 
@@ -52,7 +51,6 @@ def setup_box(solution, test):
         inFile.write(test.stdin)
 
 def run_solution(test):
-    sandbox = get_sandbox()
     boxId = get_box_id()
     time_limit = str(test.time_limit)
 
@@ -129,6 +127,7 @@ def test_solution(solution):
     
 @shared_task
 def run_test(solution, test):
+    print('run test')
     boxId = get_box_id()
     
     setup_box(solution, test)
@@ -151,11 +150,12 @@ def run_test(solution, test):
         sandbox_msg = msg
     
     result = TestResult(message = sandbox_msg, score = score, passed = passed,
-                        solution = solution, test = test, exec_time = time)
+                        solution_id = solution.id, test_id = test.id, exec_time = time)
     return result
 
 @shared_task(ignore_result = True) 
 def save_result(result, solution):
+    print('save reuslts')
     with transaction.atomic():
         failedTestGroups = set()
         

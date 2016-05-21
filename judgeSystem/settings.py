@@ -11,9 +11,6 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
-#Sensitive data not commited to version control
-from judgeSystem.sens import *
-
 from kombu import Exchange, Queue
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -103,13 +100,12 @@ BASE_NAVBAR = 'judgeSystem/navbar.html'
 
 DATABASES = {
     'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'judgeSystemDB',
-        'USER': 'admin',
-        'ATOMIC_REQUESTS': True,
+        'NAME': '',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '', #uses default port
     }
 }
 
@@ -143,8 +139,8 @@ EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 
-#EMAIL_HOST_USER = sens.EMAIL
-#EMAIL_HOST_PASSWORD = sens.EMAIL_PASSWORD
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
 
 LOGIN_URL = '/account/login/'
 JUDGE_COMPILE_TL = 3
@@ -152,4 +148,5 @@ JUDGE_COMPILE_TL = 3
 TAGGIT_CASE_INSENSITIVE = True
 
 NOCAPTCHA = True
-RECAPTCHA_PUBLIC_KEY = '6LeEqxUTAAAAAO3X-rpxVp-Lc_XHWTt_23jsAH_8'
+RECAPTCHA_PUBLIC_KEY = ''
+RECAPTCHA_PRIVATE_KEY = ''

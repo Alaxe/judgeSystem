@@ -1,0 +1,10 @@
+[Unit]
+Description=Handle the celery queue for the judge
+
+[Service]
+Type=forking
+WorkingDirectory=[The root directory of the project]
+ExecStart=[Thee root directory of the project]/run_celery
+
+[Install]
+WantedBy=multi-user.target
