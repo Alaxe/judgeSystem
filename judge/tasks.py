@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-import subprocess, time, os
+import subprocess, time, os, signal
 
 from billiard import current_process
 from celery import shared_task
@@ -24,21 +24,26 @@ def get_box_loc():
 def get_grader_loc(problem):
     return settings.BASE_DIR + '/judge/graders/' + str(problem.pk)
 
-def compile_solution(solution):
-    sourceName = get_sol_loc(solution) + '.cpp'
+def compile_program(sourcePath, destPath):
+    compileArgs = ['g++', '-O2', '--std=c++11', '-o', destPath, sourcePath]
+    try:
+        proc = subprocess.Popen(compileArgs, preexec_fn = os.setsid)
+        if proc.wait(timeout = settings.JUDGE_COMPILE_TL) != 0:
+            raise subprocess.CalledProcessError(proc.returncode, 'g++')
+    except subprocess.TimeoutExpired as e:
+        os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+        raise e
+    finally:
+        os.remove(sourcePath)
 
-    with open(sourceName, 'w') as sourceFile:
+def compile_solution(solution):
+    sourcePath = get_sol_loc(solution) + '.cpp'
+
+    with open(sourcePath, 'w') as sourceFile:
         sourceFile.write(solution.source)
 
-    compileArgs = ['g++', '-O2', '--std=c++11',
-                    '-o', get_sol_loc(solution), sourceName]
-
-    try:
-        subprocess.run(compileArgs, timeout = settings.JUDGE_COMPILE_TL,
-                check = True)
-    finally:
-        os.remove(sourceName)
-
+    compile_program(sourcePath, get_sol_loc(solution))
+    
 def setup_box(solution, test):
     boxId = get_box_id()
     subprocess.call([sandbox, '-b', str(boxId), '--init'])

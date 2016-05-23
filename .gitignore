@@ -4,6 +4,7 @@ db.sqlite3
 *.swp
 *.swo
 run-server
+run_celery
 erl_crash.dump
 celery.*
 *.sock

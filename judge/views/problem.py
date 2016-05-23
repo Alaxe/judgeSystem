@@ -22,7 +22,7 @@ from django.views.generic import TemplateView, DetailView, View
 from media_manager.models import MediaFile
 
 from judge.models import Problem, Test, Solution, UserProblemData
-from judge.tasks import test_solution, retest_problem
+from judge.tasks import compile_program, test_solution, retest_problem
 
 class ProblemList(TemplateView):
     template_name = 'judge/problem_list.html'
@@ -249,23 +249,13 @@ class ProblemChecker(PermissionRequiredMixin, View):
                 with open(grader + '.cpp', 'wb') as dest:
                     dest.write(request.FILES['customChecker'].read())
 
-                compileArgs = ['g++', '--std=c++11', '-static',
-                    '-o', grader, grader + '.cpp']
-
                 try:
-                    subprocess.run(compileArgs, timeout =
-                            settings.JUDGE_COMPILE_TL, check = True)
-                    problem.save()
-
+                    compile_program(grader + '.cpp', grader)
                     messages.success(request, 'Checker successfully compiled')
-                    
                 except subprocess.CalledProcessError:
                     messages.error(request, 'Compilation error (syntax)')
                 except subprocess.TimeoutExpired:
                     messages.error(request, 'Compilation error (timeout)')
-                finally:
-                    os.remove(grader + '.cpp')
-
             else:
                 with open(grader, 'wb') as dest:
                     dest.write(request.FILES['customChecker'].read())
