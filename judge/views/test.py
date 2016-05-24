@@ -323,6 +323,8 @@ class TestList(PermissionRequiredMixin, View):
             return self.update_tests(request, problem_id)
         elif 'delete' in request.POST:
             return self.delete_tests(request, problem_id)
+        else:
+            return self.get(request, problem_id)
         
 class TestInput(PermissionRequiredMixin, View):
     permission_required = 'judge.view_test'   

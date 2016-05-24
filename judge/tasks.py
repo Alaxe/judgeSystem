@@ -37,12 +37,28 @@ def compile_program(sourcePath, destPath):
         os.remove(sourcePath)
 
 def compile_solution(solution):
-    sourcePath = get_sol_loc(solution) + '.cpp'
+    sourcePath = get_box_loc() + 'solution.cpp'
 
     with open(sourcePath, 'w') as sourceFile:
         sourceFile.write(solution.source)
+    
+    if not solution.problem.custom_grader:
+        compile_program(sourcePath, get_sol_loc(solution))
+    else:
+        headerPath = get_box_loc() + solution.problem.grader_header_filename
+        graderPath = get_box_loc() + 'grader.cpp'
 
-    compile_program(sourcePath, get_sol_loc(solution))
+        with open(headerPath, 'w') as headerFile:
+            headerFile.write(solution.problem.grader_header)
+
+        with open(graderPath, 'w') as graderFile:
+            graderFile.write(solution.problem.grader_source)
+
+        try:
+            compile_program(graderPath, get_sol_loc(solution))
+        finally:
+            os.remove(sourcePath)
+            os.remove(headerPath)
     
 def setup_box(solution, test):
     boxId = get_box_id()

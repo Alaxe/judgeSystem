@@ -1,0 +1,62 @@
+{% extends 'judge/problem_edit_base.html' %}
+
+{% load judge %}
+{% load bootstrap3 %}
+
+{% block title %}
+	<h1>Checker settings</h1>
+{% endblock %}
+
+{% block breadcrumb_active %}
+    Grading
+{% endblock %}
+
+{% block edit_content %}
+    <h3>Checker</h3>
+	<p>
+		The solutions could be graded with the default checker (matches
+		their output directly to the correct one) or you could provide 
+		a custom one. This is useful when there's more than one correct answer. 
+		You should upload the source code of the checker or a staticly compiled 
+        binary (with -static) which  takes as parameters 3  files - the input 
+        file, the corect output and the contestant's  output. On the first line
+        it should print 1.0 if the contestant's  output is correct and 0.0 
+        otherwise. For more info you can reference
+		<a href="https://cms.readthedocs.org/en/v1.2/Task%20types.html#batch">
+			CMS' checkers</a>, whose format we use here.
+    </p>
+
+    <form method="POST" enctype="multipart/form-data"
+	                action="{{ request.get_full_path }}">
+        {% csrf_token %}
+        {% bootstrap_form checkerForm %}
+		<input type="submit" name="checker" value="Set checker settings" 
+				class="btn btn-primary btn-block">
+	</form>
+    <hr>
+
+    <h3>Grader</h3>
+    <p>
+        A grader could be provided which takes care of input and output, so 
+        that the solutions only have to implement a few functions. You have to
+        provide the source of the grader and the header for the functions. The
+        header filename is the filename included in the solutions. Your grader
+        has to include the solution with: <code> #include "solution.cpp"</code>
+        For more info you can reference
+		<a href="https://cms.readthedocs.org/en/v1.2/Task%20types.html#batch">
+			CMS' graders</a>, whose format we use here.
+    </p>
+
+    <form method="POST" enctype="multipart/form-data"
+                    action="{{ request.get_full_path }}">
+        {% csrf_token %}
+        {% bootstrap_form graderForm %}
+        <input type="submit" name="grader" value="Set grader settings"
+                class="btn btn-primary btn-block">
+    </form>
+
+{% endblock %}
+
+{% block edit_nav %}
+	{% problem_edit_nav page='grading'%}
+{% endblock %}

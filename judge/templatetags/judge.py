@@ -33,9 +33,9 @@ def problem_edit_nav(context, *args, **kwargs):
             'url': reverse('judge:test_new', args = (problem_pk,)),
             'text': 'Add tests'
         }, {
-            'name': 'checker',
-            'url': reverse('judge:problem_checker', args = (problem_pk,)),
-            'text': 'Configure a custom checker'
+            'name': 'grading',
+            'url': reverse('judge:problem_grading', args = (problem_pk,)),
+            'text': 'Configure grading'
         }, {
             'name': 'visibility',
             'url': reverse('judge:problem_visibility', args= (problem_pk,)),

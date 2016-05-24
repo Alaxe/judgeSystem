@@ -200,30 +200,78 @@ class ProblemCheckerForm(forms.Form):
     useCustomChecker = forms.BooleanField(label = 'Use custom checker', 
                     required = False)
     customChecker = forms.FileField(required = False, 
-                    label = 'Upload checker source (c++) / binary (if used)')
+                    label = 'Checker source (c++) / binary (if used)')
 
-    def is_valid(self):
+    def is_valid(self, has_checker = False):
         valid = super(ProblemCheckerForm, self).is_valid()
 
         data = self.cleaned_data
-        if data.get('useCustomChecker') and (not data.get('customChecker')) :
-                self.add_error('customChecker', 'You need to provide a checker')
+        if has_checker:
+            return valid
+        elif data.get('useCustomChecker') and (not data.get('customChecker')):
+            self.add_error('customChecker', 'Provide a checker')
+            valid = False
+
+        return valid
+
+class ProblemGraderForm(forms.Form):
+    useCustomGrader = forms.BooleanField(label = 'Use custom grader', 
+                    required = False)
+    graderHeaderFilename = forms.CharField(label = 'The name of the header file'
+                    + ' to be included in the solutions',
+                    required = False)
+    graderHeader = forms.FileField(label = 'Grader header file (.h)',
+                    required = False)
+    graderSource = forms.FileField(label = 'Grader source file (.cpp)',
+                    required = False)
+                    
+    def is_valid(self, has_grader = False):
+        valid = super(ProblemGraderForm, self).is_valid()
+        data = self.cleaned_data
+
+        if data.get('useCustomGrader'):
+            if not data.get('graderHeaderFilename'):
+                self.add_error('graderHeaderFilename', 
+                        'Provide a grader header filename')
+                valid = False
+            elif not data.get('graderHeaderFilename').endswith('.h'):
+                self.add_error('graderHeaderFilename',
+                        'The grader header filename must end with ".h"')
+                valid = False
+
+        if data.get('useCustomGrader') and (not has_grader):
+            if not data.get('graderHeader'):
+                self.add_error('graderHeader', 'Provide a grader header')
+                valid = False
+
+            if not data.get('graderSource'):
+                self.add_error('graderSource', 'Provide a grader source')
                 valid = False
 
         return valid
 
-class ProblemChecker(PermissionRequiredMixin, View):
+class ProblemGrading(PermissionRequiredMixin, View):
     permission_required = 'judge.add_checker_to_problem'
-    template_name = 'judge/problem_checker.html'
+    template_name = 'judge/problem_grading.html'
 
-    def get_context(self, pk, form = None):
-        if not form:
-            problem = get_object_or_404(Problem, pk = pk)
-            form = ProblemCheckerForm()
-            form.fields['useCustomChecker'].initial = problem.custom_checker
+    def get_context(self, pk, checkerForm = None, graderForm = None):
+        problem = get_object_or_404(Problem, pk = pk)
+
+        if not checkerForm:
+            checkerForm = ProblemCheckerForm()
+
+            checkerForm.fields['useCustomChecker'].initial = \
+                    problem.custom_checker
+        if not graderForm:
+            graderForm = ProblemGraderForm()
+            graderForm.fields['useCustomGrader'].initial = problem.custom_grader
+            graderForm.fields['graderHeaderFilename'].initial = \
+                    problem.grader_header_filename
+
 
         return {
-            'form': form,
+            'checkerForm': checkerForm,
+            'graderForm': graderForm,
             'problem': problem
         }
 
@@ -231,12 +279,12 @@ class ProblemChecker(PermissionRequiredMixin, View):
         context = self.get_context(pk)
         return render(request, self.template_name, context)
 
-    def post(self, request, pk):
+    def update_checker(self, request, pk):
         form = ProblemCheckerForm(request.POST, request.FILES)
         problem = get_object_or_404(Problem, pk = pk)
 
-        if not form.is_valid():
-            context = self.get_context(pk, form = form)
+        if not form.is_valid(has_checker = problem.custom_checker):
+            context = self.get_context(pk, checkerForm = form)
             return render(request, self.template_name, context)
 
         problem.custom_checker = form.cleaned_data.get('useCustomChecker')
@@ -252,11 +300,12 @@ class ProblemChecker(PermissionRequiredMixin, View):
                 try:
                     compile_program(grader + '.cpp', grader)
                     messages.success(request, 'Checker successfully compiled')
+                    problem.save()
                 except subprocess.CalledProcessError:
                     messages.error(request, 'Compilation error (syntax)')
                 except subprocess.TimeoutExpired:
                     messages.error(request, 'Compilation error (timeout)')
-            else:
+            elif name:
                 with open(grader, 'wb') as dest:
                     dest.write(request.FILES['customChecker'].read())
 
@@ -264,10 +313,46 @@ class ProblemChecker(PermissionRequiredMixin, View):
                 messages.success(request, 'Checker successfully uploaded')
         else:
             problem.save()
-
             messages.success(request, 'Checker removed successfully')
 
-        return redirect(reverse('judge:problem_edit', args=(pk,)))
+        return self.get(request, pk)
+
+    def update_grader(self, request, pk):
+        form = ProblemGraderForm(request.POST, request.FILES)
+        problem = get_object_or_404(Problem, pk = pk)
+
+        if not form.is_valid(has_grader = problem.custom_grader):
+            context = self.get_context(pk, graderForm = form)
+            return render(request, self.template_name, context)
+
+        data = form.cleaned_data
+
+        problem.custom_grader = data.get('useCustomGrader')
+        #print(problem.custom_grader)
+
+        if data.get('useCustomGrader'):
+            problem.grader_header_filename = data.get('graderHeaderFilename')
+            if data['graderHeader']:
+                problem.grader_header = request.FILES['graderHeader'].read()
+            if data['graderSource']:
+                problem.grader_source = request.FILES['graderSource'].read()
+        else:
+            problem.grader_header_filename = ''
+            problem.grader_header = ''
+            problem.grader_source = ''
+
+        problem.save()
+        messages.success(request, 'Grader updated successfully')
+
+        return self.get(request, pk)
+
+    def post(self, request, pk):
+        if 'checker' in request.POST:
+            return self.update_checker(request, pk)
+        elif 'grader' in request.POST:
+            return self.update_grader(request, pk)
+        else:
+            return self.get(request, pk)
 
 class ProblemRetest(PermissionRequiredMixin, View):
     permission_required = 'judge.retest_problem'
