@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-import subprocess, time, os, signal
+import subprocess, time, os, signal, sys
 
 from billiard import current_process
 from celery import shared_task
@@ -14,9 +14,9 @@ from judge.models import Test, TestResult, TestGroupResult, Solution, \
 
 sandbox = 'isolate'
 
-def get_sol_loc(solution):
+def get_sol_loc(solution_id):
     solutionRoot = settings.BASE_DIR + '/judge/solutions/'
-    return solutionRoot + str(solution.pk)
+    return solutionRoot + str(solution_id)
 def get_box_id():
     return current_process().index
 def get_box_loc():
@@ -43,7 +43,7 @@ def compile_solution(solution):
         sourceFile.write(solution.source)
     
     if not solution.problem.custom_grader:
-        compile_program(sourcePath, get_sol_loc(solution))
+        compile_program(sourcePath, get_sol_loc(solution.id))
     else:
         headerPath = get_box_loc() + solution.problem.grader_header_filename
         graderPath = get_box_loc() + 'grader.cpp'
@@ -55,15 +55,15 @@ def compile_solution(solution):
             graderFile.write(solution.problem.grader_source)
 
         try:
-            compile_program(graderPath, get_sol_loc(solution))
+            compile_program(graderPath, get_sol_loc(solution.id))
         finally:
             os.remove(sourcePath)
             os.remove(headerPath)
     
-def setup_box(solution, test):
+def setup_box(solution_id, test):
     boxId = get_box_id()
     subprocess.call([sandbox, '-b', str(boxId), '--init'])
-    subprocess.call(['cp', get_sol_loc(solution), 
+    subprocess.call(['cp', get_sol_loc(solution_id), 
                     get_box_loc() + 'solution'])
 
     inFilePath = get_box_loc() + 'std.in'
@@ -81,9 +81,7 @@ def run_solution(test):
 
     proc = subprocess.Popen(args, stdout = subprocess.PIPE, 
                             stderr = subprocess.PIPE)
-    while proc.poll():
-        time.sleep(0.01)
-
+    proc.wait()
     out, err = proc.communicate()
     return err.decode('utf-8')
 
@@ -131,13 +129,16 @@ def test_solution(solution):
         solution.grader_message = 'Testing'
 
         taskList = []
-        tests = solution.problem.test_set.all()
+        print('adding tests')
+        print(sys.getsizeof(solution))
+        tests = Test.objects.filter(problem_id = solution.problem_id)
         for t in tests:
-            curSubTask = run_test.si(solution, t)
+            curSubTask = run_test.si(solution.id, t.id)
             taskList.append(curSubTask)
 
         res = chord(group(taskList), save_result.s(solution))
         res.apply_async()
+        print('tests added')
 
     except subprocess.CalledProcessError:
         solution.grader_message = 'Compilation error (syntax)'
@@ -147,11 +148,11 @@ def test_solution(solution):
         solution.save()
     
 @shared_task
-def run_test(solution, test):
-    print('run test')
+def run_test(solution_id, test_id):
+    test = Test.objects.get(id = test_id)
     boxId = get_box_id()
     
-    setup_box(solution, test)
+    setup_box(solution_id, test)
     sandbox_msg = run_solution(test)
 
     score = 0
@@ -171,7 +172,7 @@ def run_test(solution, test):
         sandbox_msg = msg
     
     result = TestResult(message = sandbox_msg, score = score, passed = passed,
-                        solution_id = solution.id, test_id = test.id, exec_time = time)
+                        solution_id = solution_id, test_id = test.id, exec_time = time)
     return result
 
 @shared_task(ignore_result = True) 
@@ -213,7 +214,7 @@ def save_result(result, solution):
     solution.save()
 
     try:
-        os.remove(get_sol_loc(solution))
+        os.remove(get_sol_loc(solution.id))
     except FileNotFoundError:
         pass
 
