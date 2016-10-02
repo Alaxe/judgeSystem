@@ -10,7 +10,7 @@ A python/django based system for testing c/c++ solutions to algoritmic problems
 
 ##Required software:
 * A linux distribution (tested on Arch and Ubuntu)
-* Python 3 (tested only with 3.5)
+* Python 3 (tested  with 3.5)
 * Python modules: view requirements.txt
 * g++ compiler
 * A database (postgresql recommended)
@@ -33,29 +33,30 @@ A python/django based system for testing c/c++ solutions to algoritmic problems
 4. Setup database 
     * install it ([guide][postgres_guide] for postgres)
     * Fill in `DATABASE` in `judgeSystem/settings.py`
-    * Generate any missing migrations `python manage.py createmigrations`
-    * Create the database schema with `python manage.py migrate`
 5. Other dependencies
     * Python modules `sudo pip install -r requirements.txt --upgrade`
     * Static files `python manage.py collectstatic`
     * (optinal) create a super user `python manage.py createsuperuser`
-4. Install rabbitmq
+6. Database migrations
+    * Generate any missing migrations `python manage.py createmigrations`
+    * Create the database schema with `python manage.py migrate`
+7. Install rabbitmq
     * `sudo apt-get install rabbitmq`
     * Start the service `sudo systemctl start rabbitmq-server` and enable it
       `sudo systemctl enable rabbitmq-server` (i.e. make it start on boot)
       **Note:** This assumes that you have systemd. While that's the case with
       newer distros, you may have to use an your disto's init system
-5. Install isolate
+8. Install isolate
     * Clone the [repository][isolate] `git clone https://github.com/ioi/isolate`
     * Install `make install` (Has to be run from the repository's directory)
-6. (optional) Install a proper web server (you can use the development server,
+9. (optional) Install a proper web server (you can use the development server,
    which comes with django, but it's not suitable for production) Here's a 
    [guide][nginx_uwsgi_guide] for nginx with uwsgi, a bit out of date though
     * When configuring uwsgi instead of `module` use `wsgi-file` and the full
       path to `judgesystem/judgeSystem/wsgi.py`
     * Most distros have systemd services so instead of `sudo service ...`
       use `sudo systemctl (start|restart|stop|enable) (nginx|uwsgi)`
-7. (optional) Install celery as a service (systemd)
+10. (optional) Install celery as a service (systemd)
    * Add to `judge-celery.service` the full path to the repository
    * Copy the file to create the service `sudo cp judge-celery.service
        /etc/systemd/system/` and reload the services with `sudo systemctl

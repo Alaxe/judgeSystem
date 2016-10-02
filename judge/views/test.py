@@ -107,6 +107,8 @@ class TestNew(PermissionRequiredMixin, View):
                         outFileName = testName + '.sol'
                     elif testName + '.out' in fileNamesSet:
                         outFileName = testName + '.out'
+                    elif testName + '.ok' in fileNamesSet:
+                        outFileName = testName + '.ok'
                     else:
                         continue
 

@@ -23,6 +23,9 @@ def get_box_loc():
     return '/var/local/lib/isolate/' + str(get_box_id()) + '/box/'
 def get_grader_loc(problem):
     return settings.BASE_DIR + '/judge/graders/' + str(problem.pk)
+def init_box():
+    subprocess.call([sandbox, '-b', str(get_box_id()), '--init'])
+
 
 def compile_program(sourcePath, destPath):
     compileArgs = ['g++', '-O2', '--std=c++11', '-o', destPath, sourcePath]
@@ -37,6 +40,8 @@ def compile_program(sourcePath, destPath):
         os.remove(sourcePath)
 
 def compile_solution(solution):
+    init_box()
+
     sourcePath = get_box_loc() + 'solution.cpp'
 
     with open(sourcePath, 'w') as sourceFile:
@@ -60,9 +65,8 @@ def compile_solution(solution):
             os.remove(sourcePath)
             os.remove(headerPath)
     
-def setup_box(solution_id, test):
-    boxId = get_box_id()
-    subprocess.call([sandbox, '-b', str(boxId), '--init'])
+def setup_box_for_test(solution_id, test):
+    init_box()
     subprocess.call(['cp', get_sol_loc(solution_id), 
                     get_box_loc() + 'solution'])
 
@@ -152,7 +156,7 @@ def run_test(solution_id, test_id):
     test = Test.objects.get(id = test_id)
     boxId = get_box_id()
     
-    setup_box(solution_id, test)
+    setup_box_for_test(solution_id, test)
     sandbox_msg = run_solution(test)
 
     score = 0

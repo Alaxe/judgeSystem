@@ -1,5 +1,6 @@
 #
 judgeSystem/settings.py
+localDB
 db.sqlite3
 *.swp
 *.swo
