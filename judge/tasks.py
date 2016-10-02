@@ -1,6 +1,10 @@
 from __future__ import absolute_import
 
-import subprocess, time, os, signal, sys
+import os
+import time
+import signal
+import subprocess
+import sys
 
 from billiard import current_process
 from celery import shared_task

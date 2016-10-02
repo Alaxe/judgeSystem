@@ -1,4 +1,6 @@
 #
+download
+task
 judgeSystem/settings.py
 localDB
 db.sqlite3
