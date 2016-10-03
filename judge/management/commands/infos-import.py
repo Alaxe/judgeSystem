@@ -14,8 +14,7 @@ class Command(BaseCommand):
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
 
-        #self.GROUPS = ['A', 'B', 'C', 'D', 'E']
-        self.GROUPS = ['B']
+        self.GROUPS = ['A', 'B', 'C', 'D', 'E']
         self.PROBLEM_PER_GROUP = 3
         self.BASE_URL = 'http://www.math.bas.bg/infos/files/'
 
@@ -67,7 +66,7 @@ class Command(BaseCommand):
         outputExtensions = ['.sol', '.out', '.ok']
 
         testCount = 0
-        for inputFilename in testFilenames:
+        for inputFilename in sorted(testFilenames):
             testBase = None
             for ext in inputExtensions:
                 if inputFilename.endswith(ext):
@@ -94,16 +93,13 @@ class Command(BaseCommand):
 
             with open(path + outputFilename) as outputFile:
                 test.stdout = outputFile.read()
-
-            test.save()
+            
             testCount += 1
+            test.save()
         
         if testCount:
             scorePerTest = self.PROBLEM_SCORE / testCount
             Test.objects.filter(problem = problem).update(score = scorePerTest)
-
-        print('{} - {}'.format(problem.title, testCount))
-
 
     def add_problem(self, group, ind):
         name = self.get_problem_name(group, ind)
