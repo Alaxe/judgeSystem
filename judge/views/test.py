@@ -94,23 +94,37 @@ class TestNew(PermissionRequiredMixin, View):
 
         try:
             with ZipFile(zipName) as testsZip:
-                fileNames = testsZip.namelist()
-                fileNamesSet = set(fileNames)
+                testFilenames = testsZip.namelist()
+                testFilenameSet = set(testFilenames)
+
+                inputExtensions = ['.in', '.txt', '.test']
+                outputExtensions = ['.sol', '.out', '.ok']
 
                 testCount = 0
-                for inFileName in fileNames:
-                    if not inFileName.endswith('.in'):
+
+                for inputFilename in testFilenames:
+
+                    testBase = None
+                    for ext in inputExtensions:
+                        if inputFilename.endswith(ext):
+                            testBase = inputFilename[:-len(ext)]
+                            break
+
+                    if not testBase:
                         continue
 
-                    testName = inFileName[:-3]
-                    if testName + '.sol' in fileNamesSet:
-                        outFileName = testName + '.sol'
-                    elif testName + '.out' in fileNamesSet:
-                        outFileName = testName + '.out'
-                    elif testName + '.ok' in fileNamesSet:
-                        outFileName = testName + '.ok'
-                    else:
+                    print(testBase)
+
+                    outputFilename = None
+                    for ext in outputExtensions:
+                        if testBase + ext in testFilenameSet:
+                            outputFilename = testBase + ext
+                            break
+
+                    if not outputFilename:
                         continue
+
+                    print(outputFilename)
 
                     testCount += 1
 
@@ -119,10 +133,10 @@ class TestNew(PermissionRequiredMixin, View):
                     test.mem_limit  = form.cleaned_data['mem_limit']
                     test.score      = form.cleaned_data['score']
 
-                    with testsZip.open(inFileName, 'r') as inFile:
-                        test.stdin = inFile.read()
-                    with testsZip.open(outFileName, 'r') as outFile:
-                        test.stdout = outFile.read()
+                    with testsZip.open(inputFilename, 'r') as inputFile:
+                        test.stdin = inputFile.read()
+                    with testsZip.open(outputFilename, 'r') as outputFile:
+                        test.stdout = outputFile.read()
 
                     test.save()
 
