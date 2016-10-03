@@ -101,9 +101,13 @@ class Command(BaseCommand):
             scorePerTest = self.PROBLEM_SCORE / testCount
             Test.objects.filter(problem = problem).update(score = scorePerTest)
 
-    def add_problem(self, group, ind):
+    def add_problem(self, group, ind, options = {}):
         name = self.get_problem_name(group, ind)
         problem = Problem.objects.create(title = name.capitalize())
+
+        self.add_tests(problem, 
+                'download/{}/{}-{}/tests/'.format(group, ind, name))
+        problem.update_max_score()
 
         pdfLink = ''
         with open('download/{}{}.pdf'.format(group, str(ind)), 'rb') as pdf:
@@ -115,17 +119,20 @@ class Command(BaseCommand):
         problem.statement = '[PDF]({})'.format(media.media.url)
         problem.statement_language = Problem.MD
 
+        problem.tags.add(group, options['competition-date'][:4],
+                *options['tags'])
+
         problem.save()
 
-        self.add_tests(problem, 
-                'download/{}/{}-{}/tests/'.format(group, ind, name))
-        problem.update_max_score()
-
     def add_arguments(self, parser):
-        parser.add_argument('competition-date', type=str,
+        parser.add_argument('competition-date', type = str,
                 help = 'The date of the imported competition, in format \
                 yyyy-mm-dd. Used for generation of URL\'s at \
                 http://math.bas.bg/infos/')
+
+        parser.add_argument('--tags', dest = 'tags', type = str, nargs = '*',
+                help = 'Addititonal tags to be added to the problems. Useful \
+                for a competiton specific tag')
 
         parser.add_argument('--keep', dest = 'cleanup', action = 'store_false',
                 default = True, help = 'Use this option to keep the working \
@@ -141,7 +148,7 @@ class Command(BaseCommand):
         print('Adding problems...')
         for group in self.GROUPS:
             for i in range(1, self.PROBLEM_PER_GROUP + 1):
-                self.add_problem(group, i)
+                self.add_problem(group, i, options)
 
         if options['cleanup']:
             print('Cleaning up...')
