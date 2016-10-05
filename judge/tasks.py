@@ -14,7 +14,7 @@ from django.core.cache import cache
 from django.db import transaction
 
 from judge.models import Test, TestResult, TestGroupResult, Solution, \
-        UserProblemData, UserStatts
+        UserProblemData, UserStats
 
 sandbox = 'isolate'
 
@@ -226,7 +226,6 @@ def save_result(result, solution):
     except FileNotFoundError:
         pass
 
-
 @shared_task(ignore_result = True) 
 def retest_problem(problem):
     solutions = problem.solution_set.all()
@@ -246,4 +245,4 @@ def retest_problem(problem):
         for data in UPdata:
             data.max_score = 0
             data.save()
-            UserStatts.get_for_user(data.user).update_statts()
+            UserStats.get_for_user(data.user).update()

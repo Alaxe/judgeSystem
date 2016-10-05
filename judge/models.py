@@ -1,3 +1,5 @@
+import datetime
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
@@ -100,7 +102,8 @@ class Problem(models.Model):
     
 class Solution(models.Model):
     source = models.TextField()
-    submit_date = models.DateTimeField('Date of submition')
+    submit_date = models.DateTimeField('Date of submition', default =
+            timezone.now)
 
     grader_message = models.CharField(max_length = 32, default = 'In Queue')
 
@@ -157,13 +160,10 @@ class Solution(models.Model):
 
         self.save()
 
-        data = UserProblemData.objects.get(user = self.user, 
-            problem = self.problem)
-
-        data.update_score()
+        UserProblemData.get_for_user_problem(self.user, self.problem) \
+                       .update_score()
         
-        statts = UserStatts.get_for_user(self.user)
-        statts.update_statts()
+        UserStats.get_for_user(self.user).update()
 
 class TestGroup(models.Model):
     name = models.CharField('Name of test group', max_length = 32)
@@ -227,7 +227,17 @@ class UserProblemData(models.Model):
     problem = models.ForeignKey(Problem)
 
     max_score = models.DecimalField(default = 0, **score_field_kwargs)
-    last_submit = models.DateTimeField()
+    last_submit = models.DateTimeField(default = datetime.datetime(2000, 1, 1,
+            tzinfo = timezone.get_current_timezone()))
+
+    @staticmethod
+    def get_for_user_problem(user, problem):
+        try:
+            return UserProblemData.objects.get(user = user, problem = problem)
+        except UserProblemData.DoesNotExist:
+            res = UserProblemData.objects.create(user = user, problem = problem)
+            UserStats.get_for_user(user).update()
+            return res
 
     def update_score(self):
         solutions = Solution.objects.filter(user = self.user, 
@@ -238,7 +248,8 @@ class UserProblemData(models.Model):
     def __str__(self):
         return self.user.username + ' ' + self.problem.title + ' UPdata'
 
-class UserStatts(models.Model):
+
+class UserStats(models.Model):
     user = models.OneToOneField(User)
 
     solved_problems = models.IntegerField(default = 0)
@@ -250,12 +261,12 @@ class UserStatts(models.Model):
 
     @staticmethod
     def get_for_user(user):
-        if not hasattr(user, 'userstatts'):
-            return UserStatts.objects.create(user = user)
+        if not hasattr(user, 'userstats'):
+            return UserStats.objects.create(user = user)
         else:
-            return user.userstatts
+            return user.userstats
 
-    def update_statts(self):
+    def update(self):
         self.tried_problems = UserProblemData.objects.filter(
                                     user = self.user).count()
         self.solved_problems = UserProblemData.objects.filter(user = self.user,

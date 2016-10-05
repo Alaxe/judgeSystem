@@ -258,12 +258,12 @@ class UserDetails(LoginRequiredMixin, TemplateView):
         ]
         
         try:
-            from judge.models import UserStatts
-            userStatts = UserStatts.get_for_user(self.request.user)
+            from judge.models import UserStats
+            userStats = UserStats.get_for_user(self.request.user)
 
             details.extend([
-                ('Attempted problems', userStatts.tried_problems),
-                ('Solved problems', userStatts.solved_problems)
+                ('Attempted problems', userStats.tried_problems),
+                ('Solved problems', userStats.solved_problems)
             ])
         except ImportError:
             pass

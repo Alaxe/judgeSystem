@@ -11,7 +11,7 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect,\
 from django.views.generic import DetailView, View
 from django.utils import timezone
 
-from judge.models import Solution, Problem, UserProblemData, UserStatts
+from judge.models import Solution, Problem, UserProblemData, UserStats
 from judge.tasks import test_solution
 
 class MayViewSolutionMixin(UserPassesTestMixin):
@@ -73,30 +73,18 @@ class SolutionSubmit(LoginRequiredMixin, View):
         if not self.form.is_valid():
             return self.render(request)
 
-        try:
-            data = UserProblemData.objects.get(user = user,
-                                                problem = self.problem)
+        data = UserProblemData.get_for_user_problem(user, self.problem)
+        nextSubmit = data.last_submit + datetime.timedelta(seconds = 30)
 
-            nextSubmit = data.last_submit + datetime.timedelta(seconds = 30)
-
-            if nextSubmit > timezone.now():
-                timeLeft = nextSubmit - timezone.now()
-                messageText = 'You can submit a solution once every 30 seconds.\
-                    Try again in {0} seconds'. format(timeLeft.seconds)
-                messages.warning(request, messageText)
-                return self.render(request)
-
-            else:
-                data.last_submit = timezone.now()
-                data.save()
-
-        except UserProblemData.DoesNotExist:
-            data = UserProblemData(user = user,
-                                    problem = self.problem,
-                                    last_submit = timezone.now())
-
+        if nextSubmit > timezone.now():
+            timeLeft = nextSubmit - timezone.now()
+            messageText = 'You can submit a solution once every 30 seconds.\
+                Try again in {0} seconds'. format(timeLeft.seconds)
+            messages.warning(request, messageText)
+            return self.render(request)
+        else:
+            data.last_submit = timezone.now()
             data.save()
-            UserStatts.get_for_user(user).update_statts()
 
         source = self.form.cleaned_data['source']
         solution = Solution(
@@ -106,7 +94,6 @@ class SolutionSubmit(LoginRequiredMixin, View):
             problem = self.problem)
 
         solution.save()
-        
         test_solution.delay(solution)
 
         url = reverse('judge:solution_details', args = (solution.pk,))
