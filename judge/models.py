@@ -111,6 +111,21 @@ class Solution(models.Model):
     user = models.ForeignKey(User)
     score = models.DecimalField(max_digits = 8, decimal_places = 4, default = 0)
 
+    COMPILATION_PENDING = 'pending'
+    COMPILATION_SUCCEEDED = 'success'
+    COMPILATION_FAILED_SYNTAX = 'syntax'
+    COMPILATION_FAILED_TL = 'tl'
+    
+    COMPILATION_STATUS_CHOICES = (
+        (COMPILATION_PENDING, 'Not yet compiled'),
+        (COMPILATION_SUCCEEDED, 'Compilation successful'),
+        (COMPILATION_FAILED_SYNTAX, 'Compilation failed (syntax error)'),
+        (COMPILATION_FAILED_TL, 'Compilation failed (time limit exceeed'),
+    )
+    compilation_status = models.CharField('Compilation status', max_length = 8,
+        choices = COMPILATION_STATUS_CHOICES, default = COMPILATION_PENDING)
+ 
+
     class Meta:
         ordering = ['-submit_date']
         permissions = (

@@ -22,7 +22,7 @@ from django.views.generic import TemplateView, DetailView, View
 from media_manager.models import MediaFile
 
 from judge.models import Problem, Test, Solution, UserProblemData
-from judge.tasks import compile_program, test_solution, retest_problem
+from judge.tasks import test_solution, retest_problem
 
 class ProblemList(TemplateView):
     template_name = 'judge/problem_list.html'
@@ -372,7 +372,7 @@ class ProblemRetest(PermissionRequiredMixin, View):
     def post(self, request, pk):
         problem = get_object_or_404(Problem, pk = pk)
 
-        retest_problem.delay(problem)
+        retest_problem(problem).delay()
 
         messageText = "Solutions added to the queue."
         messages.add_message(request, messages.SUCCESS, messageText)

@@ -23,7 +23,6 @@ class MayViewSolutionMixin(UserPassesTestMixin):
             solution = get_object_or_404(Solution, pk = int(pk))
             return solution.user_id == self.request.user.id
 
-
 class SolutionDetails(MayViewSolutionMixin,View):
     template_name = 'judge/solution_details.html'
 
@@ -94,7 +93,7 @@ class SolutionSubmit(LoginRequiredMixin, View):
             problem = self.problem)
 
         solution.save()
-        test_solution.delay(solution)
+        test_solution(solution).delay()
 
         url = reverse('judge:solution_details', args = (solution.pk,))
         return HttpResponseRedirect(url)
