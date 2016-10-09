@@ -1,9 +1,10 @@
 from enum import Enum
 import os
 import math
-import urllib.request
 import shutil
 import subprocess
+from urllib.request import urlretrieve
+from urllib.error import HTTPError
 import zipfile
 
 from django.contrib.auth.models import User
@@ -24,46 +25,44 @@ class Command(BaseCommand):
         super(Command, self).__init__(*args, **kwargs)
 
         self.GROUPS = ['A', 'B', 'C', 'D', 'E']
-        #$self.GROUPS = ['C']
+        #self.GROUPS = ['D']
         self.PROBLEM_PER_GROUP = 3
         self.BASE_URL = 'http://www.math.bas.bg/infos/files/'
-
+        self.ROOT = 'infos-import'
 
         self.MEMORY_LIMIT = 128
         self.MAX_TIME_LIMIT = 2
         self.PROBLEM_SCORE = 100
 
     def cleanup(self):
-        shutil.rmtree('download', ignore_errors = True)
-        shutil.rmtree('task', ignore_errors = True)
+        shutil.rmtree(self.ROOT, ignore_errors = True)
 
     def setup_directories(self):
         self.cleanup()
 
-        os.makedirs('download')
-        os.makedirs('task')
+        os.makedirs(self.ROOT)
 
     def download_statements(self, dateStr):
         for group in self.GROUPS:
             for i in range(1, self.PROBLEM_PER_GROUP + 1):
                 filename = '{}{}.pdf'.format(group, str(i))
-                filepath = 'download/{}'.format(filename)
+                filepath = os.path.join(self.ROOT, filename)
 
                 url = '{}{}-{}'.format(self.BASE_URL, dateStr, filename)
 
-                urllib.request.urlretrieve(url, filename = filepath)
+                urlretrieve(url, filename = filepath)
 
     def download_tests(self, dateStr):
         for group in self.GROUPS:
-            filepath = 'download/{}-tests.zip'.format(group)
+            filepath = os.path.join(self.ROOT, '{}-tests.zip'.format(group))
             url = '{}{}-tests&authors-{}.zip'.format(self.BASE_URL, dateStr, group)
 
-            urllib.request.urlretrieve(url, filename = filepath)
+            urlretrieve(url, filename = filepath)
             with zipfile.ZipFile(filepath, 'r') as zipRef:
-                zipRef.extractall('download/')
+                zipRef.extractall(self.ROOT)
 
     def get_problem_name(self, group, ind):
-        for f in os.listdir(path = 'download/' + group):
+        for f in os.listdir(path = os.path.join(self.ROOT, group)):
             if f.startswith(str(ind) + '-'):
                 return f[2:]
 
@@ -150,7 +149,6 @@ class Command(BaseCommand):
 
         return minTime
 
-
     def determine_timelimit(self, problem, path, **options):
         print('Testing {}...'.format(problem.title))
 
@@ -170,17 +168,17 @@ class Command(BaseCommand):
 
         return time_limit
 
-
     def add_problem(self, group, ind, **options):
         name = self.get_problem_name(group, ind)
         problem = Problem.objects.create(title = name.capitalize())
-        path = 'download/{}/{}-{}'.format(group, ind, name)
+        path = os.path.join(self.ROOT, group, '{}-{}'.format(ind, name))
 
         self.add_tests(problem, os.path.join(path, 'tests'))
         problem.update_max_score()
 
         pdfLink = ''
-        with open('download/{}{}.pdf'.format(group, str(ind)), 'rb') as pdf:
+        pdfPath = os.path.join(self.ROOT, '{}{}.pdf'.format(group, str(ind)))
+        with open(pdfPath, 'rb') as pdf:
             media = MediaFile(content_object = problem, 
                     filename = '{}{}-statement.pdf'.format(group, str(ind)),
                     media = File(pdf))
@@ -269,18 +267,23 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.setup_directories()
-        #print(options['visibility'])
-        #return
 
         print('Downloading competition data...')
-        self.download_statements(options['competition-date'])
-        self.download_tests(options['competition-date'])
+        try:
+            self.download_statements(options['competition-date'])
+            self.download_tests(options['competition-date'])
 
-        print('Adding problems...')
-        for group in self.GROUPS:
-            for i in range(1, self.PROBLEM_PER_GROUP + 1):
-                self.add_problem(group, i, **options)
+            print('Adding problems...')
+            for group in self.GROUPS:
+                for i in range(1, self.PROBLEM_PER_GROUP + 1):
+                    self.add_problem(group, i, **options)
 
-        if options['cleanup']:
-            print('Cleaning up...')
-            self.cleanup()
+        except HTTPError as err:
+            print(err)
+            print('An error has occured while downloading the problems.')
+            print('Make sure you have provided a correct competition date.')
+
+        finally:
+            if options['cleanup']:
+                print('Cleaning up...')
+                self.cleanup()
