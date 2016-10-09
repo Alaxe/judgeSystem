@@ -1,3 +1,4 @@
+from enum import Enum
 import os
 import math
 import urllib.request
@@ -13,14 +14,20 @@ from judge.models import Problem, Solution, Test
 from judge.tasks import test_solution
 from media_manager.models import MediaFile
 
+class Visibility(Enum):
+    HIDDEN = 0
+    VISIBLE = 1
+    FORCE_VISIBLE = 2
+
 class Command(BaseCommand):
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
 
         self.GROUPS = ['A', 'B', 'C', 'D', 'E']
-        #self.GROUPS = ['C']
+        #$self.GROUPS = ['C']
         self.PROBLEM_PER_GROUP = 3
         self.BASE_URL = 'http://www.math.bas.bg/infos/files/'
+
 
         self.MEMORY_LIMIT = 128
         self.MAX_TIME_LIMIT = 2
@@ -180,7 +187,17 @@ class Command(BaseCommand):
             media.save()
 
         timelimit = self.determine_timelimit(problem, path, **options)
-        #timelimit = None
+
+
+        if options['visibility'] == Visibility.HIDDEN:
+            problem.visible = False
+        elif options['visibility'] == Visibility.FORCE_VISIBLE:
+            problem.visible = True
+        else:
+            problem.visible = (timelimit != None)
+
+        if not timelimit:
+            timelimit = self.MAX_TIME_LIMIT
 
         problem.statement = ('**Statement:** [PDF]({}) \n\n' + \
             '**Time limit**: {} s\n\n' + \
@@ -191,29 +208,69 @@ class Command(BaseCommand):
         problem.tags.add(group, options['competition-date'][:4],
                 *options['tags'])
 
-
         problem.save()
 
     def add_arguments(self, parser):
-        parser.add_argument('competition-date', type = str,
+        parser.add_argument('competition-date', 
+                type = str,
                 help = 'The date of the imported competition, in format \
-                yyyy-mm-dd. Used for generation of URL\'s at \
-                http://math.bas.bg/infos/')
+                        yyyy-mm-dd. Used for generation of URL\'s at \
+                        http://math.bas.bg/infos/ .'
+                )
 
-        parser.add_argument('--tags', dest = 'tags', type = str, nargs = '*',
-                default = [], help = 'Addititonal tags to be added to the \
-                problems. Useful for a competiton specific tag')
+        parser.add_argument('--tags', 
+                dest = 'tags', 
+                type = str, 
+                nargs = '*',
+                default = [], 
+                help = 'Addititonal tags to be added to the problems. Useful \
+                        for a competiton specific tag.'
+                )
 
-        parser.add_argument('--keep', dest = 'cleanup', action = 'store_false',
-                default = True, help = 'Use this option to keep the working \
-                files. (by default they\'re deleted)')
-        parser.add_argument('--user', dest = 'user', type = str,
-                default = 'infos', help = 'The user used when testing the \
-                author solutions. If the specified user doesn\'t exist, it \
-                they will be created')
+        parser.add_argument('--keep', 
+                dest = 'cleanup', 
+                action = 'store_false',
+                default = True, 
+                help = 'Use this option to keep the working files. (by \
+                        default they\'re deleted)'
+                )
+
+        parser.add_argument('--user', 
+                dest = 'user', 
+                type = str,
+                default = 'infos', 
+                help = 'The user used when testing the author solutions. If \
+                        the specified user doesn\'t exist, they will be \
+                        created.'
+                )
+
+        parser.add_argument('--hidden', 
+                dest = 'visibility', 
+                action = 'store_const', 
+                const = Visibility.HIDDEN,
+                default = Visibility.VISIBLE, 
+                help = 'All added problems are hidden. By default they are \
+                        vissible unless an error occurs.'
+                )
+        parser.add_argument('--visible',
+                dest = 'visibility',
+                action = 'store_const',
+                const = Visibility.VISIBLE,
+                default = Visibility.VISIBLE,
+                help = 'All added problems are visible, unless an error occurs. \
+                        This is the default behaviour.'
+                )
+        parser.add_argument('--force-visible',
+                dest = 'visibility',
+                action = 'store_const',
+                const = Visibility.FORCE_VISIBLE,
+                default = Visibility.VISIBLE,
+                help = 'All added problems are visible, even if errors occur.')
 
     def handle(self, *args, **options):
         self.setup_directories()
+        #print(options['visibility'])
+        #return
 
         print('Downloading competition data...')
         self.download_statements(options['competition-date'])
