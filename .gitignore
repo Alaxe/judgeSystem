@@ -2,6 +2,7 @@
 download
 task
 judgeSystem/settings.py
+judgeSystem/sens.py
 localDB
 db.sqlite3
 *.swp

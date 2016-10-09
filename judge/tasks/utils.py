@@ -1,4 +1,4 @@
-from celery import chain, group
+from celery import group
 from django.db import transaction
 
 from judge.models import Test, UserProblemData, UserStats
@@ -22,10 +22,7 @@ def test_solution(solution):
 
     saveTask = SaveResults().s(solution)
 
-    return chain(compileTask, group(testTasks), saveTask)
-    #res = chord(group(taskList), save_result.s(solution))
-    #res.apply_async()
-   
+    return (compileTask | group(testTasks) | saveTask)
 
 def retest_problem(problem):
     solutions = problem.solution_set.all()
