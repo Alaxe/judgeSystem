@@ -22,7 +22,7 @@ from django.views.generic import TemplateView, DetailView, View
 from media_manager.models import MediaFile
 
 from judge.models import Problem, Test, Solution, UserProblemData
-from judge.tasks import test_solution, retest_problem
+from judge.tasks import test_solution, retest_problem, compile_program
 
 class ProblemList(TemplateView):
     template_name = 'judge/problem_list.html'
@@ -291,7 +291,8 @@ class ProblemGrading(PermissionRequiredMixin, View):
 
         if problem.custom_checker:
             name = form.cleaned_data.get('customChecker').name
-            grader = settings.BASE_DIR + '/judge/graders/' + str(problem.pk)
+            grader = os.path.join(settings.BASE_DIR, 'judge/graders',
+                    str(problem.pk))
 
             if name.endswith('.cpp'):
                 with open(grader + '.cpp', 'wb') as dest:

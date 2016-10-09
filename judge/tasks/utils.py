@@ -1,48 +1,44 @@
-from celery import group
-from django.db import transaction
+import os
+import signal
+import subprocess
 
-from judge.models import Test, UserProblemData, UserStats
+from billiard import current_process
+from django.conf import settings
 
-from judge.tasks.compile_solution import CompileSolution
-from judge.tasks.run_test import RunTest
-from judge.tasks.save_results import SaveResults
+from judge.models import Solution
 
-   
-def test_solution(solution):
-    solution.grader_message = 'Testing'
-    solution.save()
+SOLUTION_ROOT = settings.BASE_DIR +'/judge/solutions'
+GRADER_ROOT = settings.BASE_DIR + '/judge/graders' 
 
-    compileTask = CompileSolution().si(solution)
+SANDBOX = 'isolate'
+SANDBOX_ROOT ='/var/local/lib/isolate' 
 
+def get_box_id():
+    return current_process().index
 
-    tests = Test.objects.filter(problem_id = solution.problem_id)
-    testTasks = []
-    for t in tests:
-        testTasks.append(RunTest().si(solution.id, t.id))
+def get_sol_path(solution_id):
+    return os.path.join(SOLUTION_ROOT, str(solution_id))
 
-    saveTask = SaveResults().s(solution)
+def get_box_path():
+    return os.path.join(SANDBOX_ROOT, str(get_box_id()), 'box')
 
-    return (compileTask | group(testTasks) | saveTask)
+def get_grader_path(problem):
+    return os.path.join(GRADER_ROOT, str(problem.pk))
 
-def retest_problem(problem):
-    solutions = problem.solution_set.all()
+def init_box():
+    subprocess.call([SANDBOX, '-b', str(get_box_id()), '--init'])
 
-    tasks = []
-    with transaction.atomic():
-        UPdata = UserProblemData.objects.filter(problem = problem)
+def compile_program(sourcePath, destPath):
+    compileArgs = ['g++', '-O2', '--std=c++11', '-o', destPath, sourcePath]
 
-        for sol in solutions:
-            sol.testresult_set.all().delete()
-            sol.testgroupresult_set.all().delete()
-            sol.score = 0
-            sol.grader_message = 'In Queue'
-            sol.save()
+    try:
+        proc = subprocess.Popen(compileArgs, preexec_fn = os.setsid)
 
-            tasks.append(test_solution(sol))
+        if proc.wait(timeout = settings.JUDGE_COMPILE_TL) == 0:
+            return Solution.COMPILATION_SUCCEEDED
+        else:
+            return Solution.COMPILATION_FAILED_SYNTAX
 
-        for data in UPdata:
-            data.max_score = 0
-            data.save()
-            UserStats.get_for_user(data.user).update()
-
-    return group(tasks)
+    except subprocess.TimeoutExpired as e:
+        os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+        return Solution.COMPILATION_FAILED_TL

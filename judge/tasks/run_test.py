@@ -3,7 +3,7 @@ import subprocess
 
 from celery import Task
 
-from ._private import init_box, get_box_id, get_box_path, get_grader_path, \
+from .utils import init_box, get_box_id, get_box_path, get_grader_path, \
         get_sol_path, SANDBOX
 from judge.models import Test, TestResult
 

@@ -4,7 +4,7 @@ from celery import Task
 from django.db import transaction
 
 from judge.models import TestGroupResult, TestResult, Solution
-from ._private import get_sol_path
+from .utils import get_sol_path
 
 class SaveResults(Task):
     def save_result_objects(self, results, solution):
