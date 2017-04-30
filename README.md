@@ -1,14 +1,14 @@
 # judgeSystem
 A python/django based system for testing c/c++ solutions to algoritmic problems
 
-##What it does now:
+## What it does now:
 * Basic Login/register funtionality
 * Task/test editing
 * Testing solutions
 * A simple blog
 * Searching by tags
 
-##Required software:
+## Required software:
 * A linux distribution (tested on Arch and Ubuntu)
 * Python 3 (tested  with 3.5)
 * Python modules: view requirements.txt
@@ -17,7 +17,7 @@ A python/django based system for testing c/c++ solutions to algoritmic problems
 * rabbitmq
 * [isolate sandbox][isolate]
 
-##How to install:
+## How to install:
 1. Clone the repository `git clone https://github.com/Alaxe/judgesystem.git`
 2. (Optional) install [virtualenv][virtualenv] ([guide][virtualenv_guide])
 3. Setup settings `judgeSystem/settings.py`
@@ -64,7 +64,7 @@ A python/django based system for testing c/c++ solutions to algoritmic problems
   * Control it with `sudo systemctl (start|stop|restart) judge-celery` and make
       it auto-start with `sudo systemctl enable judge-celery`
 
-##How to run:
+## How to run:
   * Web server
       * If you installed a nginx it should be running as a service
       * For the development servere`python manage.py runserver` (you can add a `url:port` pair as a
